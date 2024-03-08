@@ -112,7 +112,7 @@ int main() {
 
   while (!glfwWindowShouldClose(window)) {
     glClear(GL_COLOR_BUFFER_BIT);
-    glClearColor(0.05, 0.1, 0.05, 1);
+    glClearColor(0.1, 0.1, 0.1, 1);
 
     const float ratio = width / (float)height;
 
