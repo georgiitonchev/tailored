@@ -8,7 +8,6 @@ SRC_DIR = src
 MKDIR_P = mkdir -p
 
 SRCS = $(wildcard $(SRC_DIR)/*.c)
-OBJS = $(SRCS:$(SRC_DIR)/%.c)
 
 all: $(BUILD_DIR)/tailored
 

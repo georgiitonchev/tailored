@@ -16,26 +16,6 @@ static const Vertex vertices[3] = {{{-0.6f, -0.4f}, {1.f, 0.f, 0.f}},
                                    {{0.6f, -0.4f}, {0.f, 1.f, 0.f}},
                                    {{0.f, 0.6f}, {0.f, 0.f, 1.f}}};
 
-static const char *vertex_shader_text =
-    "#version 330\n"
-    "uniform mat4 MVP;\n"
-    "in vec3 vCol;\n"
-    "in vec2 vPos;\n"
-    "out vec3 color;\n"
-    "void main()\n"
-    "{\n"
-    "    gl_Position = MVP * vec4(vPos, 0.0, 1.0);\n"
-    "    color = vCol;\n"
-    "}\n";
-
-static const char *fragment_shader_text = "#version 330\n"
-                                          "in vec3 color;\n"
-                                          "out vec4 fragment;\n"
-                                          "void main()\n"
-                                          "{\n"
-                                          "    fragment = vec4(color, 1.0);\n"
-                                          "}\n";
-
 int main() {
   printf("Hello, World!\n");
   printf("Initializing GLFW...\n");
@@ -47,6 +27,7 @@ int main() {
 
   printf("GLFW initialized succesfully.\n");
 
+  glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -72,7 +53,7 @@ int main() {
     exit(EXIT_FAILURE);
   }
 
-  printf("GLAD initialized successfuly.\n");
+  printf("GLAD initialized successsfuly.\n");
 
   int width, height;
   glfwGetFramebufferSize(window, &width, &height);
@@ -83,13 +64,71 @@ int main() {
   glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
+  // read vertex shader file
+  char *vertex_shader_text;
+
+  FILE *file_pointer = fopen("./res/shaders/shader.vs", "rb");
+  long file_size;
+
+  if (file_pointer == NULL) {
+    perror("./res/shaders/shader.vs");
+    exit(EXIT_FAILURE);
+  }
+
+  fseek(file_pointer, 0, SEEK_END);
+  file_size = ftell(file_pointer);
+  rewind(file_pointer);
+
+  vertex_shader_text = (char *)malloc(file_size * sizeof(char));
+
+  // Read file contents into the buffer
+  fread(vertex_shader_text, sizeof(char), file_size, file_pointer);
+
+  // Add null terminator at the end to make it a valid C string
+  vertex_shader_text[file_size] = '\0';
+
+  // Close the file
+  fclose(file_pointer);
+
+  // Free allocated memory
+  const char *const vsb = vertex_shader_text;
   const GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-  glShaderSource(vertex_shader, 1, &vertex_shader_text, NULL);
+  glShaderSource(vertex_shader, 1, &vsb, NULL);
   glCompileShader(vertex_shader);
 
+  free(vertex_shader_text);
+
+  char *fragment_shader_text;
+
+  file_pointer = fopen("./res/shaders/shader.fs", "rb");
+
+  if (file_pointer == NULL) {
+    perror("./res/shaders/shader.fs");
+    exit(EXIT_FAILURE);
+  }
+
+  fseek(file_pointer, 0, SEEK_END);
+  file_size = ftell(file_pointer);
+  rewind(file_pointer);
+
+  fragment_shader_text = (char *)malloc(file_size * sizeof(char));
+
+  // Read file contents into the buffer
+  fread(fragment_shader_text, sizeof(char), file_size, file_pointer);
+
+  // Add null terminator at the end to make it a valid C string
+  fragment_shader_text[file_size] = '\0';
+
+  // Close the file
+  fclose(file_pointer);
+
+  const char *const fsv = fragment_shader_text;
+
   const GLuint fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(fragment_shader, 1, &fragment_shader_text, NULL);
+  glShaderSource(fragment_shader, 1, &fsv, NULL);
   glCompileShader(fragment_shader);
+
+  free(fragment_shader_text);
 
   const GLuint program = glCreateProgram();
   glAttachShader(program, vertex_shader);
@@ -112,7 +151,7 @@ int main() {
 
   while (!glfwWindowShouldClose(window)) {
     glClear(GL_COLOR_BUFFER_BIT);
-    glClearColor(0.1, 0.1, 0.1, 1);
+    glClearColor(36.0 / 255, 10.0 / 255, 52.0 / 255, 1);
 
     const float ratio = width / (float)height;
 
@@ -124,7 +163,7 @@ int main() {
 
     glUseProgram(program);
     glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat *)&mvp);
-    glBindVertexArray(vertex_array);
+    // glBindVertexArray(vertex_array);
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
     glfwSwapBuffers(window);
