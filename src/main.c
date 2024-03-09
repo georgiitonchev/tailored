@@ -154,7 +154,7 @@ unsigned int create_vertex_array_object() {
   return vertex_array_object;
 }
 
-unsigned int create_texture() {
+unsigned int create_texture_a() {
   int width, height, channels;
   unsigned char *data =
       stbi_load("./res/textures/container.jpg", &width, &height, &channels, 0);
@@ -172,6 +172,31 @@ unsigned int create_texture() {
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
                GL_UNSIGNED_BYTE, data);
   glGenerateMipmap(GL_TEXTURE_2D);
+
+  stbi_image_free(data);
+
+  return texture;
+}
+
+unsigned int create_texture_b() {
+  int width, height, channels;
+  unsigned char *data = stbi_load("./res/textures/awesomeface.png", &width,
+                                  &height, &channels, 0);
+  unsigned int texture;
+  glGenTextures(1, &texture);
+  glBindTexture(GL_TEXTURE_2D, texture);
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                  GL_LINEAR_MIPMAP_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+  if (data) {
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA,
+                 GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+  }
 
   stbi_image_free(data);
 
@@ -225,17 +250,28 @@ int main() {
 
   unsigned int shader_program = create_shader_program();
   unsigned int vertex_array_object = create_vertex_array_object();
-  unsigned int texture = create_texture();
+
+  stbi_set_flip_vertically_on_load(1);
+  unsigned int texture_a = create_texture_a();
+  unsigned int texture_b = create_texture_b();
   // uncomment this call to draw in wireframe polygons.
   // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+  glUseProgram(shader_program);
+  glUniform1i(glGetUniformLocation(shader_program, "u_texture_a"), 0);
+  glUniform1i(glGetUniformLocation(shader_program, "u_texture_b"), 1);
 
   while (!glfwWindowShouldClose(window)) {
     glClear(GL_COLOR_BUFFER_BIT);
     glClearColor(36.0 / 255, 10.0 / 255, 52.0 / 255, 1);
 
     // draw our first triangle
-    glUseProgram(shader_program);
-    glBindTexture(GL_TEXTURE_2D, texture);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture_a);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, texture_b);
+
     glBindVertexArray(vertex_array_object);
     // glDrawArrays(GL_TRIANGLES, 0, 3); //also works, but ignores elements
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);

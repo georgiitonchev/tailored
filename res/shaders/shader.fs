@@ -5,8 +5,9 @@ in vec2 tex_coord;
 
 out vec4 fragment;
 
-uniform sampler2D u_texture;
+uniform sampler2D u_texture_a;
+uniform sampler2D u_texture_b;
 
 void main(){
-    fragment = texture(u_texture, tex_coord);
+    fragment = mix(texture(u_texture_a, tex_coord), texture(u_texture_b, tex_coord), 0.2);
 }
