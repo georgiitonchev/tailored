@@ -1,12 +1,37 @@
 #version 330 core
 
-in vec2 tex_coord;
+in vec3 normal;
+in vec3 frag_pos;
 
 out vec4 fragment;
 
-uniform sampler2D u_texture_a;
-uniform sampler2D u_texture_b;
+uniform vec3 u_object_color;
+uniform vec3 u_light_color;
+
+uniform vec3 u_light_pos;
+uniform vec3 u_cam_pos;
+
+uniform sampler2D u_texture;
+
 
 void main(){
-    fragment = mix(texture(u_texture_a, tex_coord), texture(u_texture_b, tex_coord), 0.2);
+
+    float ambient_strength = 0.1;
+    vec3 ambient = ambient_strength * u_light_color;
+
+    vec3 norm = normalize(normal);
+    vec3 light_dir = normalize(u_light_pos - frag_pos);
+
+    float diff = max(dot(norm, light_dir), 0.0);
+    vec3 diffuse = diff * u_light_color;
+
+    float specular_strength = 0.5;
+    vec3 view_dir = normalize(u_cam_pos - frag_pos);
+    vec3 reflect_dir = reflect(-light_dir, norm);
+
+    float spec = pow(max(dot(view_dir, reflect_dir), 0.0), 32);
+    vec3 specular = specular_strength * spec * u_light_color;
+
+    vec3 result = (ambient + diffuse + specular) * u_object_color;
+    fragment = vec4(result, 1);
 }

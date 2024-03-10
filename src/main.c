@@ -1,3 +1,4 @@
+#include <OpenGL/OpenGL.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -14,7 +15,7 @@
 const unsigned int WINDOW_WIDTH = 640;
 const unsigned int WINDOW_HEIGHT = 360;
 
-void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos);
+void cursor_pos_callback(GLFWwindow *window, double xpos, double ypos);
 void process_input(GLFWwindow *window);
 
 const char *read_file(const char *path) {
@@ -100,38 +101,38 @@ unsigned int create_shader_program() {
 }
 
 unsigned int create_vertex_array_object() {
-  // set up vertex data (and buffer(s)) and configure vertex attributes
-  // ------------------------------------------------------------------
+
   float vertices[] = {
-      -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.5f,  -0.5f, -0.5f, 1.0f, 0.0f,
-      0.5f,  0.5f,  -0.5f, 1.0f, 1.0f, 0.5f,  0.5f,  -0.5f, 1.0f, 1.0f,
-      -0.5f, 0.5f,  -0.5f, 0.0f, 1.0f, -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
+      -0.5f, -0.5f, -0.5f, 0.0f,  0.0f,  -1.0f, 0.5f,  -0.5f, -0.5f,
+      0.0f,  0.0f,  -1.0f, 0.5f,  0.5f,  -0.5f, 0.0f,  0.0f,  -1.0f,
+      0.5f,  0.5f,  -0.5f, 0.0f,  0.0f,  -1.0f, -0.5f, 0.5f,  -0.5f,
+      0.0f,  0.0f,  -1.0f, -0.5f, -0.5f, -0.5f, 0.0f,  0.0f,  -1.0f,
 
-      -0.5f, -0.5f, 0.5f,  0.0f, 0.0f, 0.5f,  -0.5f, 0.5f,  1.0f, 0.0f,
-      0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-      -0.5f, 0.5f,  0.5f,  0.0f, 1.0f, -0.5f, -0.5f, 0.5f,  0.0f, 0.0f,
+      -0.5f, -0.5f, 0.5f,  0.0f,  0.0f,  1.0f,  0.5f,  -0.5f, 0.5f,
+      0.0f,  0.0f,  1.0f,  0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+      0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  -0.5f, 0.5f,  0.5f,
+      0.0f,  0.0f,  1.0f,  -0.5f, -0.5f, 0.5f,  0.0f,  0.0f,  1.0f,
 
-      -0.5f, 0.5f,  0.5f,  1.0f, 0.0f, -0.5f, 0.5f,  -0.5f, 1.0f, 1.0f,
-      -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-      -0.5f, -0.5f, 0.5f,  0.0f, 0.0f, -0.5f, 0.5f,  0.5f,  1.0f, 0.0f,
+      -0.5f, 0.5f,  0.5f,  -1.0f, 0.0f,  0.0f,  -0.5f, 0.5f,  -0.5f,
+      -1.0f, 0.0f,  0.0f,  -0.5f, -0.5f, -0.5f, -1.0f, 0.0f,  0.0f,
+      -0.5f, -0.5f, -0.5f, -1.0f, 0.0f,  0.0f,  -0.5f, -0.5f, 0.5f,
+      -1.0f, 0.0f,  0.0f,  -0.5f, 0.5f,  0.5f,  -1.0f, 0.0f,  0.0f,
 
-      0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.5f,  0.5f,  -0.5f, 1.0f, 1.0f,
-      0.5f,  -0.5f, -0.5f, 0.0f, 1.0f, 0.5f,  -0.5f, -0.5f, 0.0f, 1.0f,
-      0.5f,  -0.5f, 0.5f,  0.0f, 0.0f, 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+      0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.5f,  0.5f,  -0.5f,
+      1.0f,  0.0f,  0.0f,  0.5f,  -0.5f, -0.5f, 1.0f,  0.0f,  0.0f,
+      0.5f,  -0.5f, -0.5f, 1.0f,  0.0f,  0.0f,  0.5f,  -0.5f, 0.5f,
+      1.0f,  0.0f,  0.0f,  0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
 
-      -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.5f,  -0.5f, -0.5f, 1.0f, 1.0f,
-      0.5f,  -0.5f, 0.5f,  1.0f, 0.0f, 0.5f,  -0.5f, 0.5f,  1.0f, 0.0f,
-      -0.5f, -0.5f, 0.5f,  0.0f, 0.0f, -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+      -0.5f, -0.5f, -0.5f, 0.0f,  -1.0f, 0.0f,  0.5f,  -0.5f, -0.5f,
+      0.0f,  -1.0f, 0.0f,  0.5f,  -0.5f, 0.5f,  0.0f,  -1.0f, 0.0f,
+      0.5f,  -0.5f, 0.5f,  0.0f,  -1.0f, 0.0f,  -0.5f, -0.5f, 0.5f,
+      0.0f,  -1.0f, 0.0f,  -0.5f, -0.5f, -0.5f, 0.0f,  -1.0f, 0.0f,
 
-      -0.5f, 0.5f,  -0.5f, 0.0f, 1.0f, 0.5f,  0.5f,  -0.5f, 1.0f, 1.0f,
-      0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-      -0.5f, 0.5f,  0.5f,  0.0f, 0.0f, -0.5f, 0.5f,  -0.5f, 0.0f, 1.0f};
+      -0.5f, 0.5f,  -0.5f, 0.0f,  1.0f,  0.0f,  0.5f,  0.5f,  -0.5f,
+      0.0f,  1.0f,  0.0f,  0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+      0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  -0.5f, 0.5f,  0.5f,
+      0.0f,  1.0f,  0.0f,  -0.5f, 0.5f,  -0.5f, 0.0f,  1.0f,  0.0f};
 
-  unsigned int indices[] = {
-      // note that we start from 0!
-      0, 1, 3, // first Triangle
-      1, 2, 3  // second Triangle
-  };
   unsigned int vertex_buffer_object, vertex_array_object, element_array_object;
   glGenVertexArrays(1, &vertex_array_object);
   glGenBuffers(1, &vertex_buffer_object);
@@ -143,14 +144,10 @@ unsigned int create_vertex_array_object() {
   glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_object);
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, element_array_object);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
-               GL_STATIC_DRAW);
-
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(0);
 
-  glVertexAttribPointer(1, 2, GL_FLOAT, GL_TRUE, 5 * sizeof(float),
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_TRUE, 6 * sizeof(float),
                         (void *)(3 * sizeof(float)));
   glEnableVertexAttribArray(1);
 
@@ -224,6 +221,8 @@ vec3 cam_pos = {0, 0, 3};
 vec3 cam_dir = {0, 0, -1};
 vec3 cam_up = {0, 1, 0};
 
+vec3 light_pos = {1.2f, 1.0f, 2.0f};
+
 float delta_time;
 float last_frame_time;
 
@@ -259,8 +258,8 @@ int main() {
   printf("GLFW window created successfuly.\n");
 
   glfwMakeContextCurrent(window);
-  glfwSetCursorPosCallback(window, cursor_pos_callback);
-  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+  // glfwSetCursorPosCallback(window, cursor_pos_callback);
+  // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
   printf("Initializing GLAD...\n");
 
@@ -282,18 +281,17 @@ int main() {
   unsigned int vertex_array_object = create_vertex_array_object();
 
   stbi_set_flip_vertically_on_load(1);
-  unsigned int texture_a = create_texture_a();
-  unsigned int texture_b = create_texture_b();
+  unsigned int u_texture = create_texture_a();
 
   glUseProgram(shader_program);
-  glUniform1i(glGetUniformLocation(shader_program, "u_texture_a"), 0);
-  glUniform1i(glGetUniformLocation(shader_program, "u_texture_b"), 1);
+  glUniform1i(glGetUniformLocation(shader_program, "u_texture"), 0);
+  glUniform3fv(glGetUniformLocation(shader_program, "u_object_color"), 1,
+               (vec3){1, 0.5f, 0.3f});
 
-  vec3 cube_positions[] = {{0.0f, 0.0f, 0.0f},    {2.0f, 5.0f, -15.0f},
-                           {-1.5f, -2.2f, -2.5f}, {-3.8f, -2.0f, -12.3f},
-                           {2.4f, -0.4f, -3.5f},  {-1.7f, 3.0f, -7.5f},
-                           {1.3f, -2.0f, -2.5f},  {1.5f, 2.0f, -2.5f},
-                           {1.5f, 0.2f, -1.5f},   {-1.3f, 1.0f, -1.5f}};
+  glUniform3fv(glGetUniformLocation(shader_program, "u_light_color"), 1,
+               (vec3){1, 1, 1});
+  glUniform3fv(glGetUniformLocation(shader_program, "u_light_pos"), 1,
+               light_pos);
 
   glEnable(GL_DEPTH_TEST);
   while (!glfwWindowShouldClose(window)) {
@@ -316,26 +314,24 @@ int main() {
     glm_perspective(glm_rad(45.0f), ratio, .1f, 100.0f, mat_projection);
     // glm_ortho_default(ratio, mat_projection);
 
+    mat4 mat_model = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}};
+    glm_rotate(mat_model, (float)glfwGetTime(), (vec3){0, 0.6f, 0.3f});
+    glUniformMatrix4fv(glGetUniformLocation(shader_program, "u_model"), 1,
+                       GL_FALSE, (float *)mat_model);
+
     glUniformMatrix4fv(glGetUniformLocation(shader_program, "u_view"), 1,
                        GL_FALSE, (float *)mat_view);
     glUniformMatrix4fv(glGetUniformLocation(shader_program, "u_projection"), 1,
                        GL_FALSE, (float *)mat_projection);
 
+    glUniform3fv(glGetUniformLocation(shader_program, "u_cam_pos"), 1, cam_pos);
+
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture_a);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, texture_b);
+    glBindTexture(GL_TEXTURE_2D, u_texture);
 
     glBindVertexArray(vertex_array_object);
 
-    for (unsigned int i = 0; i < 10; i++) {
-      mat4 mat_model = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}};
-      glm_translate(mat_model, cube_positions[i]);
-
-      glUniformMatrix4fv(glGetUniformLocation(shader_program, "u_model"), 1,
-                         GL_FALSE, (float *)mat_model);
-      glDrawArrays(GL_TRIANGLES, 0, 36);
-    }
+    glDrawArrays(GL_TRIANGLES, 0, 36);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
@@ -381,32 +377,31 @@ void process_input(GLFWwindow *window) {
 float yaw;
 float pitch;
 
-void cursor_pos_callback(GLFWwindow* window, double xposIn, double yposIn)
-{
-    float xpos = (float)xposIn;
-    float ypos = (float)yposIn;
+void cursor_pos_callback(GLFWwindow *window, double xposIn, double yposIn) {
+  float xpos = (float)xposIn;
+  float ypos = (float)yposIn;
 
-    float xoffset = xpos - mouse_last_x;
-    float yoffset = mouse_last_y - ypos; // reversed since y-coordinates go from bottom to top
-    mouse_last_x = xpos;
-    mouse_last_y = ypos;
+  float xoffset = xpos - mouse_last_x;
+  float yoffset =
+      mouse_last_y - ypos; // reversed since y-coordinates go from bottom to top
+  mouse_last_x = xpos;
+  mouse_last_y = ypos;
 
-    float sensitivity = 0.1f; // change this value to your liking
-    xoffset *= sensitivity;
-    yoffset *= sensitivity;
+  float sensitivity = 0.1f; // change this value to your liking
+  xoffset *= sensitivity;
+  yoffset *= sensitivity;
 
-    yaw += xoffset;
-    pitch += yoffset;
+  yaw += xoffset;
+  pitch += yoffset;
 
-    // make sure that when pitch is out of bounds, screen doesn't get flipped
-    if (pitch > 89.0f)
-        pitch = 89.0f;
-    if (pitch < -89.0f)
-        pitch = -89.0f;
+  // make sure that when pitch is out of bounds, screen doesn't get flipped
+  if (pitch > 89.0f)
+    pitch = 89.0f;
+  if (pitch < -89.0f)
+    pitch = -89.0f;
 
-    cam_dir[0] = cos(glm_rad(yaw)) * cos (glm_rad(pitch));
-    cam_dir[1] = sin(glm_rad(pitch));
-    cam_dir[2] = sin(glm_rad(yaw)) * cos(glm_rad(pitch));
-    glm_normalize(cam_dir);
+  cam_dir[0] = cos(glm_rad(yaw)) * cos(glm_rad(pitch));
+  cam_dir[1] = sin(glm_rad(pitch));
+  cam_dir[2] = sin(glm_rad(yaw)) * cos(glm_rad(pitch));
+  glm_normalize(cam_dir);
 }
-

@@ -8,7 +8,7 @@ LIB_DIRS = -L./dep/libs/GLFW
 
 LIBS_MAC = -lglfw.3 -framework OpenGL
 LIBS_WINDOWS = -lglfw3dll -lopengl32
-LIBS_LINUX = -lglfw3
+LIBS_LINUX =
 
 CMDS_MAC = install_name_tool -add_rpath @executable_path $(BUILD_DIR)/tailored
 
