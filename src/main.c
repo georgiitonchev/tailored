@@ -1,4 +1,3 @@
-#include <OpenGL/OpenGL.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -11,6 +10,8 @@
 #include "../dep/include/stb/stb_image.h"
 // MATH
 #include "../dep/include/cglm/cglm.h"
+
+// make chang
 
 const unsigned int WINDOW_WIDTH = 640;
 const unsigned int WINDOW_HEIGHT = 360;
@@ -101,12 +102,29 @@ unsigned int create_vertex_array_object() {
   // set up vertex data (and buffer(s)) and configure vertex attributes
   // ------------------------------------------------------------------
   float vertices[] = {
-      // positions          // colors           // texture coords
-      0.5f,  0.5f,  0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, // top right
-      0.5f,  -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // bottom right
-      -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom left
-      -0.5f, 0.5f,  0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f  // top left
-  };
+      -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.5f,  -0.5f, -0.5f, 1.0f, 0.0f,
+      0.5f,  0.5f,  -0.5f, 1.0f, 1.0f, 0.5f,  0.5f,  -0.5f, 1.0f, 1.0f,
+      -0.5f, 0.5f,  -0.5f, 0.0f, 1.0f, -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
+
+      -0.5f, -0.5f, 0.5f,  0.0f, 0.0f, 0.5f,  -0.5f, 0.5f,  1.0f, 0.0f,
+      0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+      -0.5f, 0.5f,  0.5f,  0.0f, 1.0f, -0.5f, -0.5f, 0.5f,  0.0f, 0.0f,
+
+      -0.5f, 0.5f,  0.5f,  1.0f, 0.0f, -0.5f, 0.5f,  -0.5f, 1.0f, 1.0f,
+      -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+      -0.5f, -0.5f, 0.5f,  0.0f, 0.0f, -0.5f, 0.5f,  0.5f,  1.0f, 0.0f,
+
+      0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.5f,  0.5f,  -0.5f, 1.0f, 1.0f,
+      0.5f,  -0.5f, -0.5f, 0.0f, 1.0f, 0.5f,  -0.5f, -0.5f, 0.0f, 1.0f,
+      0.5f,  -0.5f, 0.5f,  0.0f, 0.0f, 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+      -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.5f,  -0.5f, -0.5f, 1.0f, 1.0f,
+      0.5f,  -0.5f, 0.5f,  1.0f, 0.0f, 0.5f,  -0.5f, 0.5f,  1.0f, 0.0f,
+      -0.5f, -0.5f, 0.5f,  0.0f, 0.0f, -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+
+      -0.5f, 0.5f,  -0.5f, 0.0f, 1.0f, 0.5f,  0.5f,  -0.5f, 1.0f, 1.0f,
+      0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+      -0.5f, 0.5f,  0.5f,  0.0f, 0.0f, -0.5f, 0.5f,  -0.5f, 0.0f, 1.0f};
 
   unsigned int indices[] = {
       // note that we start from 0!
@@ -128,16 +146,13 @@ unsigned int create_vertex_array_object() {
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
                GL_STATIC_DRAW);
 
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(0);
 
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_TRUE, 8 * sizeof(float),
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_TRUE, 5 * sizeof(float),
                         (void *)(3 * sizeof(float)));
   glEnableVertexAttribArray(1);
 
-  glVertexAttribPointer(2, 2, GL_FLOAT, GL_TRUE, 8 * sizeof(float),
-                        (void *)(6 * sizeof(float)));
-  glEnableVertexAttribArray(2);
   // note that this is allowed, the call to glVertexAttribPointer registered VBO
   // as the vertex attribute's bound vertex buffer object so afterwards we can
   // safely unbind
@@ -224,10 +239,6 @@ int main() {
   GLFWwindow *window =
       glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Tailored", NULL, NULL);
 
-  mat4 m = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}};
-
-  glm_translate(m, (vec3){1.0f, 0.0f, 0.0f});
-
   if (!window) {
     printf("Failed to create a GLFW window.\n");
     glfwTerminate();
@@ -252,6 +263,7 @@ int main() {
   int width, height;
   glfwGetFramebufferSize(window, &width, &height);
   glViewport(0, 0, width, height);
+  const float ratio = width / (float)height;
 
   unsigned int shader_program = create_shader_program();
   unsigned int vertex_array_object = create_vertex_array_object();
@@ -264,11 +276,32 @@ int main() {
   glUniform1i(glGetUniformLocation(shader_program, "u_texture_a"), 0);
   glUniform1i(glGetUniformLocation(shader_program, "u_texture_b"), 1);
 
+  vec3 cube_positions[] = {{0.0f, 0.0f, 0.0f},    {2.0f, 5.0f, -15.0f},
+                           {-1.5f, -2.2f, -2.5f}, {-3.8f, -2.0f, -12.3f},
+                           {2.4f, -0.4f, -3.5f},  {-1.7f, 3.0f, -7.5f},
+                           {1.3f, -2.0f, -2.5f},  {1.5f, 2.0f, -2.5f},
+                           {1.5f, 0.2f, -1.5f},   {-1.3f, 1.0f, -1.5f}};
+
+  glEnable(GL_DEPTH_TEST);
   while (!glfwWindowShouldClose(window)) {
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(36.0 / 255, 10.0 / 255, 52.0 / 255, 1);
 
-    // draw our first triangle
+    // identity matrix
+
+    mat4 mat_view = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}};
+    glm_translate(mat_view, (vec3){0, 0, -3});
+
+    mat4 mat_projection = {
+        {1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}};
+
+    glm_perspective(glm_rad(45.0f), ratio, .1f, 100.0f, mat_projection);
+    // glm_ortho_default(ratio, mat_projection);
+
+    glUniformMatrix4fv(glGetUniformLocation(shader_program, "u_view"), 1,
+                       GL_FALSE, (float *)mat_view);
+    glUniformMatrix4fv(glGetUniformLocation(shader_program, "u_projection"), 1,
+                       GL_FALSE, (float *)mat_projection);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture_a);
@@ -276,8 +309,20 @@ int main() {
     glBindTexture(GL_TEXTURE_2D, texture_b);
 
     glBindVertexArray(vertex_array_object);
-    // glDrawArrays(GL_TRIANGLES, 0, 3); //also works, but ignores elements
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+    for (unsigned int i = 0; i < 10; i++) {
+
+      mat4 mat_model = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}};
+      glm_translate(mat_model, cube_positions[i]);
+      if (i % 3 == 0) {
+        glm_rotate(mat_model, (float)glfwGetTime() * glm_rad(-45),
+                   (vec3){0.5f, 1.0f, 0});
+      }
+
+      glUniformMatrix4fv(glGetUniformLocation(shader_program, "u_model"), 1,
+                         GL_FALSE, (float *)mat_model);
+      glDrawArrays(GL_TRIANGLES, 0, 36);
+    }
 
     glfwSwapBuffers(window);
     glfwPollEvents();
