@@ -14,24 +14,22 @@ CMDS_MAC = install_name_tool -add_rpath @executable_path $(BUILD_DIR)/tailored
 
 SRCS = $(wildcard $(SRC_DIR)/*.c)
 
-ifdef OS
-    ifeq ($(OS), Windows_NT)
-		EXE_EXT = .exe
-        LIBS = $(LIBS_WINDOWS)
-		CMDS = 
-    else
-        UNAME_S := $(shell uname -s)
-		ifeq ($(UNAME_S), Linux)
-			EXE_EXT =
-			LIBS = $(LIBS_LINUX)
-			CMDS = 
-		endif
-		ifeq ($(UNAME_S),Darwin)
-			EXE_EXT =
-			LIBS = $(LIBS_MAC)
-			CMDS = CMDS_MAC
-		endif
-    endif
+ifeq ($(OS), Windows_NT)
+	EXE_EXT = .exe
+    LIBS = $(LIBS_WINDOWS)
+	CMDS =
+else
+    UNAME_S := $(shell uname -s)
+	ifeq ($(UNAME_S), Linux)
+		EXE_EXT =
+		LIBS = $(LIBS_LINUX)
+		CMDS =
+	endif
+	ifeq ($(UNAME_S),Darwin)
+		EXE_EXT =
+		LIBS = $(LIBS_MAC)
+		CMDS = $(CMDS_MAC)
+	endif
 endif
 
 all: $(BUILD_DIR)/tailored$(EXE_EXT)
