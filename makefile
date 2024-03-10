@@ -11,6 +11,8 @@ all: $(BUILD_DIR)/tailored
 
 $(BUILD_DIR)/tailored: $(SRCS)
 	$(CC) $(CFLAGS) -o $(BUILD_DIR)/tailored $(SRCS) $(LDFLAGS) $(FRAMEWORKS)
+	install_name_tool -add_rpath @executable_path $(BUILD_DIR)/tailored
+	./$(BUILD_DIR)/tailored
 
 clean:
 	rm -f $(BUILD_DIR)/

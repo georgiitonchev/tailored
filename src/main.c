@@ -6,10 +6,11 @@
 #include "../dep/include/glad/glad.h"
 // Windowing
 #include "../dep/include/GLFW/glfw3.h"
-
 // STB
 #define STB_IMAGE_IMPLEMENTATION
 #include "../dep/include/stb/stb_image.h"
+// MATH
+#include "../dep/include/cglm/cglm.h"
 
 const unsigned int WINDOW_WIDTH = 640;
 const unsigned int WINDOW_HEIGHT = 360;
@@ -223,6 +224,10 @@ int main() {
   GLFWwindow *window =
       glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Tailored", NULL, NULL);
 
+  mat4 m = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}};
+
+  glm_translate(m, (vec3){1.0f, 0.0f, 0.0f});
+
   if (!window) {
     printf("Failed to create a GLFW window.\n");
     glfwTerminate();
@@ -254,8 +259,6 @@ int main() {
   stbi_set_flip_vertically_on_load(1);
   unsigned int texture_a = create_texture_a();
   unsigned int texture_b = create_texture_b();
-  // uncomment this call to draw in wireframe polygons.
-  // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
   glUseProgram(shader_program);
   glUniform1i(glGetUniformLocation(shader_program, "u_texture_a"), 0);
