@@ -11,8 +11,6 @@
 // MATH
 #include "../dep/include/cglm/cglm.h"
 
-// make chang
-
 const unsigned int WINDOW_WIDTH = 640;
 const unsigned int WINDOW_HEIGHT = 360;
 
