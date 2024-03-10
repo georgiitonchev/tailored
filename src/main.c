@@ -224,6 +224,9 @@ vec3 cam_pos = {0, 0, 3};
 vec3 cam_dir = {0, 0, -1};
 vec3 cam_up = {0, 1, 0};
 
+float delta_time;
+float last_frame_time;
+
 int main() {
   printf("Hello, World!\n");
   printf("Initializing GLFW...\n");
@@ -290,6 +293,10 @@ int main() {
   glEnable(GL_DEPTH_TEST);
   while (!glfwWindowShouldClose(window)) {
 
+    float current_frame_time = glfwGetTime();
+    delta_time = current_frame_time - last_frame_time;
+    last_frame_time = current_frame_time;
+
     processInput(window);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(36.0 / 255, 10.0 / 255, 52.0 / 255, 1);
@@ -345,7 +352,7 @@ int main() {
 }
 
 void processInput(GLFWwindow *window) {
-  const float cam_speed = 0.05f;
+  const float cam_speed = 2.5f * delta_time;
   vec3 vel = {};
   vec3 cam_right = {};
 
