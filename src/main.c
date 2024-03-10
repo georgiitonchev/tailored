@@ -11,11 +11,11 @@
 // MATH
 #include "../dep/include/cglm/cglm.h"
 
-// faf
 const unsigned int WINDOW_WIDTH = 640;
 const unsigned int WINDOW_HEIGHT = 360;
 
-void processInput(GLFWwindow *window);
+void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos);
+void process_input(GLFWwindow *window);
 
 const char *read_file(const char *path) {
   char *text_buffer;
@@ -227,6 +227,9 @@ vec3 cam_up = {0, 1, 0};
 float delta_time;
 float last_frame_time;
 
+float mouse_last_x;
+float mouse_last_y;
+
 int main() {
   printf("Hello, World!\n");
   printf("Initializing GLFW...\n");
@@ -256,6 +259,8 @@ int main() {
   printf("GLFW window created successfuly.\n");
 
   glfwMakeContextCurrent(window);
+  glfwSetCursorPosCallback(window, cursor_pos_callback);
+  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
   printf("Initializing GLAD...\n");
 
@@ -297,7 +302,7 @@ int main() {
     delta_time = current_frame_time - last_frame_time;
     last_frame_time = current_frame_time;
 
-    processInput(window);
+    process_input(window);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(36.0 / 255, 10.0 / 255, 52.0 / 255, 1);
 
@@ -324,13 +329,8 @@ int main() {
     glBindVertexArray(vertex_array_object);
 
     for (unsigned int i = 0; i < 10; i++) {
-
       mat4 mat_model = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}};
       glm_translate(mat_model, cube_positions[i]);
-      if (i % 3 == 0) {
-        glm_rotate(mat_model, (float)glfwGetTime() * glm_rad(-45),
-                   (vec3){0.5f, 1.0f, 0});
-      }
 
       glUniformMatrix4fv(glGetUniformLocation(shader_program, "u_model"), 1,
                          GL_FALSE, (float *)mat_model);
@@ -351,10 +351,10 @@ int main() {
   exit(EXIT_SUCCESS);
 }
 
-void processInput(GLFWwindow *window) {
+void process_input(GLFWwindow *window) {
   const float cam_speed = 2.5f * delta_time;
-  vec3 vel = {};
-  vec3 cam_right = {};
+  vec3 vel = {0, 0, 0};
+  vec3 cam_right = {0, 0, 0};
 
   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
     glm_vec3_scale(cam_dir, cam_speed, vel);
@@ -377,3 +377,36 @@ void processInput(GLFWwindow *window) {
     glm_vec3_add(cam_pos, vel, cam_pos);
   }
 }
+
+float yaw;
+float pitch;
+
+void cursor_pos_callback(GLFWwindow* window, double xposIn, double yposIn)
+{
+    float xpos = (float)xposIn;
+    float ypos = (float)yposIn;
+
+    float xoffset = xpos - mouse_last_x;
+    float yoffset = mouse_last_y - ypos; // reversed since y-coordinates go from bottom to top
+    mouse_last_x = xpos;
+    mouse_last_y = ypos;
+
+    float sensitivity = 0.1f; // change this value to your liking
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+
+    yaw += xoffset;
+    pitch += yoffset;
+
+    // make sure that when pitch is out of bounds, screen doesn't get flipped
+    if (pitch > 89.0f)
+        pitch = 89.0f;
+    if (pitch < -89.0f)
+        pitch = -89.0f;
+
+    cam_dir[0] = cos(glm_rad(yaw)) * cos (glm_rad(pitch));
+    cam_dir[1] = sin(glm_rad(pitch));
+    cam_dir[2] = sin(glm_rad(yaw)) * cos(glm_rad(pitch));
+    glm_normalize(cam_dir);
+}
+
