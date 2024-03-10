@@ -15,6 +15,8 @@
 const unsigned int WINDOW_WIDTH = 640;
 const unsigned int WINDOW_HEIGHT = 360;
 
+void processInput(GLFWwindow *window);
+
 const char *read_file(const char *path) {
   char *text_buffer;
 
@@ -218,6 +220,10 @@ unsigned int create_texture_b() {
   return texture;
 }
 
+vec3 cam_pos = {0, 0, 3};
+vec3 cam_dir = {0, 0, -1};
+vec3 cam_up = {0, 1, 0};
+
 int main() {
   printf("Hello, World!\n");
   printf("Initializing GLFW...\n");
@@ -283,13 +289,14 @@ int main() {
 
   glEnable(GL_DEPTH_TEST);
   while (!glfwWindowShouldClose(window)) {
+
+    processInput(window);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(36.0 / 255, 10.0 / 255, 52.0 / 255, 1);
 
     // identity matrix
-
     mat4 mat_view = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}};
-    glm_translate(mat_view, (vec3){0, 0, -3});
+    glm_look(cam_pos, cam_dir, cam_up, mat_view);
 
     mat4 mat_projection = {
         {1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}};
@@ -335,4 +342,31 @@ int main() {
   glfwDestroyWindow(window);
   glfwTerminate();
   exit(EXIT_SUCCESS);
+}
+
+void processInput(GLFWwindow *window) {
+  const float cam_speed = 0.05f;
+  vec3 vel = {};
+  vec3 cam_right = {};
+
+  if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+    glm_vec3_scale(cam_dir, cam_speed, vel);
+    glm_vec3_add(cam_pos, vel, cam_pos);
+  }
+  if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+    glm_vec3_scale(cam_dir, -cam_speed, vel);
+    glm_vec3_add(cam_pos, vel, cam_pos);
+  }
+  if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+    glm_vec3_cross(cam_dir, cam_up, cam_right);
+    glm_vec3_normalize(cam_right);
+    glm_vec3_scale(cam_right, -cam_speed, vel);
+    glm_vec3_add(cam_pos, vel, cam_pos);
+  }
+  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+    glm_vec3_cross(cam_dir, cam_up, cam_right);
+    glm_vec3_normalize(cam_right);
+    glm_vec3_scale(cam_right, cam_speed, vel);
+    glm_vec3_add(cam_pos, vel, cam_pos);
+  }
 }
