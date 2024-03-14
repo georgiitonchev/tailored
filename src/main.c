@@ -103,40 +103,46 @@ unsigned int create_shader_program() {
 unsigned int create_vertex_array_object() {
 
   float vertices[] = {
-      -0.5f, -0.5f, -0.5f, 0.0f,  0.0f,  -1.0f, 0.5f,  -0.5f, -0.5f,
-      0.0f,  0.0f,  -1.0f, 0.5f,  0.5f,  -0.5f, 0.0f,  0.0f,  -1.0f,
-      0.5f,  0.5f,  -0.5f, 0.0f,  0.0f,  -1.0f, -0.5f, 0.5f,  -0.5f,
-      0.0f,  0.0f,  -1.0f, -0.5f, -0.5f, -0.5f, 0.0f,  0.0f,  -1.0f,
+      // positions          // normals           // texture coords
+      -0.5f, -0.5f, -0.5f, 0.0f,  0.0f,  -1.0f, 0.0f,  0.0f,  0.5f,  -0.5f,
+      -0.5f, 0.0f,  0.0f,  -1.0f, 1.0f,  0.0f,  0.5f,  0.5f,  -0.5f, 0.0f,
+      0.0f,  -1.0f, 1.0f,  1.0f,  0.5f,  0.5f,  -0.5f, 0.0f,  0.0f,  -1.0f,
+      1.0f,  1.0f,  -0.5f, 0.5f,  -0.5f, 0.0f,  0.0f,  -1.0f, 0.0f,  1.0f,
+      -0.5f, -0.5f, -0.5f, 0.0f,  0.0f,  -1.0f, 0.0f,  0.0f,
 
-      -0.5f, -0.5f, 0.5f,  0.0f,  0.0f,  1.0f,  0.5f,  -0.5f, 0.5f,
-      0.0f,  0.0f,  1.0f,  0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-      0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  -0.5f, 0.5f,  0.5f,
-      0.0f,  0.0f,  1.0f,  -0.5f, -0.5f, 0.5f,  0.0f,  0.0f,  1.0f,
+      -0.5f, -0.5f, 0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,  0.5f,  -0.5f,
+      0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  0.0f,  0.5f,  0.5f,  0.5f,  0.0f,
+      0.0f,  1.0f,  1.0f,  1.0f,  0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+      1.0f,  1.0f,  -0.5f, 0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  1.0f,
+      -0.5f, -0.5f, 0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
 
-      -0.5f, 0.5f,  0.5f,  -1.0f, 0.0f,  0.0f,  -0.5f, 0.5f,  -0.5f,
-      -1.0f, 0.0f,  0.0f,  -0.5f, -0.5f, -0.5f, -1.0f, 0.0f,  0.0f,
-      -0.5f, -0.5f, -0.5f, -1.0f, 0.0f,  0.0f,  -0.5f, -0.5f, 0.5f,
-      -1.0f, 0.0f,  0.0f,  -0.5f, 0.5f,  0.5f,  -1.0f, 0.0f,  0.0f,
+      -0.5f, 0.5f,  0.5f,  -1.0f, 0.0f,  0.0f,  1.0f,  0.0f,  -0.5f, 0.5f,
+      -0.5f, -1.0f, 0.0f,  0.0f,  1.0f,  1.0f,  -0.5f, -0.5f, -0.5f, -1.0f,
+      0.0f,  0.0f,  0.0f,  1.0f,  -0.5f, -0.5f, -0.5f, -1.0f, 0.0f,  0.0f,
+      0.0f,  1.0f,  -0.5f, -0.5f, 0.5f,  -1.0f, 0.0f,  0.0f,  0.0f,  0.0f,
+      -0.5f, 0.5f,  0.5f,  -1.0f, 0.0f,  0.0f,  1.0f,  0.0f,
 
-      0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.5f,  0.5f,  -0.5f,
-      1.0f,  0.0f,  0.0f,  0.5f,  -0.5f, -0.5f, 1.0f,  0.0f,  0.0f,
-      0.5f,  -0.5f, -0.5f, 1.0f,  0.0f,  0.0f,  0.5f,  -0.5f, 0.5f,
-      1.0f,  0.0f,  0.0f,  0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+      0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,  0.5f,  0.5f,
+      -0.5f, 1.0f,  0.0f,  0.0f,  1.0f,  1.0f,  0.5f,  -0.5f, -0.5f, 1.0f,
+      0.0f,  0.0f,  0.0f,  1.0f,  0.5f,  -0.5f, -0.5f, 1.0f,  0.0f,  0.0f,
+      0.0f,  1.0f,  0.5f,  -0.5f, 0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
+      0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
 
-      -0.5f, -0.5f, -0.5f, 0.0f,  -1.0f, 0.0f,  0.5f,  -0.5f, -0.5f,
-      0.0f,  -1.0f, 0.0f,  0.5f,  -0.5f, 0.5f,  0.0f,  -1.0f, 0.0f,
-      0.5f,  -0.5f, 0.5f,  0.0f,  -1.0f, 0.0f,  -0.5f, -0.5f, 0.5f,
-      0.0f,  -1.0f, 0.0f,  -0.5f, -0.5f, -0.5f, 0.0f,  -1.0f, 0.0f,
+      -0.5f, -0.5f, -0.5f, 0.0f,  -1.0f, 0.0f,  0.0f,  1.0f,  0.5f,  -0.5f,
+      -0.5f, 0.0f,  -1.0f, 0.0f,  1.0f,  1.0f,  0.5f,  -0.5f, 0.5f,  0.0f,
+      -1.0f, 0.0f,  1.0f,  0.0f,  0.5f,  -0.5f, 0.5f,  0.0f,  -1.0f, 0.0f,
+      1.0f,  0.0f,  -0.5f, -0.5f, 0.5f,  0.0f,  -1.0f, 0.0f,  0.0f,  0.0f,
+      -0.5f, -0.5f, -0.5f, 0.0f,  -1.0f, 0.0f,  0.0f,  1.0f,
 
-      -0.5f, 0.5f,  -0.5f, 0.0f,  1.0f,  0.0f,  0.5f,  0.5f,  -0.5f,
-      0.0f,  1.0f,  0.0f,  0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-      0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  -0.5f, 0.5f,  0.5f,
-      0.0f,  1.0f,  0.0f,  -0.5f, 0.5f,  -0.5f, 0.0f,  1.0f,  0.0f};
+      -0.5f, 0.5f,  -0.5f, 0.0f,  1.0f,  0.0f,  0.0f,  1.0f,  0.5f,  0.5f,
+      -0.5f, 0.0f,  1.0f,  0.0f,  1.0f,  1.0f,  0.5f,  0.5f,  0.5f,  0.0f,
+      1.0f,  0.0f,  1.0f,  0.0f,  0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+      1.0f,  0.0f,  -0.5f, 0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f,
+      -0.5f, 0.5f,  -0.5f, 0.0f,  1.0f,  0.0f,  0.0f,  1.0f};
 
   unsigned int vertex_buffer_object, vertex_array_object, element_array_object;
   glGenVertexArrays(1, &vertex_array_object);
   glGenBuffers(1, &vertex_buffer_object);
-  glGenBuffers(1, &element_array_object);
   // bind the Vertex Array Object first, then bind and set vertex buffer(s), and
   // then configure vertex attributes(s).
   glBindVertexArray(vertex_array_object);
@@ -144,12 +150,16 @@ unsigned int create_vertex_array_object() {
   glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_object);
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(0);
 
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_TRUE, 6 * sizeof(float),
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_TRUE, 8 * sizeof(float),
                         (void *)(3 * sizeof(float)));
   glEnableVertexAttribArray(1);
+
+  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
+                        (void *)(6 * sizeof(float)));
+  glEnableVertexAttribArray(2);
 
   // note that this is allowed, the call to glVertexAttribPointer registered VBO
   // as the vertex attribute's bound vertex buffer object so afterwards we can
@@ -168,10 +178,9 @@ unsigned int create_vertex_array_object() {
   return vertex_array_object;
 }
 
-unsigned int create_texture_a() {
+unsigned int load_texture(const char *texture_path, int texture_format) {
   int width, height, channels;
-  unsigned char *data =
-      stbi_load("./res/textures/container.jpg", &width, &height, &channels, 0);
+  unsigned char *data = stbi_load(texture_path, &width, &height, &channels, 0);
 
   unsigned int texture;
   glGenTextures(1, &texture);
@@ -183,34 +192,9 @@ unsigned int create_texture_a() {
                   GL_LINEAR_MIPMAP_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
-               GL_UNSIGNED_BYTE, data);
+  glTexImage2D(GL_TEXTURE_2D, 0, texture_format, width, height, 0,
+               texture_format, GL_UNSIGNED_BYTE, data);
   glGenerateMipmap(GL_TEXTURE_2D);
-
-  stbi_image_free(data);
-
-  return texture;
-}
-
-unsigned int create_texture_b() {
-  int width, height, channels;
-  unsigned char *data = stbi_load("./res/textures/awesomeface.png", &width,
-                                  &height, &channels, 0);
-  unsigned int texture;
-  glGenTextures(1, &texture);
-  glBindTexture(GL_TEXTURE_2D, texture);
-
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                  GL_LINEAR_MIPMAP_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-  if (data) {
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA,
-                 GL_UNSIGNED_BYTE, data);
-    glGenerateMipmap(GL_TEXTURE_2D);
-  }
 
   stbi_image_free(data);
 
@@ -244,6 +228,7 @@ int main() {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
   printf("Creating GLFW window...\n");
   GLFWwindow *window =
@@ -281,20 +266,57 @@ int main() {
   unsigned int vertex_array_object = create_vertex_array_object();
 
   stbi_set_flip_vertically_on_load(1);
-  unsigned int u_texture = create_texture_a();
+  unsigned int u_texture =
+      load_texture("./res/textures/container2.png", GL_RGBA);
+
+  unsigned int u_texture_specular =
+      load_texture("./res/textures/container2_specular.png", GL_RGBA);
 
   glUseProgram(shader_program);
   glUniform1i(glGetUniformLocation(shader_program, "u_texture"), 0);
+  glUniform1i(glGetUniformLocation(shader_program, "u_texture_specular"), 1);
+
   glUniform3fv(glGetUniformLocation(shader_program, "u_object_color"), 1,
                (vec3){1, 0.5f, 0.3f});
 
-  glUniform3fv(glGetUniformLocation(shader_program, "u_light_color"), 1,
+  glUniform3fv(glGetUniformLocation(shader_program, "u_dir_light.color"), 1,
                (vec3){1, 1, 1});
-  glUniform3fv(glGetUniformLocation(shader_program, "u_light_pos"), 1,
-               light_pos);
+  glUniform3fv(glGetUniformLocation(shader_program, "u_dir_light.direction"), 1,
+               (vec3){-1, 0, 0});
+  glUniform3fv(glGetUniformLocation(shader_program, "u_point_light.color"), 1,
+               (vec3){1, 1, 1});
+
+  glUniform1f(glGetUniformLocation(shader_program, "u_point_light.constant"),
+              1.0f);
+  glUniform1f(glGetUniformLocation(shader_program, "u_point_light.linear"),
+              0.09f);
+  glUniform1f(glGetUniformLocation(shader_program, "u_point_light.quadratic"),
+              0.032f);
+
+  glUniform1f(glGetUniformLocation(shader_program, "u_spot_light.constant"),
+              1.0f);
+  glUniform1f(glGetUniformLocation(shader_program, "u_spot_light.linear"),
+              0.09f);
+  glUniform1f(glGetUniformLocation(shader_program, "u_spot_light.quadratic"),
+              0.032f);
+
+  glUniform3fv(glGetUniformLocation(shader_program, "u_spot_light.color"), 1,
+               (vec3){1, 1, 1});
+
+  glUniform3fv(glGetUniformLocation(shader_program, "u_spot_light.direction"),
+               1, cam_dir);
+
+  glUniform1f(glGetUniformLocation(shader_program, "u_spot_light.inner_angle"),
+              cos(glm_rad(8.0)));
+
+  glUniform1f(glGetUniformLocation(shader_program, "u_spot_light.outer_angle"),
+              cos(glm_rad(9.0)));
 
   glEnable(GL_DEPTH_TEST);
   while (!glfwWindowShouldClose(window)) {
+
+    glUniform3fv(glGetUniformLocation(shader_program, "u_spot_light.position"),
+                 1, cam_pos);
 
     float current_frame_time = glfwGetTime();
     delta_time = current_frame_time - last_frame_time;
@@ -308,13 +330,11 @@ int main() {
     mat4 mat_view = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}};
     glm_look(cam_pos, cam_dir, cam_up, mat_view);
 
-    mat4 mat_projection = {
-        {1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}};
-
+    mat4 mat_projection;
     glm_perspective(glm_rad(45.0f), ratio, .1f, 100.0f, mat_projection);
-    // glm_ortho_default(ratio, mat_projection);
 
-    mat4 mat_model = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}};
+    mat4 mat_model;
+    glm_mat4_identity(mat_model);
     glm_rotate(mat_model, (float)glfwGetTime(), (vec3){0, 0.6f, 0.3f});
     glUniformMatrix4fv(glGetUniformLocation(shader_program, "u_model"), 1,
                        GL_FALSE, (float *)mat_model);
@@ -329,8 +349,10 @@ int main() {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, u_texture);
 
-    glBindVertexArray(vertex_array_object);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, u_texture_specular);
 
+    glBindVertexArray(vertex_array_object);
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
     glfwSwapBuffers(window);
@@ -372,6 +394,8 @@ void process_input(GLFWwindow *window) {
     glm_vec3_scale(cam_right, cam_speed, vel);
     glm_vec3_add(cam_pos, vel, cam_pos);
   }
+
+  glm_vec3(cam_pos, light_pos);
 }
 
 float yaw;
