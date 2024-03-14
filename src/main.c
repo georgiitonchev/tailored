@@ -318,6 +318,9 @@ int main() {
     glUniform3fv(glGetUniformLocation(shader_program, "u_spot_light.position"),
                  1, cam_pos);
 
+    glUniform3fv(glGetUniformLocation(shader_program, "u_point_light.position"),
+                 1, cam_pos);
+
     float current_frame_time = glfwGetTime();
     delta_time = current_frame_time - last_frame_time;
     last_frame_time = current_frame_time;

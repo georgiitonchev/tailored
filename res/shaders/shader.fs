@@ -103,8 +103,8 @@ vec3 calc_point_light(PointLight point_light)
     vec3 ambient  = point_light.color * vec3(texture(u_texture, tex_coord));
     vec3 diffuse  = point_light.color * diff * vec3(texture(u_texture, tex_coord));
     vec3 specular = point_light.color * spec * vec3(texture(u_texture_specular, tex_coord));
-    ambient  *= attenuation;
-    diffuse  *= attenuation;
+    ambient *= attenuation;
+    diffuse *= attenuation;
     specular *= attenuation;
     return (ambient + diffuse + specular);
 }
