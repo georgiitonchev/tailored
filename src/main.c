@@ -225,7 +225,7 @@ void load_fbx(const char *path) {
 
     printf("Object: %s\n", node->name.data);
     if (node->mesh) {
-      printf("-> mesh with %zu vertices\n", node->mesh->vertices.count);
+      printf("-> mesh with %zu materials\n", node->materials.count);
     }
   }
 
