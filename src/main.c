@@ -12,6 +12,9 @@
 // MATH
 #include "../dep/include/cglm/cglm.h"
 
+// FBX
+#include "../dep/include/ufbx/ufbx.h"
+
 const unsigned int WINDOW_WIDTH = 640;
 const unsigned int WINDOW_HEIGHT = 360;
 
@@ -201,6 +204,34 @@ unsigned int load_texture(const char *texture_path, int texture_format) {
   return texture;
 }
 
+void load_fbx(const char *path) {
+
+  ufbx_load_opts opts = {0}; // Optional, pass NULL for defaults
+  ufbx_error error; // Optional, pass NULL if you don't care about errors
+  ufbx_scene *scene = ufbx_load_file(path, &opts, &error);
+
+  if (!scene) {
+    fprintf(stderr, "Failed to load: %s\n", error.description.data);
+    exit(1);
+  }
+
+  // Use and inspect `scene`, it's just plain data!
+
+  // Let's just list all objects within the scene for example:
+  for (size_t i = 0; i < scene->nodes.count; i++) {
+    ufbx_node *node = scene->nodes.data[i];
+    if (node->is_root)
+      continue;
+
+    printf("Object: %s\n", node->name.data);
+    if (node->mesh) {
+      printf("-> mesh with %zu vertices\n", node->mesh->vertices.count);
+    }
+  }
+
+  ufbx_free_scene(scene);
+}
+
 vec3 cam_pos = {0, 0, 3};
 vec3 cam_dir = {0, 0, -1};
 vec3 cam_up = {0, 1, 0};
@@ -264,6 +295,8 @@ int main() {
 
   unsigned int shader_program = create_shader_program();
   unsigned int vertex_array_object = create_vertex_array_object();
+
+  load_fbx("./res/models/backpack.fbx");
 
   stbi_set_flip_vertically_on_load(1);
   unsigned int u_texture =
