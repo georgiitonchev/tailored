@@ -15,88 +15,6 @@
 // MATH
 #include "../dep/include/cglm/cglm.h"
 
-typedef struct Vertex {
-  vec3 position;
-  vec3 normal;
-  vec3 tex_coords;
-} Vertex;
-
-typedef struct Texture {
-  unsigned int id;
-  const char *type;
-} Texture;
-
-typedef struct Mesh {
-  Vertex *vertices;
-  unsigned int *indices;
-  Texture *textures;
-
-  unsigned int vertex_array_object;
-  unsigned int vertex_buffer_object;
-  unsigned int element_buffer_object;
-} Mesh;
-
-void setup_mesh(Mesh *mesh) {
-  glGenVertexArrays(1, &mesh->vertex_array_object);
-  glGenBuffers(1, &mesh->vertex_buffer_object);
-  glGenBuffers(1, &mesh->element_buffer_object);
-
-  glBindVertexArray(mesh->vertex_array_object);
-  glBindBuffer(GL_ARRAY_BUFFER, mesh->vertex_buffer_object);
-
-  glBufferData(GL_ARRAY_BUFFER, arrlen(mesh->vertices) * sizeof(Vertex),
-               &mesh->vertices[0], GL_STATIC_DRAW);
-
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->element_buffer_object);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-               arrlen(mesh->indices) * sizeof(unsigned int), &mesh->indices[0],
-               GL_STATIC_DRAW);
-
-  // vertex positions
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)0);
-  // vertex normals
-  glEnableVertexAttribArray(1);
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-                        (void *)offsetof(Vertex, normal));
-  // vertex texture coords
-  glEnableVertexAttribArray(2);
-  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-                        (void *)offsetof(Vertex, tex_coords));
-
-  glBindVertexArray(0);
-}
-
-void draw_mesh(Mesh *mesh, unsigned int shader_program) {
-
-  unsigned int diffuse_index = 1;
-  unsigned int specular_index = 1;
-
-  for (unsigned int i = 0; i < arrlen(mesh->textures); i++) {
-    glActiveTexture(GL_TEXTURE0 + i);
-
-    int index;
-    const char *name = mesh->textures[i].type;
-    if (strcmp(name, "texture_diffuse"))
-      index = diffuse_index++;
-    else if (strcmp(name, "texture_specular"))
-      index = specular_index++;
-
-    char buffer[100];
-    int cx = snprintf(buffer, 100, "material.%s%d", name, index);
-
-    glUniform1i(glGetUniformLocation(shader_program, buffer), i);
-    glBindTexture(GL_TEXTURE_2D, mesh->textures[i].id);
-  }
-
-  glActiveTexture(GL_TEXTURE0);
-
-  // draw mesh
-  glBindVertexArray(mesh->vertex_array_object);
-  glDrawElements(GL_TRIANGLES, arrlen(mesh->indices), GL_UNSIGNED_INT, 0);
-  glBindVertexArray(0);
-}
-
 const unsigned int WINDOW_WIDTH = 640;
 const unsigned int WINDOW_HEIGHT = 360;
 
@@ -280,6 +198,7 @@ unsigned int load_texture(const char *texture_path, int texture_format) {
   glTexImage2D(GL_TEXTURE_2D, 0, texture_format, width, height, 0,
                texture_format, GL_UNSIGNED_BYTE, data);
   glGenerateMipmap(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, 0);
 
   stbi_image_free(data);
 
@@ -320,7 +239,7 @@ int main() {
       glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Tailored", NULL, NULL);
 
   if (!window) {
-    printf("Failed to create a GLFW window.\n");
+    printf("Failed to create a GLFW windo w.\n");
     glfwTerminate();
     exit(EXIT_FAILURE);
   }
