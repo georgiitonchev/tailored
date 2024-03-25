@@ -279,9 +279,9 @@ int main() {
     printf("triangle %d: %d, %d, %d\n", i / 3, model.meshes[0].indices[i], model.meshes[0].indices[i + 1], model.meshes[0].indices[i + 2]);
   }
 
-    printf("vertices: %d\n", model.meshes[0].vertices_count);
+  printf("vertices: %d\n", model.meshes[0].vertices_count);
   for (unsigned int i = 0; i < model.meshes[0].vertices_count; i++) {
-    printf("vertex %d: %f, %f, %f\n", i, model.meshes[0].vertices[i].x, model.meshes[0].vertices[i].y, model.meshes[0].vertices[i].z);
+    printf("vertex %d: %f, %f, %f\n", i, model.meshes[0].vertices[i].position.x, model.meshes[0].vertices[i].position.y, model.meshes[0].vertices[i].position.z);
   }
 
   setup_mesh(&model.meshes[0]);

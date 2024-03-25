@@ -7,12 +7,15 @@ typedef struct t_vec3 {
   float z;
 } t_vec3;
 
+typedef struct t_vertex {
+  t_vec3 position;
+  t_vec3 normal;
+
+} t_vertex;
+
 typedef struct t_mesh {
   unsigned int vertices_count;
-  t_vec3 *vertices;
-
-  unsigned int normals_count;
-  t_vec3 *normals;
+  t_vertex* vertices;
 
   bool has_indices;
   unsigned int indices_count;

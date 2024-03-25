@@ -13,8 +13,7 @@ t_mesh process_mesh(cgltf_mesh *cgltf_mesh) {
     cgltf_primitive primitive = cgltf_mesh->primitives[pi];
 
     if (primitive.indices != NULL) {
-
-		mesh.has_indices = true;
+			mesh.has_indices = true;
       	cgltf_accessor *data = primitive.indices;
       	unsigned short *indices = malloc(data->count * sizeof(unsigned short));
 
@@ -33,13 +32,15 @@ t_mesh process_mesh(cgltf_mesh *cgltf_mesh) {
       	mesh.indices = indices;
     }
 
+		mesh.vertices_count = primitive.attributes[0].data->count;
+		t_vertex* vertices = malloc(mesh.vertices_count * sizeof(t_vertex));
+
     for (cgltf_size ai = 0; ai < primitive.attributes_count; ai++) {
 
 			cgltf_attribute attribute = primitive.attributes[ai];
 			cgltf_accessor *data = attribute.data;
 
 			if (attribute.type == cgltf_attribute_type_position) {
-					t_vec3 *vertices = malloc(data->count * sizeof(t_vec3));
 
 					int n = 0;
 					float *buffer = (float *)data->buffer_view->buffer->data +
@@ -52,17 +53,12 @@ t_mesh process_mesh(cgltf_mesh *cgltf_mesh) {
 							vertex.y = buffer[n + 1];
 							vertex.z = buffer[n + 2];
 
-							vertices[k] = vertex;
+							vertices[k].position = vertex;
 
 							n += (int)(data->stride / sizeof(float));
 					}
-			
-					mesh.vertices_count = data->count;
-					mesh.vertices = vertices;
 			}
-			else if (attribute.type == cgltf_attribute_type_normal){
-
-				t_vec3 *normals = malloc(data->count * sizeof(t_vec3));
+			else if (attribute.type == cgltf_attribute_type_normal) {
 
 					int n = 0;
 					float *buffer = (float *)data->buffer_view->buffer->data +
@@ -75,15 +71,14 @@ t_mesh process_mesh(cgltf_mesh *cgltf_mesh) {
 							normal.y = buffer[n + 1];
 							normal.z = buffer[n + 2];
 
-							normals[k] = normal;
+							vertices[k].normal = normal;
 
 							n += (int)(data->stride / sizeof(float));
 					}
-			
-					mesh.normals_count = data->count;
-					mesh.normals = normals;
 			}
     }
+
+		mesh.vertices = vertices;
   }
   return mesh;
 }
@@ -149,30 +144,26 @@ void setup_mesh(t_mesh* mesh)
     glBindBuffer(GL_ARRAY_BUFFER, mesh->gl_array_buffer); //VBO
 
     //bind vertices data
-    glBufferData(GL_ARRAY_BUFFER, mesh->vertices_count * sizeof(t_vec3), mesh->vertices, GL_STATIC_DRAW); // mesh->vertices might need to be something else
+    glBufferData(GL_ARRAY_BUFFER, mesh->vertices_count * sizeof(t_vertex), mesh->vertices, GL_STATIC_DRAW); // mesh->vertices might need to be something else
 
-	if (mesh->has_indices) {
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->gl_element_array_buffer);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->indices_count * sizeof(unsigned short), mesh->indices, GL_STATIC_DRAW); //mesh->indices might need to be something else
-	}
+		if (mesh->has_indices) {
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->gl_element_array_buffer);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->indices_count * sizeof(unsigned short), mesh->indices, GL_STATIC_DRAW); //mesh->indices might need to be something else
+		}
 
-    //attribute pointers
-	GLsizei stride = sizeof(t_vec3); //positions stride
-	if (mesh->normals_count > 0)
-		stride += sizeof(t_vec3); //normals stride
-
-	//positions
+		//positions
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, 0); //may need to cast 0 to void*
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(t_vertex), 0); //may need to cast 0 to void*
 
-	//normals
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_TRUE, stride, (void *)(sizeof(t_vec3)));
+		//normals
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_TRUE, sizeof(t_vertex), (void *)offsetof(t_vertex, normal));
 
     glBindVertexArray(0);
 }
 
-void draw_mesh(t_mesh* mesh, unsigned int shader_program) {
+void draw_mesh(t_mesh* mesh, unsigned int shader_program) 
+{
     glUseProgram(shader_program);
     glBindVertexArray(mesh->gl_vertex_array);
 
