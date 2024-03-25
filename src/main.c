@@ -222,6 +222,8 @@ float last_frame_time;
 float mouse_last_x;
 float mouse_last_y;
 
+bool rotate_model;
+
 int main() {
   printf("Hello, World!\n");
   printf("Initializing GLFW...\n");
@@ -267,14 +269,19 @@ int main() {
   printf("GLAD initialized successsfuly.\n");
 
   t_model model = {0};
-  process_gltf_file("./res/models/simple/scene.gltf", &model);
+  //process_gltf_file("./res/models/simple/scene.gltf", &model); // V
+  //process_gltf_file("./res/models/triangle/Triangle.gltf", &model); // V
+  //process_gltf_file("./res/models/triangle_without_indices/triangleWithoutIndices.gltf", &model); // V
+  process_gltf_file("./res/models/cube/Cube.gltf", &model);
 
-  for (cgltf_size vi = 0; vi < 3; vi++) {
-      printf("index: (%d)\n", model.meshes[0].indices[vi]);
+  printf("indices_count: %d\n", model.meshes[0].indices_count);
+  for (unsigned int i = 0; i < model.meshes[0].indices_count; i += 3) {
+    printf("triangle %d: %d, %d, %d\n", i / 3, model.meshes[0].indices[i], model.meshes[0].indices[i + 1], model.meshes[0].indices[i + 2]);
   }
-  for (cgltf_size vi = 0; vi < 3; vi++) {
-      printf("vertex: (%f, %f, %f)\n", model.meshes[0].vertices[vi].x,
-          model.meshes[0].vertices[vi].y, model.meshes[0].vertices[vi].z);
+
+    printf("vertices: %d\n", model.meshes[0].vertices_count);
+  for (unsigned int i = 0; i < model.meshes[0].vertices_count; i++) {
+    printf("vertex %d: %f, %f, %f\n", i, model.meshes[0].vertices[i].x, model.meshes[0].vertices[i].y, model.meshes[0].vertices[i].z);
   }
 
   setup_mesh(&model.meshes[0]);
@@ -296,6 +303,28 @@ int main() {
     process_input(window);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(36.0 / 255, 10.0 / 255, 52.0 / 255, 1);
+
+    // identity matrix
+    mat4 mat_view = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}};
+    glm_look(cam_pos, cam_dir, cam_up, mat_view);
+
+    mat4 mat_projection;
+    glm_perspective(glm_rad(45.0f), ratio, .1f, 100.0f, mat_projection);
+
+    mat4 mat_model;
+    glm_mat4_identity(mat_model);
+
+    if (rotate_model)
+      glm_rotate(mat_model, (float)glfwGetTime(), (vec3){0, 0.6f, 0.3f});
+
+    glUniformMatrix4fv(glGetUniformLocation(shader_program, "u_model"), 1,
+                       GL_FALSE, (float *)mat_model);
+
+    glUniformMatrix4fv(glGetUniformLocation(shader_program, "u_view"), 1,
+                       GL_FALSE, (float *)mat_view);
+
+    glUniformMatrix4fv(glGetUniformLocation(shader_program, "u_projection"), 1,
+                       GL_FALSE, (float *)mat_projection);
 
     draw_mesh(&model.meshes[0], shader_program);
 
@@ -337,6 +366,10 @@ void process_input(GLFWwindow *window) {
     glm_vec3_normalize(cam_right);
     glm_vec3_scale(cam_right, cam_speed, vel);
     glm_vec3_add(cam_pos, vel, cam_pos);
+  }
+
+  if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+    rotate_model = !rotate_model;
   }
 
   glm_vec3(cam_pos, light_pos);

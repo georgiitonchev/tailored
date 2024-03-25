@@ -14,51 +14,77 @@ t_mesh process_mesh(cgltf_mesh *cgltf_mesh) {
 
     if (primitive.indices != NULL) {
 
-      cgltf_accessor *data = primitive.indices;
-      unsigned short *indices = malloc(data->count * sizeof(unsigned short));
+		mesh.has_indices = true;
+      	cgltf_accessor *data = primitive.indices;
+      	unsigned short *indices = malloc(data->count * sizeof(unsigned short));
 
-      unsigned short *buffer =
-          (unsigned short *)data->buffer_view->buffer->data +
-          data->buffer_view->offset / sizeof(unsigned short) +
-          data->offset / sizeof(unsigned short);
+      	unsigned short *buffer =
+          	(unsigned short *)data->buffer_view->buffer->data +
+          	data->buffer_view->offset / sizeof(unsigned short) +
+          	data->offset / sizeof(unsigned short);
 
-      int n = 0;
-      for (unsigned int i = 0; i < data->count; i++) {
-        indices[i] = buffer[n];
-        n += (int)(data->stride / sizeof(unsigned short));
-      }
+      	int n = 0;
+      	for (unsigned int i = 0; i < data->count; i++) {
+        	indices[i] = buffer[n];
+        	n += (int)(data->stride / sizeof(unsigned short));
+      	}
 
-      mesh.indices_count = data->count;
-      mesh.indices = indices;
+      	mesh.indices_count = data->count;
+      	mesh.indices = indices;
     }
 
     for (cgltf_size ai = 0; ai < primitive.attributes_count; ai++) {
-      cgltf_attribute attribute = primitive.attributes[ai];
-      cgltf_accessor *data = attribute.data;
 
-      t_vec3 *vertices = malloc(data->count * sizeof(t_vec3));
+			cgltf_attribute attribute = primitive.attributes[ai];
+			cgltf_accessor *data = attribute.data;
 
-      int n = 0;
-      float *buffer = (float *)data->buffer_view->buffer->data +
-                      data->buffer_view->offset / sizeof(float) +
-                      data->offset / sizeof(float);
+			if (attribute.type == cgltf_attribute_type_position) {
+					t_vec3 *vertices = malloc(data->count * sizeof(t_vec3));
 
-      for (unsigned int k = 0; k < data->count; k++) {
-        t_vec3 vertex = {0};
-        vertex.x = buffer[n];
-        vertex.y = buffer[n + 1];
-        vertex.z = buffer[n + 2];
+					int n = 0;
+					float *buffer = (float *)data->buffer_view->buffer->data +
+													data->buffer_view->offset / sizeof(float) +
+													data->offset / sizeof(float);
 
-        vertices[k] = vertex;
+					for (unsigned int k = 0; k < data->count; k++) {
+							t_vec3 vertex = {0};
+							vertex.x = buffer[n];
+							vertex.y = buffer[n + 1];
+							vertex.z = buffer[n + 2];
 
-        n += (int)(data->stride / sizeof(float));
-      }
-    
-        mesh.vertices_count = data->count;
-        mesh.vertices = vertices;
+							vertices[k] = vertex;
+
+							n += (int)(data->stride / sizeof(float));
+					}
+			
+					mesh.vertices_count = data->count;
+					mesh.vertices = vertices;
+			}
+			else if (attribute.type == cgltf_attribute_type_normal){
+
+				t_vec3 *normals = malloc(data->count * sizeof(t_vec3));
+
+					int n = 0;
+					float *buffer = (float *)data->buffer_view->buffer->data +
+													data->buffer_view->offset / sizeof(float) +
+													data->offset / sizeof(float);
+
+					for (unsigned int k = 0; k < data->count; k++) {
+							t_vec3 normal = {0};
+							normal.x = buffer[n];
+							normal.y = buffer[n + 1];
+							normal.z = buffer[n + 2];
+
+							normals[k] = normal;
+
+							n += (int)(data->stride / sizeof(float));
+					}
+			
+					mesh.normals_count = data->count;
+					mesh.normals = normals;
+			}
     }
   }
-
   return mesh;
 }
 
@@ -90,14 +116,23 @@ void process_gltf_file(const char* path, t_model* model) {
 
         result = cgltf_load_buffers(&options, data, path);
 
-        for (cgltf_size i = 0; i < data->meshes_count; i++) {
-            model->meshes = malloc(sizeof(t_mesh) * data->meshes_count);
-            model->meshes[i] = process_mesh(&data->meshes[i]);
-        }
+				if (result == cgltf_result_success) {
 
+					 printf(".gltf buffers loaded successfuly\n");
+					 for (cgltf_size i = 0; i < data->meshes_count; i++) {
+							model->meshes = malloc(sizeof(t_mesh) * data->meshes_count);
+							model->meshes[i] = process_mesh(&data->meshes[i]);
+        	}
+
+						printf("meshes processed.\n");
+				}
+				else{
+					printf("error loading .gltf buffers\n");
+				}
         // process_scene(data->scene);
 
         cgltf_free(data);
+				printf("free data.\n");
     } else {
         printf("error loading .gltf file\n");
     }
@@ -116,20 +151,33 @@ void setup_mesh(t_mesh* mesh)
     //bind vertices data
     glBufferData(GL_ARRAY_BUFFER, mesh->vertices_count * sizeof(t_vec3), mesh->vertices, GL_STATIC_DRAW); // mesh->vertices might need to be something else
 
-    //bind indices data
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->gl_element_array_buffer);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->indices_count * sizeof(unsigned short), mesh->indices, GL_STATIC_DRAW); //mesh->indices might need to be something else
+	if (mesh->has_indices) {
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->gl_element_array_buffer);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->indices_count * sizeof(unsigned short), mesh->indices, GL_STATIC_DRAW); //mesh->indices might need to be something else
+	}
 
     //attribute pointers
-    //positions
+	GLsizei stride = sizeof(t_vec3); //positions stride
+	if (mesh->normals_count > 0)
+		stride += sizeof(t_vec3); //normals stride
+
+	//positions
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(t_vec3), 0); //may need to cast 0 to void*
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, 0); //may need to cast 0 to void*
+
+	//normals
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_TRUE, stride, (void *)(sizeof(t_vec3)));
 
     glBindVertexArray(0);
 }
 
-void draw_mesh(t_mesh* mesh, unsigned int shader_program){
+void draw_mesh(t_mesh* mesh, unsigned int shader_program) {
     glUseProgram(shader_program);
     glBindVertexArray(mesh->gl_vertex_array);
-    glDrawElements(GL_TRIANGLES, mesh->indices_count, GL_UNSIGNED_SHORT, 0);
+
+	if (mesh->has_indices)
+		glDrawElements(GL_TRIANGLES, mesh->indices_count, GL_UNSIGNED_SHORT, 0);
+	else
+		glDrawArrays(GL_TRIANGLES, 0, mesh->vertices_count);
 }

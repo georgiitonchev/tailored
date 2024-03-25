@@ -1,4 +1,5 @@
 #include "../dep/include/cgltf/cgltf.h"
+#include <stdbool.h>
 
 typedef struct t_vec3 {
   float x;
@@ -10,6 +11,10 @@ typedef struct t_mesh {
   unsigned int vertices_count;
   t_vec3 *vertices;
 
+  unsigned int normals_count;
+  t_vec3 *normals;
+
+  bool has_indices;
   unsigned int indices_count;
   unsigned short *indices;
 
