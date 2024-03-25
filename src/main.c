@@ -1,4 +1,7 @@
+#ifdef __APPLE__
 #include <OpenGL/OpenGL.h>
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
