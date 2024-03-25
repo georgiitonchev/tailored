@@ -18,6 +18,8 @@
 // MATH
 #include "../dep/include/cglm/cglm.h"
 
+#include "tailored.h"
+
 const unsigned int WINDOW_WIDTH = 640;
 const unsigned int WINDOW_HEIGHT = 360;
 
@@ -264,69 +266,28 @@ int main() {
 
   printf("GLAD initialized successsfuly.\n");
 
+  t_model model = {0};
+  process_gltf_file("./res/models/simple/scene.gltf", &model);
+
+  for (cgltf_size vi = 0; vi < 3; vi++) {
+      printf("index: (%d)\n", model.meshes[0].indices[vi]);
+  }
+  for (cgltf_size vi = 0; vi < 3; vi++) {
+      printf("vertex: (%f, %f, %f)\n", model.meshes[0].vertices[vi].x,
+          model.meshes[0].vertices[vi].y, model.meshes[0].vertices[vi].z);
+  }
+
+  setup_mesh(&model.meshes[0]);
+
   int width, height;
   glfwGetFramebufferSize(window, &width, &height);
   glViewport(0, 0, width, height);
   const float ratio = width / (float)height;
 
   unsigned int shader_program = create_shader_program();
-  unsigned int vertex_array_object = create_vertex_array_object();
-
-  stbi_set_flip_vertically_on_load(1);
-  unsigned int u_texture =
-      load_texture("./res/textures/container2.png", GL_RGBA);
-
-  unsigned int u_texture_specular =
-      load_texture("./res/textures/container2_specular.png", GL_RGBA);
-
-  glUseProgram(shader_program);
-  glUniform1i(glGetUniformLocation(shader_program, "u_texture"), 0);
-  glUniform1i(glGetUniformLocation(shader_program, "u_texture_specular"), 1);
-
-  glUniform3fv(glGetUniformLocation(shader_program, "u_object_color"), 1,
-               (vec3){1, 0.5f, 0.3f});
-
-  glUniform3fv(glGetUniformLocation(shader_program, "u_dir_light.color"), 1,
-               (vec3){1, 1, 1});
-  glUniform3fv(glGetUniformLocation(shader_program, "u_dir_light.direction"), 1,
-               (vec3){-1, 0, 0});
-  glUniform3fv(glGetUniformLocation(shader_program, "u_point_light.color"), 1,
-               (vec3){1, 1, 1});
-
-  glUniform1f(glGetUniformLocation(shader_program, "u_point_light.constant"),
-              1.0f);
-  glUniform1f(glGetUniformLocation(shader_program, "u_point_light.linear"),
-              0.09f);
-  glUniform1f(glGetUniformLocation(shader_program, "u_point_light.quadratic"),
-              0.032f);
-
-  glUniform1f(glGetUniformLocation(shader_program, "u_spot_light.constant"),
-              1.0f);
-  glUniform1f(glGetUniformLocation(shader_program, "u_spot_light.linear"),
-              0.09f);
-  glUniform1f(glGetUniformLocation(shader_program, "u_spot_light.quadratic"),
-              0.032f);
-
-  glUniform3fv(glGetUniformLocation(shader_program, "u_spot_light.color"), 1,
-               (vec3){1, 1, 1});
-
-  glUniform3fv(glGetUniformLocation(shader_program, "u_spot_light.direction"),
-               1, cam_dir);
-
-  glUniform1f(glGetUniformLocation(shader_program, "u_spot_light.inner_angle"),
-              cos(glm_rad(8.0)));
-
-  glUniform1f(glGetUniformLocation(shader_program, "u_spot_light.outer_angle"),
-              cos(glm_rad(9.0)));
 
   glEnable(GL_DEPTH_TEST);
   while (!glfwWindowShouldClose(window)) {
-
-    glUniform3fv(glGetUniformLocation(shader_program, "u_spot_light.position"),
-                 1, cam_pos);
-
-    glUniform3fv(glGetUniformLocation(shader_program, "u_point_light.position"),
-                 1, cam_pos);
 
     float current_frame_time = glfwGetTime();
     delta_time = current_frame_time - last_frame_time;
@@ -336,40 +297,13 @@ int main() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(36.0 / 255, 10.0 / 255, 52.0 / 255, 1);
 
-    // identity matrix
-    mat4 mat_view = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}};
-    glm_look(cam_pos, cam_dir, cam_up, mat_view);
-
-    mat4 mat_projection;
-    glm_perspective(glm_rad(45.0f), ratio, .1f, 100.0f, mat_projection);
-
-    mat4 mat_model;
-    glm_mat4_identity(mat_model);
-    glm_rotate(mat_model, (float)glfwGetTime(), (vec3){0, 0.6f, 0.3f});
-    glUniformMatrix4fv(glGetUniformLocation(shader_program, "u_model"), 1,
-                       GL_FALSE, (float *)mat_model);
-
-    glUniformMatrix4fv(glGetUniformLocation(shader_program, "u_view"), 1,
-                       GL_FALSE, (float *)mat_view);
-    glUniformMatrix4fv(glGetUniformLocation(shader_program, "u_projection"), 1,
-                       GL_FALSE, (float *)mat_projection);
-
-    glUniform3fv(glGetUniformLocation(shader_program, "u_cam_pos"), 1, cam_pos);
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, u_texture);
-
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, u_texture_specular);
-
-    glBindVertexArray(vertex_array_object);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+    draw_mesh(&model.meshes[0], shader_program);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
 
-  glDeleteVertexArrays(1, &vertex_array_object);
+  //glDeleteVertexArrays(1, &vertex_array_object);
   // glDeleteBuffers(1, &VBO);
   // glDeleteBuffers(1, &EBO);
   glDeleteProgram(shader_program);
