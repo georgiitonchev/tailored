@@ -2,8 +2,9 @@
 
 layout (location = 0) in vec3 in_pos;
 layout (location = 1) in vec3 in_normal;
+layout (location = 2) in vec2 in_tex_coords;
 
-out vec2 tex_coord;
+out vec2 tex_coords;
 out vec3 normal;
 out vec3 frag_pos;
 
@@ -17,4 +18,6 @@ void main() {
 
     frag_pos = vec3(u_model * vec4(in_pos, 1));
     normal = mat3(transpose(inverse(u_model))) * in_normal;
+
+    tex_coords = in_tex_coords;
 }

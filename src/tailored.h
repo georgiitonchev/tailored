@@ -17,7 +17,6 @@ typedef struct t_mesh {
   unsigned int vertices_count;
   t_vertex* vertices;
 
-  bool has_indices;
   unsigned int indices_count;
   unsigned short *indices;
 
