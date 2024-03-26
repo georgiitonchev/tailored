@@ -167,11 +167,18 @@ int main() {
   // process_gltf_file("./res/models/triangle/Triangle.gltf", &model); // V
   // process_gltf_file("./res/models/triangle_without_indices/triangleWithoutIndices.gltf",
   // &model); // V
-  // process_gltf_file("./res/models/cube/Cube.gltf", &model);
-  process_gltf_file("./res/models/avocado/Avocado.gltf", &model);
+  process_gltf_file("./res/models/cube/Cube.gltf", &model);
+  // process_gltf_file("./res/models/avocado/Avocado.gltf", &model);
   // process_gltf_file("./res/models/corset/Corset.gltf", &model);
+  // &model);
 
-  setup_mesh(&model.meshes[0]);
+  for (unsigned int i = 0; i < model.meshes_count; i++) {
+    setup_mesh(&model.meshes[i]);
+    printf("indices: %d\n", model.meshes[i].indices_count);
+    printf("vertices: %d\n", model.meshes[i].vertices_count);
+  }
+
+  printf("meshes: %d\n", model.meshes_count);
 
   int width, height;
   glfwGetFramebufferSize(window, &width, &height);
@@ -181,6 +188,9 @@ int main() {
   unsigned int shader_program = create_shader_program();
 
   glEnable(GL_DEPTH_TEST);
+  glEnable(GL_STENCIL_TEST);
+  glEnable(GL_CULL_FACE);
+
   while (!glfwWindowShouldClose(window)) {
 
     float current_frame_time = glfwGetTime();
@@ -188,7 +198,7 @@ int main() {
     last_frame_time = current_frame_time;
 
     process_input(window);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     glClearColor(36.0 / 255, 10.0 / 255, 52.0 / 255, 1);
 
     // identity matrix
@@ -213,7 +223,9 @@ int main() {
     glUniformMatrix4fv(glGetUniformLocation(shader_program, "u_projection"), 1,
                        GL_FALSE, (float *)mat_projection);
 
-    draw_mesh(&model.meshes[0], shader_program);
+    for (unsigned int i = 0; i < model.meshes_count; i++) {
+      draw_mesh(&model.meshes[i], shader_program);
+    }
 
     glfwSwapBuffers(window);
     glfwPollEvents();

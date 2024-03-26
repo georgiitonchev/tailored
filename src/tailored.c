@@ -194,6 +194,8 @@ void process_gltf_file(const char *path, t_model *model) {
         model->meshes[i] = process_mesh(&data->meshes[i], path);
       }
 
+      model->meshes_count = data->meshes_count;
+
       printf("meshes processed.\n");
     } else {
       printf("error loading .gltf buffers\n");
