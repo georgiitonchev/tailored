@@ -10,11 +10,7 @@
 #include "../dep/include/glad/glad.h"
 // Windowing
 #include "../dep/include/GLFW/glfw3.h"
-// STB
-#define STB_IMAGE_IMPLEMENTATION
-#include "../dep/include/stb/stb_image.h"
-#define STB_DS_IMPLEMENTATION
-#include "../dep/include/stb/stb_ds.h"
+
 // MATH
 #include "../dep/include/cglm/cglm.h"
 
@@ -108,30 +104,6 @@ unsigned int create_shader_program() {
   return shader_program;
 }
 
-unsigned int load_texture(const char *texture_path, int texture_format) {
-  int width, height, channels;
-  unsigned char *data = stbi_load(texture_path, &width, &height, &channels, 0);
-
-  unsigned int texture;
-  glGenTextures(1, &texture);
-  glBindTexture(GL_TEXTURE_2D, texture);
-
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                  GL_LINEAR_MIPMAP_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-  glTexImage2D(GL_TEXTURE_2D, 0, texture_format, width, height, 0,
-               texture_format, GL_UNSIGNED_BYTE, data);
-  glGenerateMipmap(GL_TEXTURE_2D);
-  glBindTexture(GL_TEXTURE_2D, 0);
-
-  stbi_image_free(data);
-
-  return texture;
-}
-
 vec3 cam_pos = {0, 0, 3};
 vec3 cam_dir = {0, 0, -1};
 vec3 cam_up = {0, 1, 0};
@@ -176,8 +148,8 @@ int main() {
   printf("GLFW window created successfuly.\n");
 
   glfwMakeContextCurrent(window);
-  //glfwSetCursorPosCallback(window, cursor_pos_callback);
-  //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+  // glfwSetCursorPosCallback(window, cursor_pos_callback);
+  // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
   printf("Initializing GLAD...\n");
 
@@ -191,12 +163,13 @@ int main() {
   printf("GLAD initialized successsfuly.\n");
 
   t_model model = {0};
-  //process_gltf_file("./res/models/simple/scene.gltf", &model); // V
-  //process_gltf_file("./res/models/triangle/Triangle.gltf", &model); // V
-  //process_gltf_file("./res/models/triangle_without_indices/triangleWithoutIndices.gltf", &model); // V
-  //process_gltf_file("./res/models/cube/Cube.gltf", &model);
+  // process_gltf_file("./res/models/simple/scene.gltf", &model); // V
+  // process_gltf_file("./res/models/triangle/Triangle.gltf", &model); // V
+  // process_gltf_file("./res/models/triangle_without_indices/triangleWithoutIndices.gltf",
+  // &model); // V
+  // process_gltf_file("./res/models/cube/Cube.gltf", &model);
   process_gltf_file("./res/models/avocado/Avocado.gltf", &model);
-  //process_gltf_file("./res/models/corset/Corset.gltf", &model);
+  // process_gltf_file("./res/models/corset/Corset.gltf", &model);
 
   setup_mesh(&model.meshes[0]);
 
@@ -246,9 +219,9 @@ int main() {
     glfwPollEvents();
   }
 
-  //glDeleteVertexArrays(1, &vertex_array_object);
-  // glDeleteBuffers(1, &VBO);
-  // glDeleteBuffers(1, &EBO);
+  // glDeleteVertexArrays(1, &vertex_array_object);
+  //  glDeleteBuffers(1, &VBO);
+  //  glDeleteBuffers(1, &EBO);
   glDeleteProgram(shader_program);
 
   glfwDestroyWindow(window);

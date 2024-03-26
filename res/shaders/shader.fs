@@ -2,13 +2,12 @@
 
 in vec3 normal;
 in vec3 frag_pos;
-in vec2 tex_coords;
+in vec2 tex_coord;
 
-uniform sampler2D texture_base;
+uniform sampler2D u_texture_base;
 
 out vec4 fragment;
 
-void main(){
-
-    fragment = vec4(normal, 1.0);
+void main() {
+    fragment = texture(u_texture_base, tex_coord);
 }
