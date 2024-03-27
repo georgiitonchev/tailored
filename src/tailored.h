@@ -44,6 +44,16 @@ typedef struct t_model {
   t_mesh *meshes;
 } t_model;
 
+typedef struct t_transform {
+  t_vec3 position;
+  t_vec3 rotation;
+  t_vec3 scale;
+} t_transform;
+
+typedef struct t_node {
+  t_transform transform;
+} t_node;
+
 void free_mesh(t_mesh *mesh);
 void free_model(t_model *model);
 
