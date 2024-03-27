@@ -162,23 +162,22 @@ int main() {
 
   printf("GLAD initialized successsfuly.\n");
 
-  t_model model = {0};
+  t_scene *scenes = NULL;
   // process_gltf_file("./res/models/simple/scene.gltf", &model); // V
   // process_gltf_file("./res/models/triangle/Triangle.gltf", &model); // V
   // process_gltf_file("./res/models/triangle_without_indices/triangleWithoutIndices.gltf",
   // &model); // V
-  process_gltf_file("./res/models/cube/Cube.gltf", &model);
+  process_gltf_file("./res/models/cube/Cube.gltf", &scenes);
   // process_gltf_file("./res/models/avocado/Avocado.gltf", &model);
   // process_gltf_file("./res/models/corset/Corset.gltf", &model);
   // &model);
 
-  for (unsigned int i = 0; i < model.meshes_count; i++) {
-    setup_mesh(&model.meshes[i]);
-    printf("indices: %d\n", model.meshes[i].indices_count);
-    printf("vertices: %d\n", model.meshes[i].vertices_count);
+  t_scene scene = scenes[0];
+  for (unsigned int i = 0; i < scene.nodes_count; i++) {
+    setup_mesh(&scene.nodes[i].mesh);
+    printf("indices: %d\n", scene.nodes[i].mesh.indices_count);
+    printf("vertices: %d\n", scene.nodes[i].mesh.vertices_count);
   }
-
-  printf("meshes: %d\n", model.meshes_count);
 
   int width, height;
   glfwGetFramebufferSize(window, &width, &height);
@@ -223,8 +222,8 @@ int main() {
     glUniformMatrix4fv(glGetUniformLocation(shader_program, "u_projection"), 1,
                        GL_FALSE, (float *)mat_projection);
 
-    for (unsigned int i = 0; i < model.meshes_count; i++) {
-      draw_mesh(&model.meshes[i], shader_program);
+    for (unsigned int i = 0; i < scene.nodes_count; i++) {
+      draw_mesh(&scene.nodes[i].mesh, shader_program);
     }
 
     glfwSwapBuffers(window);

@@ -175,7 +175,7 @@ t_mesh process_mesh(cgltf_mesh *cgltf_mesh, const char *path) {
   return mesh;
 }
 
-void process_gltf_file(const char *path, t_model *model) {
+void process_gltf_file(const char *path, t_scene **scenes) {
 
   cgltf_options options = {0};
   cgltf_data *data = NULL;
@@ -188,13 +188,19 @@ void process_gltf_file(const char *path, t_model *model) {
     result = cgltf_load_buffers(&options, data, path);
     if (result == cgltf_result_success) {
 
-      printf(".gltf buffers loaded successfuly\n");
-      for (cgltf_size i = 0; i < data->meshes_count; i++) {
-        model->meshes = malloc(sizeof(t_mesh) * data->meshes_count);
-        model->meshes[i] = process_mesh(&data->meshes[i], path);
-      }
+      *scenes = malloc(sizeof(t_scene) * data->scenes_count);
 
-      model->meshes_count = data->meshes_count;
+      printf(".gltf buffers loaded successfuly\n");
+      for (cgltf_size i = 0; i < data->scenes_count; i++) {
+        cgltf_scene cgltf_scene = data->scenes[i];
+        scenes[i]->nodes_count = cgltf_scene.nodes_count;
+        scenes[i]->nodes = malloc(sizeof(t_node) * cgltf_scene.nodes_count);
+
+        for (cgltf_size ni = 0; ni < cgltf_scene.nodes_count; ni++) {
+          cgltf_node *cgltf_node = cgltf_scene.nodes[ni];
+          scenes[i]->nodes[ni].mesh = process_mesh(cgltf_node->mesh, path);
+        }
+      }
 
       printf("meshes processed.\n");
     } else {

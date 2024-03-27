@@ -39,11 +39,6 @@ typedef struct t_mesh {
   unsigned int gl_element_array_buffer;
 } t_mesh;
 
-typedef struct t_model {
-  unsigned int meshes_count;
-  t_mesh *meshes;
-} t_model;
-
 typedef struct t_transform {
   t_vec3 position;
   t_vec3 rotation;
@@ -52,15 +47,21 @@ typedef struct t_transform {
 
 typedef struct t_node {
   t_transform transform;
+  t_mesh mesh;
 } t_node;
 
+typedef struct t_scene {
+  t_node *nodes;
+  unsigned int nodes_count;
+} t_scene;
+
 void free_mesh(t_mesh *mesh);
-void free_model(t_model *model);
+void free_scene(t_scene *scene);
 
 void process_node(cgltf_node *node);
 void process_scene(cgltf_scene *scene);
 t_mesh process_mesh(cgltf_mesh *mesh, const char *path);
-void process_gltf_file(const char *path, t_model *model);
+void process_gltf_file(const char *path, t_scene **scenes);
 
 void setup_mesh(t_mesh *mesh);
 void draw_mesh(t_mesh *mesh, unsigned int shader_program);
