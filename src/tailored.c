@@ -198,7 +198,27 @@ void process_gltf_file(const char *path, t_scene **scenes) {
 
         for (cgltf_size ni = 0; ni < cgltf_scene.nodes_count; ni++) {
           cgltf_node *cgltf_node = cgltf_scene.nodes[ni];
-          scenes[i]->nodes[ni].mesh = process_mesh(cgltf_node->mesh, path);
+          t_node node = {0};
+
+          node.mesh = process_mesh(cgltf_node->mesh, path);
+
+          if (cgltf_node->has_translation) {
+            node.transform.position.x = cgltf_node->translation[0];
+            node.transform.position.y = cgltf_node->translation[1];
+            node.transform.position.z = cgltf_node->translation[2];
+          }
+          if (cgltf_node->has_rotation) {
+            node.transform.rotation.x = cgltf_node->rotation[0];
+            node.transform.rotation.y = cgltf_node->rotation[1];
+            node.transform.rotation.z = cgltf_node->rotation[2];
+          }
+          if (cgltf_node->has_scale) {
+            node.transform.scale.x = cgltf_node->scale[0];
+            node.transform.scale.y = cgltf_node->scale[1];
+            node.transform.scale.z = cgltf_node->scale[2];
+          }
+
+          scenes[i]->nodes[ni] = node;
         }
       }
 

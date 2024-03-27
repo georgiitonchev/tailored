@@ -167,10 +167,11 @@ int main() {
   // process_gltf_file("./res/models/triangle/Triangle.gltf", &model); // V
   // process_gltf_file("./res/models/triangle_without_indices/triangleWithoutIndices.gltf",
   // &model); // V
-  process_gltf_file("./res/models/cube/Cube.gltf", &scenes);
-  // process_gltf_file("./res/models/avocado/Avocado.gltf", &model);
+  // process_gltf_file("./res/models/cube/Cube.gltf", &scenes);
+  // process_gltf_file("./res/models/avocado/Avocado.gltf", &scenes);
   // process_gltf_file("./res/models/corset/Corset.gltf", &model);
   // &model);
+  process_gltf_file("./res/models/simple_meshes/SimpleMeshes.gltf", &scenes);
 
   t_scene scene = scenes[0];
   for (unsigned int i = 0; i < scene.nodes_count; i++) {
@@ -213,9 +214,6 @@ int main() {
     if (rotate_model)
       glm_rotate(mat_model, (float)glfwGetTime(), (vec3){0, 0.6f, 0.3f});
 
-    glUniformMatrix4fv(glGetUniformLocation(shader_program, "u_model"), 1,
-                       GL_FALSE, (float *)mat_model);
-
     glUniformMatrix4fv(glGetUniformLocation(shader_program, "u_view"), 1,
                        GL_FALSE, (float *)mat_view);
 
@@ -223,7 +221,16 @@ int main() {
                        GL_FALSE, (float *)mat_projection);
 
     for (unsigned int i = 0; i < scene.nodes_count; i++) {
-      draw_mesh(&scene.nodes[i].mesh, shader_program);
+
+      t_node node = scene.nodes[i];
+      glm_translate(mat_model,
+                    (vec3){node.transform.position.x, node.transform.position.y,
+                           node.transform.position.z});
+
+      glUniformMatrix4fv(glGetUniformLocation(shader_program, "u_model"), 1,
+                         GL_FALSE, (float *)mat_model);
+
+      draw_mesh(&node.mesh, shader_program);
     }
 
     glfwSwapBuffers(window);
