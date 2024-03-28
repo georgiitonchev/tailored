@@ -168,10 +168,15 @@ int main() {
   // process_gltf_file("./res/models/triangle_without_indices/triangleWithoutIndices.gltf",
   // &model); // V
   // process_gltf_file("./res/models/cube/Cube.gltf", &scenes);
-  process_gltf_file("./res/models/avocado/Avocado.gltf", &scenes);
+  //process_gltf_file("./res/models/avocado/Avocado.gltf", &scenes);
   // process_gltf_file("./res/models/corset/Corset.gltf", &model);
   // &model);
   // process_gltf_file("./res/models/simple_meshes/SimpleMeshes.gltf", &scenes);
+   process_gltf_file("./res/scenes/scene_1/scene_1.gltf", &scenes);
+
+  if (scenes == NULL) {
+    printf("Could not load scenes.\n");
+  } else printf("Scenes loaded successfuly.\n");
 
   t_scene scene = scenes[0];
   for (unsigned int i = 0; i < scene.nodes_count; i++) {

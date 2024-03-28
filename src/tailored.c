@@ -69,11 +69,15 @@ t_mesh process_mesh(cgltf_mesh *cgltf_mesh, const char *path) {
   t_mesh mesh = {0};
 
   for (cgltf_size pi = 0; pi < cgltf_mesh->primitives_count; pi++) {
+
+    printf("Mesh primitives: %zu\n", cgltf_mesh->primitives_count);
     cgltf_primitive primitive = cgltf_mesh->primitives[pi];
 
     if (primitive.indices != NULL) {
       cgltf_accessor *data = primitive.indices;
       unsigned short *indices = malloc(data->count * sizeof(unsigned short));
+
+      printf("Primitive indices: %zu\n", data->count);
 
       unsigned short *buffer =
           (unsigned short *)data->buffer_view->buffer->data +
@@ -88,28 +92,30 @@ t_mesh process_mesh(cgltf_mesh *cgltf_mesh, const char *path) {
 
       mesh.indices_count = data->count;
       mesh.indices = indices;
+
+      printf("Primitive indices collected.\n");
     }
 
-    if (primitive.material != NULL) {
-      const char *base_image_uri = primitive.material->pbr_metallic_roughness
-                                       .base_color_texture.texture->image->uri;
+    // if (primitive.material != NULL) {
+    //   const char *base_image_uri = primitive.material->pbr_metallic_roughness
+    //                                    .base_color_texture.texture->image->uri;
 
-      const char *directory_path = get_directory_path(path);
+    //   const char *directory_path = get_directory_path(path);
 
-      unsigned long directory_path_length = strlen(directory_path);
-      unsigned long base_image_uri_length = strlen(base_image_uri);
-      unsigned long texture_path_length =
-          directory_path_length + base_image_uri_length + 1;
+    //   unsigned long directory_path_length = strlen(directory_path);
+    //   unsigned long base_image_uri_length = strlen(base_image_uri);
+    //   unsigned long texture_path_length =
+    //       directory_path_length + base_image_uri_length + 1;
 
-      char *texture_path = malloc(texture_path_length * sizeof(char));
+    //   char *texture_path = malloc(texture_path_length * sizeof(char));
 
-      strcpy(texture_path, directory_path);
-      texture_path[directory_path_length] = '/';
-      strcpy(texture_path + directory_path_length + 1, base_image_uri);
-      texture_path[texture_path_length] = '\0';
+    //   strcpy(texture_path, directory_path);
+    //   texture_path[directory_path_length] = '/';
+    //   strcpy(texture_path + directory_path_length + 1, base_image_uri);
+    //   texture_path[texture_path_length] = '\0';
 
-      mesh.material.base_texture_uri = texture_path;
-    }
+    //   mesh.material.base_texture_uri = texture_path;
+    // }
 
     mesh.vertices_count = primitive.attributes[0].data->count;
     mesh.vertices = malloc(mesh.vertices_count * sizeof(t_vertex));
@@ -191,10 +197,15 @@ void process_gltf_file(const char *path, t_scene **scenes) {
       *scenes = malloc(sizeof(t_scene) * data->scenes_count);
 
       printf(".gltf buffers loaded successfuly\n");
+      printf("Scenes: %zu\n", data->scenes_count);
+
       for (cgltf_size i = 0; i < data->scenes_count; i++) {
+
         cgltf_scene cgltf_scene = data->scenes[i];
         scenes[i]->nodes_count = cgltf_scene.nodes_count;
         scenes[i]->nodes = malloc(sizeof(t_node) * cgltf_scene.nodes_count);
+
+        printf("Nodes in scene %zu: %zu\n", i, cgltf_scene.nodes_count);
 
         for (cgltf_size ni = 0; ni < cgltf_scene.nodes_count; ni++) {
           cgltf_node *cgltf_node = cgltf_scene.nodes[ni];
@@ -275,7 +286,7 @@ void setup_mesh(t_mesh *mesh) {
 
   glBindVertexArray(0);
 
-  mesh->material.base_texture = load_texture(mesh->material.base_texture_uri);
+  //mesh->material.base_texture = load_texture(mesh->material.base_texture_uri);
 }
 
 void draw_mesh(t_mesh *mesh, unsigned int shader_program) {
@@ -283,7 +294,7 @@ void draw_mesh(t_mesh *mesh, unsigned int shader_program) {
 
   glActiveTexture(GL_TEXTURE0);
   glUniform1i(glGetUniformLocation(shader_program, "u_texture_base"), 0);
-  glBindTexture(GL_TEXTURE_2D, mesh->material.base_texture);
+  //glBindTexture(GL_TEXTURE_2D, mesh->material.base_texture);
 
   glBindVertexArray(mesh->gl_vertex_array);
 
