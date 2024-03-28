@@ -1,1 +1,1 @@
-`I'm learning OpenGL and C`;
+I'm learning OpenGL and C.
