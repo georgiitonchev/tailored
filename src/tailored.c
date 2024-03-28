@@ -2,6 +2,7 @@
 
 #include "../dep/include/glad/glad.h"
 #include <stdlib.h>
+#include <string.h>
 
 #define CGLTF_IMPLEMENTATION
 #include "../dep/include/cgltf/cgltf.h"
@@ -11,6 +12,9 @@
 #include "../dep/include/stb/stb_image.h"
 #define STB_DS_IMPLEMENTATION
 #include "../dep/include/stb/stb_ds.h"
+
+// MATH
+#include "../dep/include/cglm/cglm.h"
 
 unsigned int load_texture(const char *texture_path) {
   int width, height, channels;
@@ -96,26 +100,40 @@ t_mesh process_mesh(cgltf_mesh *cgltf_mesh, const char *path) {
       printf("Primitive indices collected.\n");
     }
 
-    // if (primitive.material != NULL) {
-    //   const char *base_image_uri = primitive.material->pbr_metallic_roughness
-    //                                    .base_color_texture.texture->image->uri;
+    if (primitive.material != NULL) {
+      if (primitive.material->pbr_metallic_roughness.base_color_texture
+              .texture != NULL) {
 
-    //   const char *directory_path = get_directory_path(path);
+        printf("Loading base texture.\n.");
+        const char *base_image_uri =
+            primitive.material->pbr_metallic_roughness.base_color_texture
+                .texture->image->uri;
 
-    //   unsigned long directory_path_length = strlen(directory_path);
-    //   unsigned long base_image_uri_length = strlen(base_image_uri);
-    //   unsigned long texture_path_length =
-    //       directory_path_length + base_image_uri_length + 1;
+        const char *directory_path = get_directory_path(path);
 
-    //   char *texture_path = malloc(texture_path_length * sizeof(char));
+        unsigned long directory_path_length = strlen(directory_path);
+        unsigned long base_image_uri_length = strlen(base_image_uri);
+        unsigned long texture_path_length =
+            directory_path_length + base_image_uri_length + 1;
 
-    //   strcpy(texture_path, directory_path);
-    //   texture_path[directory_path_length] = '/';
-    //   strcpy(texture_path + directory_path_length + 1, base_image_uri);
-    //   texture_path[texture_path_length] = '\0';
+        char *texture_path = malloc(texture_path_length * sizeof(char));
 
-    //   mesh.material.base_texture_uri = texture_path;
-    // }
+        strcpy(texture_path, directory_path);
+        texture_path[directory_path_length] = '/';
+        strcpy(texture_path + directory_path_length + 1, base_image_uri);
+        texture_path[texture_path_length] = '\0';
+
+        mesh.material.base_texture_uri = texture_path;
+      } else {
+        printf("Loading base color.\n");
+        cgltf_float *base_color_factor =
+            primitive.material->pbr_metallic_roughness.base_color_factor;
+
+        mesh.material.base_color.x = base_color_factor[0];
+        mesh.material.base_color.y = base_color_factor[1];
+        mesh.material.base_color.z = base_color_factor[2];
+      }
+    }
 
     mesh.vertices_count = primitive.attributes[0].data->count;
     mesh.vertices = malloc(mesh.vertices_count * sizeof(t_vertex));
@@ -227,6 +245,10 @@ void process_gltf_file(const char *path, t_scene **scenes) {
             node.transform.scale.x = cgltf_node->scale[0];
             node.transform.scale.y = cgltf_node->scale[1];
             node.transform.scale.z = cgltf_node->scale[2];
+          } else {
+            node.transform.scale.x = 1;
+            node.transform.scale.y = 1;
+            node.transform.scale.z = 1;
           }
 
           scenes[i]->nodes[ni] = node;
@@ -286,15 +308,26 @@ void setup_mesh(t_mesh *mesh) {
 
   glBindVertexArray(0);
 
-  //mesh->material.base_texture = load_texture(mesh->material.base_texture_uri);
+  if (mesh->material.base_texture_uri != NULL) {
+    printf("Loading material base texture.\n");
+    mesh->material.base_texture = load_texture(mesh->material.base_texture_uri);
+  }
 }
 
 void draw_mesh(t_mesh *mesh, unsigned int shader_program) {
   glUseProgram(shader_program);
 
-  glActiveTexture(GL_TEXTURE0);
-  glUniform1i(glGetUniformLocation(shader_program, "u_texture_base"), 0);
-  //glBindTexture(GL_TEXTURE_2D, mesh->material.base_texture);
+  if (mesh->material.base_texture != 0) {
+    glActiveTexture(GL_TEXTURE0);
+    glUniform1i(glGetUniformLocation(shader_program, "u_texture_base"), 0);
+    glBindTexture(GL_TEXTURE_2D, mesh->material.base_texture);
+  } else {
+    glUniform1i(glGetUniformLocation(shader_program, "u_use_base_color"), true);
+    glUniform3fv(glGetUniformLocation(shader_program, "u_color_base"), 1,
+                 (vec3){mesh->material.base_color.x,
+                        mesh->material.base_color.y,
+                        mesh->material.base_color.z});
+  }
 
   glBindVertexArray(mesh->gl_vertex_array);
 

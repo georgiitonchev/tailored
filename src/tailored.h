@@ -21,6 +21,7 @@ typedef struct t_vertex {
 
 typedef struct t_material {
   const char *base_texture_uri;
+  t_vec3 base_color;
 
   unsigned int base_texture;
 } t_material;

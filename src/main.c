@@ -168,15 +168,16 @@ int main() {
   // process_gltf_file("./res/models/triangle_without_indices/triangleWithoutIndices.gltf",
   // &model); // V
   // process_gltf_file("./res/models/cube/Cube.gltf", &scenes);
-  //process_gltf_file("./res/models/avocado/Avocado.gltf", &scenes);
+  // process_gltf_file("./res/models/avocado/Avocado.gltf", &scenes);
   // process_gltf_file("./res/models/corset/Corset.gltf", &model);
   // &model);
   // process_gltf_file("./res/models/simple_meshes/SimpleMeshes.gltf", &scenes);
-   process_gltf_file("./res/scenes/scene_1/scene_1.gltf", &scenes);
+  process_gltf_file("./res/scenes/scene_1/scene_1.gltf", &scenes);
 
   if (scenes == NULL) {
     printf("Could not load scenes.\n");
-  } else printf("Scenes loaded successfuly.\n");
+  } else
+    printf("Scenes loaded successfuly.\n");
 
   t_scene scene = scenes[0];
   for (unsigned int i = 0; i < scene.nodes_count; i++) {
@@ -216,9 +217,6 @@ int main() {
     mat4 mat_model;
     glm_mat4_identity(mat_model);
 
-    if (rotate_model)
-      glm_rotate(mat_model, (float)glfwGetTime(), (vec3){0, 0.6f, 0.3f});
-
     glUniformMatrix4fv(glGetUniformLocation(shader_program, "u_view"), 1,
                        GL_FALSE, (float *)mat_view);
 
@@ -228,6 +226,14 @@ int main() {
     for (unsigned int i = 0; i < scene.nodes_count; i++) {
 
       t_node node = scene.nodes[i];
+
+      glm_scale(mat_model,
+                (vec3){node.transform.scale.x, node.transform.scale.y,
+                       node.transform.scale.z});
+
+      if (rotate_model)
+        glm_rotate(mat_model, (float)glfwGetTime(), (vec3){0, 0.6f, 0.3f});
+
       glm_translate(mat_model,
                     (vec3){node.transform.position.x, node.transform.position.y,
                            node.transform.position.z});
