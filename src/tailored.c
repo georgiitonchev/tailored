@@ -336,3 +336,86 @@ void draw_mesh(t_mesh *mesh, unsigned int shader_program) {
   else
     glDrawArrays(GL_TRIANGLES, 0, mesh->vertices_count);
 }
+
+const char *read_file(const char *path) {
+  char *text_buffer;
+
+  FILE *file_pointer = fopen(path, "rb");
+  long file_size;
+
+  if (file_pointer == NULL) {
+    perror(path);
+    exit(EXIT_FAILURE);
+  }
+
+  fseek(file_pointer, 0, SEEK_END);
+  file_size = ftell(file_pointer);
+  rewind(file_pointer);
+
+  text_buffer = (char *)malloc(file_size * sizeof(char));
+
+  // Read file contents into the buffer
+  fread(text_buffer, sizeof(char), file_size, file_pointer);
+
+  // Add null terminator at the end to make it a valid C string
+  text_buffer[file_size] = '\0';
+
+  fclose(file_pointer);
+
+  // Free allocated memory
+  return text_buffer;
+}
+
+unsigned int create_shader_program(const char* vertex_shader_path, const char* fragment_shader_path){
+
+// load vertex shader source
+  const char *vertex_shader_source = read_file(vertex_shader_path);
+
+  unsigned int vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+  glShaderSource(vertex_shader, 1, &vertex_shader_source, NULL);
+  glCompileShader(vertex_shader);
+
+  free((void *)vertex_shader_source);
+
+  // check for shader compile errors
+  int success;
+  char info_log[512];
+  glGetShaderiv(vertex_shader, GL_COMPILE_STATUS, &success);
+  if (!success) {
+    glGetShaderInfoLog(vertex_shader, 512, NULL, info_log);
+    printf("%s", info_log);
+  }
+
+  const char *fragment_shader_source = read_file(fragment_shader_path);
+
+  // fragment shader
+  unsigned int fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+  glShaderSource(fragment_shader, 1, &fragment_shader_source, NULL);
+  glCompileShader(fragment_shader);
+
+  free((void *)fragment_shader_source);
+
+  // check for shader compile errors
+  glGetShaderiv(fragment_shader, GL_COMPILE_STATUS, &success);
+  if (!success) {
+    glGetShaderInfoLog(fragment_shader, 512, NULL, info_log);
+    printf("%s", info_log);
+  }
+  // link shaders
+  unsigned int shader_program = glCreateProgram();
+  glAttachShader(shader_program, vertex_shader);
+  glAttachShader(shader_program, fragment_shader);
+  glLinkProgram(shader_program);
+  // check for linking errors
+  glGetProgramiv(shader_program, GL_LINK_STATUS, &success);
+  if (!success) {
+    glGetProgramInfoLog(shader_program, 512, NULL, info_log);
+    printf("%s", info_log);
+  }
+
+  glDeleteShader(vertex_shader);
+  glDeleteShader(fragment_shader);
+
+  return shader_program;
+}
+

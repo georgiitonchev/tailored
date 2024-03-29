@@ -22,87 +22,6 @@ const unsigned int WINDOW_HEIGHT = 360;
 void cursor_pos_callback(GLFWwindow *window, double xpos, double ypos);
 void process_input(GLFWwindow *window);
 
-const char *read_file(const char *path) {
-  char *text_buffer;
-
-  FILE *file_pointer = fopen(path, "rb");
-  long file_size;
-
-  if (file_pointer == NULL) {
-    perror(path);
-    exit(EXIT_FAILURE);
-  }
-
-  fseek(file_pointer, 0, SEEK_END);
-  file_size = ftell(file_pointer);
-  rewind(file_pointer);
-
-  text_buffer = (char *)malloc(file_size * sizeof(char));
-
-  // Read file contents into the buffer
-  fread(text_buffer, sizeof(char), file_size, file_pointer);
-
-  // Add null terminator at the end to make it a valid C string
-  text_buffer[file_size] = '\0';
-
-  fclose(file_pointer);
-
-  // Free allocated memory
-  return text_buffer;
-}
-
-unsigned int create_shader_program() {
-
-  // load vertex shader source
-  const char *vertex_shader_source = read_file("./res/shaders/shader.vs");
-
-  unsigned int vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-  glShaderSource(vertex_shader, 1, &vertex_shader_source, NULL);
-  glCompileShader(vertex_shader);
-
-  free((void *)vertex_shader_source);
-
-  // check for shader compile errors
-  int success;
-  char info_log[512];
-  glGetShaderiv(vertex_shader, GL_COMPILE_STATUS, &success);
-  if (!success) {
-    glGetShaderInfoLog(vertex_shader, 512, NULL, info_log);
-    printf("%s", info_log);
-  }
-
-  const char *fragment_shader_source = read_file("./res/shaders/shader.fs");
-
-  // fragment shader
-  unsigned int fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(fragment_shader, 1, &fragment_shader_source, NULL);
-  glCompileShader(fragment_shader);
-
-  free((void *)fragment_shader_source);
-
-  // check for shader compile errors
-  glGetShaderiv(fragment_shader, GL_COMPILE_STATUS, &success);
-  if (!success) {
-    glGetShaderInfoLog(fragment_shader, 512, NULL, info_log);
-    printf("%s", info_log);
-  }
-  // link shaders
-  unsigned int shader_program = glCreateProgram();
-  glAttachShader(shader_program, vertex_shader);
-  glAttachShader(shader_program, fragment_shader);
-  glLinkProgram(shader_program);
-  // check for linking errors
-  glGetProgramiv(shader_program, GL_LINK_STATUS, &success);
-  if (!success) {
-    glGetProgramInfoLog(shader_program, 512, NULL, info_log);
-    printf("%s", info_log);
-  }
-
-  glDeleteShader(vertex_shader);
-  glDeleteShader(fragment_shader);
-
-  return shader_program;
-}
 
 vec3 cam_pos = {0, 0, 3};
 vec3 cam_dir = {0, 0, -1};
@@ -119,7 +38,6 @@ float mouse_last_y;
 bool rotate_model;
 
 int main() {
-  printf("Hello, World!\n");
   printf("Initializing GLFW...\n");
 
   if (glfwInit() != GLFW_TRUE) {
@@ -172,7 +90,8 @@ int main() {
   // process_gltf_file("./res/models/corset/Corset.gltf", &model);
   // &model);
   // process_gltf_file("./res/models/simple_meshes/SimpleMeshes.gltf", &scenes);
-  process_gltf_file("./res/scenes/scene_1/scene_1.gltf", &scenes);
+  process_gltf_file("./res/scenes/scene_1/scene_4.gltf", &scenes);
+  //process_gltf_file("./res/scenes/scene_2/scene_3.gltf", &scenes);
 
   if (scenes == NULL) {
     printf("Could not load scenes.\n");
@@ -191,7 +110,7 @@ int main() {
   glViewport(0, 0, width, height);
   const float ratio = width / (float)height;
 
-  unsigned int shader_program = create_shader_program();
+  unsigned int shader_program = create_shader_program("./res/shaders/shader.vs", "./res/shaders/shader.fs");
 
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_STENCIL_TEST);

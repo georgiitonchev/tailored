@@ -56,6 +56,8 @@ typedef struct t_scene {
   unsigned int nodes_count;
 } t_scene;
 
+
+//scenes
 void free_mesh(t_mesh *mesh);
 void free_scene(t_scene *scene);
 
@@ -66,3 +68,9 @@ void process_gltf_file(const char *path, t_scene **scenes);
 
 void setup_mesh(t_mesh *mesh);
 void draw_mesh(t_mesh *mesh, unsigned int shader_program);
+
+//files
+const char *read_file(const char *path);
+
+//opengl
+unsigned int create_shader_program(const char* vertex_shader_path, const char* fragment_shader_path);
