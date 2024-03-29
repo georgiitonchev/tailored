@@ -230,7 +230,8 @@ void process_gltf_file(const char *path, t_scene **scenes) {
           t_node node = {0};
 
           node.mesh = process_mesh(cgltf_node->mesh, path);
-
+          setup_mesh(&node.mesh);
+          
           if (cgltf_node->has_translation) {
             node.transform.position.x = cgltf_node->translation[0];
             node.transform.position.y = cgltf_node->translation[1];

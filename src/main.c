@@ -22,7 +22,6 @@ const unsigned int WINDOW_HEIGHT = 360;
 void cursor_pos_callback(GLFWwindow *window, double xpos, double ypos);
 void process_input(GLFWwindow *window);
 
-
 vec3 cam_pos = {0, 0, 3};
 vec3 cam_dir = {0, 0, -1};
 vec3 cam_up = {0, 1, 0};
@@ -81,10 +80,9 @@ int main() {
   printf("GLAD initialized successsfuly.\n");
 
   t_scene *scenes = NULL;
-  // process_gltf_file("./res/models/simple/scene.gltf", &model); // V
-  // process_gltf_file("./res/models/triangle/Triangle.gltf", &model); // V
-  // process_gltf_file("./res/models/triangle_without_indices/triangleWithoutIndices.gltf",
-  // &model); // V
+  // process_gltf_file("./res/models/simple/scene.gltf", &model);
+  // process_gltf_file("./res/models/triangle/Triangle.gltf", &model);
+  // process_gltf_file("./res/models/triangle_without_indices/triangleWithoutIndices.gltf", &model);
   // process_gltf_file("./res/models/cube/Cube.gltf", &scenes);
   // process_gltf_file("./res/models/avocado/Avocado.gltf", &scenes);
   // process_gltf_file("./res/models/corset/Corset.gltf", &model);
@@ -100,7 +98,7 @@ int main() {
 
   t_scene scene = scenes[0];
   for (unsigned int i = 0; i < scene.nodes_count; i++) {
-    setup_mesh(&scene.nodes[i].mesh);
+    
     printf("indices: %d\n", scene.nodes[i].mesh.indices_count);
     printf("vertices: %d\n", scene.nodes[i].mesh.vertices_count);
   }
@@ -206,8 +204,6 @@ void process_input(GLFWwindow *window) {
   if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
     rotate_model = !rotate_model;
   }
-
-  glm_vec3(cam_pos, light_pos);
 }
 
 float yaw;
