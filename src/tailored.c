@@ -241,6 +241,7 @@ void process_gltf_file(const char *path, t_scene **scenes) {
             node.transform.rotation.x = cgltf_node->rotation[0];
             node.transform.rotation.y = cgltf_node->rotation[1];
             node.transform.rotation.z = cgltf_node->rotation[2];
+            node.transform.rotation.w = cgltf_node->rotation[3];
           }
           if (cgltf_node->has_scale) {
             node.transform.scale.x = cgltf_node->scale[0];

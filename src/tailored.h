@@ -12,6 +12,13 @@ typedef struct t_vec3 {
   float z;
 } t_vec3;
 
+typedef struct t_quaternion {
+  float x;
+  float y;
+  float z;
+  float w;
+} t_quaternion;
+
 typedef struct t_vertex {
   t_vec3 position;
   t_vec3 normal;
@@ -42,7 +49,7 @@ typedef struct t_mesh {
 
 typedef struct t_transform {
   t_vec3 position;
-  t_vec3 rotation;
+  t_quaternion rotation;
   t_vec3 scale;
 } t_transform;
 

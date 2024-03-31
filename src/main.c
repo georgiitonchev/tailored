@@ -22,11 +22,11 @@ const unsigned int WINDOW_HEIGHT = 360;
 void cursor_pos_callback(GLFWwindow *window, double xpos, double ypos);
 void process_input(GLFWwindow *window);
 
-vec3 cam_pos = {0, 0, 3};
+vec3 cam_pos = {0, 0, 10};
 vec3 cam_dir = {0, 0, -1};
 vec3 cam_up = {0, 1, 0};
 
-vec3 light_pos = {1.2f, 1.0f, 2.0f};
+vec3 light_pos = {10.2f, 10.0f, 20.0f};
 
 float delta_time;
 float last_frame_time;
@@ -66,8 +66,8 @@ int main() {
   printf("GLFW window created successfuly.\n");
 
   glfwMakeContextCurrent(window);
-  // glfwSetCursorPosCallback(window, cursor_pos_callback);
-  // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+  //glfwSetCursorPosCallback(window, cursor_pos_callback);
+  //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
   printf("Initializing GLAD...\n");
 
@@ -89,7 +89,7 @@ int main() {
   // process_gltf_file("./res/models/corset/Corset.gltf", &model);
   // &model);
   // process_gltf_file("./res/models/simple_meshes/SimpleMeshes.gltf", &scenes);
-  process_gltf_file("./res/scenes/scene_1/scene_4.gltf", &scenes);
+  process_gltf_file("./res/scenes/scene_3.gltf", &scenes);
   // process_gltf_file("./res/scenes/scene_2/scene_3.gltf", &scenes);
 
   if (scenes == NULL) {
@@ -134,15 +134,14 @@ int main() {
     glUniform1i(glGetUniformLocation(shader_program, "use_blinn"), use_blinn);
 
     // identity matrix
-    mat4 mat_view = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}};
+    mat4 mat_view;
+    glm_mat4_identity(mat_view);
     glm_look(cam_pos, cam_dir, cam_up, mat_view);
 
     mat4 mat_projection;
     glm_perspective(glm_rad(45.0f), ratio, .1f, 100.0f, mat_projection);
 
-    mat4 mat_model;
-    glm_mat4_identity(mat_model);
-
+   
     glUniformMatrix4fv(glGetUniformLocation(shader_program, "u_view"), 1,
                        GL_FALSE, (float *)mat_view);
 
@@ -153,18 +152,27 @@ int main() {
 
     for (unsigned int i = 0; i < scene.nodes_count; i++) {
 
+      mat4 mat_model;
+      glm_mat4_identity(mat_model);
+
       t_node node = scene.nodes[i];
 
-      glm_scale(mat_model,
-                (vec3){node.transform.scale.x, node.transform.scale.y,
-                       node.transform.scale.z});
-
-      if (rotate_model)
-        glm_rotate(mat_model, (float)glfwGetTime(), (vec3){0, 0.6f, 0.3f});
+      glm_quat_rotate_at(mat_model, 
+        (vec4) {
+          node.transform.rotation.x, 
+          node.transform.rotation.y, 
+          node.transform.rotation.z, 
+          node.transform.rotation.w }, 
+        (vec3) {node.transform.position.x, node.transform.position.y,
+                           node.transform.position.z});
 
       glm_translate(mat_model,
                     (vec3){node.transform.position.x, node.transform.position.y,
                            node.transform.position.z});
+
+      glm_scale(mat_model,
+                      (vec3){node.transform.scale.x, node.transform.scale.y,
+                            node.transform.scale.z});
 
       glUniformMatrix4fv(glGetUniformLocation(shader_program, "u_model"), 1,
                          GL_FALSE, (float *)mat_model);
