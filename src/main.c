@@ -35,6 +35,7 @@ float mouse_last_x;
 float mouse_last_y;
 
 bool rotate_model;
+bool use_blinn;
 
 int main() {
   printf("Initializing GLFW...\n");
@@ -82,14 +83,14 @@ int main() {
   t_scene *scenes = NULL;
   // process_gltf_file("./res/models/simple/scene.gltf", &model);
   // process_gltf_file("./res/models/triangle/Triangle.gltf", &model);
-  // process_gltf_file("./res/models/triangle_without_indices/triangleWithoutIndices.gltf", &model);
-  // process_gltf_file("./res/models/cube/Cube.gltf", &scenes);
+  // process_gltf_file("./res/models/triangle_without_indices/triangleWithoutIndices.gltf",
+  // &model); process_gltf_file("./res/models/cube/Cube.gltf", &scenes);
   // process_gltf_file("./res/models/avocado/Avocado.gltf", &scenes);
   // process_gltf_file("./res/models/corset/Corset.gltf", &model);
   // &model);
   // process_gltf_file("./res/models/simple_meshes/SimpleMeshes.gltf", &scenes);
   process_gltf_file("./res/scenes/scene_1/scene_4.gltf", &scenes);
-  //process_gltf_file("./res/scenes/scene_2/scene_3.gltf", &scenes);
+  // process_gltf_file("./res/scenes/scene_2/scene_3.gltf", &scenes);
 
   if (scenes == NULL) {
     printf("Could not load scenes.\n");
@@ -98,7 +99,7 @@ int main() {
 
   t_scene scene = scenes[0];
   for (unsigned int i = 0; i < scene.nodes_count; i++) {
-    
+
     printf("indices: %d\n", scene.nodes[i].mesh.indices_count);
     printf("vertices: %d\n", scene.nodes[i].mesh.vertices_count);
   }
@@ -108,11 +109,17 @@ int main() {
   glViewport(0, 0, width, height);
   const float ratio = width / (float)height;
 
-  unsigned int shader_program = create_shader_program("./res/shaders/shader.vs", "./res/shaders/shader.fs");
+  unsigned int shader_program = create_shader_program(
+      "./res/shaders/shader.vs", "./res/shaders/shader.fs");
 
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_STENCIL_TEST);
   glEnable(GL_CULL_FACE);
+
+  glUseProgram(shader_program);
+  glUniform3fv(glGetUniformLocation(shader_program, "light_pos"), 1, light_pos);
+  glUniform3fv(glGetUniformLocation(shader_program, "light_color"), 1,
+               (vec3){1, 1, 1});
 
   while (!glfwWindowShouldClose(window)) {
 
@@ -123,6 +130,8 @@ int main() {
     process_input(window);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     glClearColor(36.0 / 255, 10.0 / 255, 52.0 / 255, 1);
+
+    glUniform1i(glGetUniformLocation(shader_program, "use_blinn"), use_blinn);
 
     // identity matrix
     mat4 mat_view = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}};
@@ -139,6 +148,8 @@ int main() {
 
     glUniformMatrix4fv(glGetUniformLocation(shader_program, "u_projection"), 1,
                        GL_FALSE, (float *)mat_projection);
+
+    glUniform3fv(glGetUniformLocation(shader_program, "view_pos"), 1, cam_pos);
 
     for (unsigned int i = 0; i < scene.nodes_count; i++) {
 
@@ -175,6 +186,9 @@ int main() {
   exit(EXIT_SUCCESS);
 }
 
+bool was_space_pressed;
+bool was_b_pressed;
+
 void process_input(GLFWwindow *window) {
   const float cam_speed = 2.5f * delta_time;
   vec3 vel = {0, 0, 0};
@@ -201,8 +215,22 @@ void process_input(GLFWwindow *window) {
     glm_vec3_add(cam_pos, vel, cam_pos);
   }
 
-  if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+  if (!was_space_pressed && glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+    was_space_pressed = true;
+  }
+
+  if (was_space_pressed && glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE) {
+    was_space_pressed = false;
     rotate_model = !rotate_model;
+  }
+
+  if (!was_b_pressed && glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS) {
+    was_b_pressed = true;
+  }
+
+  if (was_b_pressed && glfwGetKey(window, GLFW_KEY_B) == GLFW_RELEASE) {
+    was_b_pressed = false;
+    use_blinn = !use_blinn;
   }
 }
 
