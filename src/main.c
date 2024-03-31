@@ -194,7 +194,7 @@ int main() {
   unsigned int depth_map_framebuffer;
   glGenFramebuffers(1, &depth_map_framebuffer);
 
-  const unsigned int SHADOW_WIDTH = WINDOW_WIDTH, SHADOW_HEIGHT = WINDOW_HEIGHT;
+  const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
 
   //depth map texture
   unsigned int depth_map_texture;
@@ -248,7 +248,7 @@ int main() {
 
     mat4 mat_light_view;
     glm_mat4_identity(mat_light_view);
-    glm_look(light_pos, (vec3){0, -0.45f, -0.45f}, cam_up, mat_light_view);
+    glm_look(light_pos, (vec3){-.45f, -0.65f, -0.45f}, cam_up, mat_light_view);
 
     mat4 mat_light_space;
     glm_mul(mat_light_projection, mat_light_view, mat_light_space);
