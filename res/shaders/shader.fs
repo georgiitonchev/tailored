@@ -3,6 +3,9 @@
 in vec3 normal;
 in vec3 frag_pos;
 in vec2 tex_coord;
+in vec4 frag_pos_light_space;
+
+uniform sampler2D u_shadow_map;
 
 uniform sampler2D u_texture_base;
 uniform vec3 u_color_base;
@@ -15,6 +18,23 @@ uniform vec3 light_color;
 uniform bool use_blinn;
 
 out vec4 fragment;
+
+float calculate_shadow() {
+
+    // perform perspective divide
+    vec3 projCoords = frag_pos_light_space.xyz / frag_pos_light_space.w;
+    // transform to [0,1] range
+    projCoords = projCoords * 0.5 + 0.5;
+    // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
+    float closestDepth = texture(u_shadow_map, projCoords.xy).r; 
+    // get depth of current fragment from light's perspective
+    float currentDepth = projCoords.z;
+    // check whether current frag pos is in shadow
+    float bias = 0.005;
+    float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
+
+    return shadow;
+}
 
 vec4 calculate_phong_lighting() {
 
@@ -45,7 +65,7 @@ vec4 calculate_phong_lighting() {
     }
     vec3 specular = specular_strength * spec * light_color;
 
-    return vec4(ambient + diffuse + specular, 1.0);
+    return vec4(ambient + (1.0 - calculate_shadow()) * (diffuse + specular), 1.0);
 }
 
 void main() {

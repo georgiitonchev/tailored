@@ -8,9 +8,12 @@ out vec2 tex_coord;
 out vec3 normal;
 out vec3 frag_pos;
 
+out vec4 frag_pos_light_space;
+
 uniform mat4 u_model;
 uniform mat4 u_view;
 uniform mat4 u_projection;
+uniform mat4 u_light_space_matrix;
 
 void main() {
 
@@ -20,4 +23,5 @@ void main() {
     //normal = mat3(transpose(inverse(u_model))) * in_normal;
     normal = in_normal;
     tex_coord = in_tex_coord;
+    frag_pos_light_space = u_light_space_matrix * vec4(frag_pos, 1.0);
 }

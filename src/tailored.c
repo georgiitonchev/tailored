@@ -317,8 +317,6 @@ void setup_mesh(t_mesh *mesh) {
 }
 
 void draw_mesh(t_mesh *mesh, unsigned int shader_program) {
-  glUseProgram(shader_program);
-
   if (mesh->material.base_texture != 0) {
     glActiveTexture(GL_TEXTURE0);
     glUniform1i(glGetUniformLocation(shader_program, "u_texture_base"), 0);
@@ -364,7 +362,6 @@ const char *read_file(const char *path) {
 
   fclose(file_pointer);
 
-  // Free allocated memory
   return text_buffer;
 }
 
@@ -377,16 +374,18 @@ unsigned int create_shader_program(const char* vertex_shader_path, const char* f
   glShaderSource(vertex_shader, 1, &vertex_shader_source, NULL);
   glCompileShader(vertex_shader);
 
-  free((void *)vertex_shader_source);
+  free((char *)vertex_shader_source);
 
   // check for shader compile errors
   int success;
-  char info_log[512];
+  char info_log[1024];
   glGetShaderiv(vertex_shader, GL_COMPILE_STATUS, &success);
   if (!success) {
-    glGetShaderInfoLog(vertex_shader, 512, NULL, info_log);
+    glGetShaderInfoLog(vertex_shader, 1024, NULL, info_log);
     printf("%s", info_log);
   }
+  else
+    printf("vertex shader compiled successfuly.\n");
 
   const char *fragment_shader_source = read_file(fragment_shader_path);
 
@@ -395,14 +394,16 @@ unsigned int create_shader_program(const char* vertex_shader_path, const char* f
   glShaderSource(fragment_shader, 1, &fragment_shader_source, NULL);
   glCompileShader(fragment_shader);
 
-  free((void *)fragment_shader_source);
+  free((char *)fragment_shader_source);
 
   // check for shader compile errors
   glGetShaderiv(fragment_shader, GL_COMPILE_STATUS, &success);
   if (!success) {
-    glGetShaderInfoLog(fragment_shader, 512, NULL, info_log);
+    glGetShaderInfoLog(fragment_shader, 1024, NULL, info_log);
     printf("%s", info_log);
   }
+  else
+    printf("fragment shader compiled successfuly.\n");
   // link shaders
   unsigned int shader_program = glCreateProgram();
   glAttachShader(shader_program, vertex_shader);
@@ -411,13 +412,15 @@ unsigned int create_shader_program(const char* vertex_shader_path, const char* f
   // check for linking errors
   glGetProgramiv(shader_program, GL_LINK_STATUS, &success);
   if (!success) {
-    glGetProgramInfoLog(shader_program, 512, NULL, info_log);
+    glGetProgramInfoLog(shader_program, 1024, NULL, info_log);
     printf("%s", info_log);
   }
+  else
+    printf("program linked successfuly.\n");
 
+  printf("shader program id: %d\n", shader_program);
   glDeleteShader(vertex_shader);
   glDeleteShader(fragment_shader);
-
   return shader_program;
 }
 
