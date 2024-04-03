@@ -39,75 +39,70 @@ float mouse_last_y;
 bool rotate_model;
 bool use_blinn;
 
-void calculate_delta_time()
-{
+void calculate_delta_time() {
   float current_frame_time = glfwGetTime();
   delta_time = current_frame_time - last_frame_time;
   last_frame_time = current_frame_time;
 }
 
-void render_scene(t_scene* scene, unsigned int program) {
+void render_scene(t_scene *scene, unsigned int program) {
   glUseProgram(program);
 
   for (unsigned int i = 0; i < scene->nodes_count; i++) {
 
-      mat4 mat_model;
-      glm_mat4_identity(mat_model);
+    mat4 mat_model;
+    glm_mat4_identity(mat_model);
 
-      t_node node = scene->nodes[i];
+    t_node node = scene->nodes[i];
 
-      glm_quat_rotate_at(mat_model, 
-        (vec4) {
-          node.transform.rotation.x, 
-          node.transform.rotation.y, 
-          node.transform.rotation.z, 
-          node.transform.rotation.w }, 
-        (vec3) {node.transform.position.x, node.transform.position.y,
-                           node.transform.position.z});
+    glm_quat_rotate_at(
+        mat_model,
+        (vec4){node.transform.rotation.x, node.transform.rotation.y,
+               node.transform.rotation.z, node.transform.rotation.w},
+        (vec3){node.transform.position.x, node.transform.position.y,
+               node.transform.position.z});
 
-      glm_translate(mat_model,
-                    (vec3){node.transform.position.x, node.transform.position.y,
-                           node.transform.position.z});
+    glm_translate(mat_model,
+                  (vec3){node.transform.position.x, node.transform.position.y,
+                         node.transform.position.z});
 
-      glm_scale(mat_model,
-                      (vec3){node.transform.scale.x, node.transform.scale.y,
-                            node.transform.scale.z});
+    glm_scale(mat_model, (vec3){node.transform.scale.x, node.transform.scale.y,
+                                node.transform.scale.z});
 
-      glUniformMatrix4fv(glGetUniformLocation(program, "u_model"), 1,
-                         GL_FALSE, (float *)mat_model);
+    glUniformMatrix4fv(glGetUniformLocation(program, "u_model"), 1, GL_FALSE,
+                       (float *)mat_model);
 
-      draw_mesh(&node.mesh, program);
-    }
+    draw_mesh(&node.mesh, program);
+  }
 }
 
 unsigned int quadVAO = 0;
 unsigned int quadVBO;
-void renderQuad()
-{
-    if (quadVAO == 0)
-    {
-        float quadVertices[] = {
-            // positions        // texture Coords
-            -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
-            -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-             1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-             1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
-        };
-        // setup plane VAO
-        glGenVertexArrays(1, &quadVAO);
-        glGenBuffers(1, &quadVBO);
-        glBindVertexArray(quadVAO);
-        glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-    }
-
+void renderQuad() {
+  if (quadVAO == 0) {
+    float quadVertices[] = {
+        // positions        // texture Coords
+        -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+        1.0f,  1.0f, 0.0f, 1.0f, 1.0f, 1.0f,  -1.0f, 0.0f, 1.0f, 0.0f,
+    };
+    // setup plane VAO
+    glGenVertexArrays(1, &quadVAO);
+    glGenBuffers(1, &quadVBO);
     glBindVertexArray(quadVAO);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices,
+                 GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
+                          (void *)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
+                          (void *)(3 * sizeof(float)));
+  }
+
+  glBindVertexArray(quadVAO);
+  glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+  glBindVertexArray(0);
 }
 
 int main() {
@@ -162,7 +157,7 @@ int main() {
   // process_gltf_file("./res/models/corset/Corset.gltf", &model);
   // &model);
   // process_gltf_file("./res/models/simple_meshes/SimpleMeshes.gltf", &scenes);
-    process_gltf_file("./res/scenes/scene_3.gltf", &scenes);
+  process_gltf_file("./res/scenes/scene_3.gltf", &scenes);
 
   if (scenes == NULL) {
     printf("Could not load scenes.\n");
@@ -175,43 +170,43 @@ int main() {
   glViewport(0, 0, width, height);
   const float ratio = width / (float)height;
 
-   unsigned int depth_shader_program = create_shader_program(
-     "./res/shaders/depth_shader.vs", "./res/shaders/depth_shader.fs");
+  unsigned int depth_shader_program = create_shader_program(
+      "./res/shaders/depth_shader.vs", "./res/shaders/depth_shader.fs");
 
-  unsigned int depth_shader_debug_program = create_shader_program(
-    "./res/shaders/depth_shader_debug.vs", "./res/shaders/depth_shader_debug.fs");
+  unsigned int depth_shader_debug_program =
+      create_shader_program("./res/shaders/depth_shader_debug.vs",
+                            "./res/shaders/depth_shader_debug.fs");
 
   unsigned int shader_program = create_shader_program(
       "./res/shaders/shader.vs", "./res/shaders/shader.fs");
 
-  
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_STENCIL_TEST);
   glEnable(GL_CULL_FACE);
 
-
-  //framebuffer
+  // framebuffer
   unsigned int depth_map_framebuffer;
   glGenFramebuffers(1, &depth_map_framebuffer);
 
   const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
 
-  //depth map texture
+  // depth map texture
   unsigned int depth_map_texture;
   glGenTextures(1, &depth_map_texture);
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, depth_map_texture);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 
-              SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH,
+               SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); 
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); 
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-  //bind framebuffer and add texture
+  // bind framebuffer and add texture
   glBindFramebuffer(GL_FRAMEBUFFER, depth_map_framebuffer);
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depth_map_texture, 0);
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D,
+                         depth_map_texture, 0);
   glDrawBuffer(GL_NONE);
   glReadBuffer(GL_NONE);
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -240,7 +235,7 @@ int main() {
     mat4 mat_projection;
     glm_perspective(glm_rad(45.0f), ratio, .1f, 100.0f, mat_projection);
 
-    //shadow map
+    // shadow map
     glUseProgram(depth_shader_program);
 
     mat4 mat_light_projection;
@@ -255,8 +250,9 @@ int main() {
 
     glCullFace(GL_FRONT);
     glUseProgram(depth_shader_program);
-    glUniformMatrix4fv(glGetUniformLocation(depth_shader_program, "light_space_matrix"), 1,
-                       GL_FALSE, (float *)mat_light_space);
+    glUniformMatrix4fv(
+        glGetUniformLocation(depth_shader_program, "light_space_matrix"), 1,
+        GL_FALSE, (float *)mat_light_space);
 
     glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
     glBindFramebuffer(GL_FRAMEBUFFER, depth_map_framebuffer);
@@ -275,36 +271,30 @@ int main() {
                        GL_FALSE, (float *)mat_projection);
 
     glUniform3fv(glGetUniformLocation(shader_program, "view_pos"), 1, cam_pos);
-    glUniformMatrix4fv(glGetUniformLocation(shader_program, "u_light_space_matrix"), 1,
-                       GL_FALSE, (float *)mat_light_space);
+    glUniformMatrix4fv(
+        glGetUniformLocation(shader_program, "u_light_space_matrix"), 1,
+        GL_FALSE, (float *)mat_light_space);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, depth_map_texture);   
+    glBindTexture(GL_TEXTURE_2D, depth_map_texture);
     render_scene(&scene, shader_program);
 
-
     // glUseProgram(depth_shader_debug_program);
-    // glUniform1f(glGetUniformLocation(depth_shader_debug_program, "near_plane"), 1.0f);
-    // glUniform1f(glGetUniformLocation(depth_shader_debug_program, "far_plane"), 7.5f);
-    // glActiveTexture(GL_TEXTURE0);
-    // glUniform1i(glGetUniformLocation(depth_shader_debug_program, "depthMap"), 0);
-    // renderQuad();
+    // glUniform1f(glGetUniformLocation(depth_shader_debug_program,
+    // "near_plane"), 1.0f);
+    // glUniform1f(glGetUniformLocation(depth_shader_debug_program,
+    // "far_plane"), 7.5f); glActiveTexture(GL_TEXTURE0);
+    // glUniform1i(glGetUniformLocation(depth_shader_debug_program, "depthMap"),
+    // 0); renderQuad();
 
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
 
-  // glDeleteVertexArrays(1, &vertex_array_object);
-  //  glDeleteBuffers(1, &VBO);
-  //  glDeleteBuffers(1, &EBO);
-  //glDeleteProgram(shader_program);
-
   glfwDestroyWindow(window);
   glfwTerminate();
   exit(EXIT_SUCCESS);
 }
-
-
 
 bool was_space_pressed;
 bool was_b_pressed;
