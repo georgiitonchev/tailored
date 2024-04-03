@@ -134,8 +134,8 @@ int main() {
   printf("GLFW window created successfuly.\n");
 
   glfwMakeContextCurrent(window);
-  glfwSetCursorPosCallback(window, cursor_pos_callback);
-  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+  // glfwSetCursorPosCallback(window, cursor_pos_callback);
+  // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
   printf("Initializing GLAD...\n");
 
@@ -262,7 +262,7 @@ int main() {
 
     glCullFace(GL_BACK);
     glUseProgram(shader_program);
-    glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+    glViewport(0, 0, width, height);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     glUniformMatrix4fv(glGetUniformLocation(shader_program, "u_view"), 1,
                        GL_FALSE, (float *)mat_view);
