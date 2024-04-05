@@ -25,7 +25,7 @@ else
 		LIBS = $(LIBS_LINUX)
 		CMDS =
 	endif
-	ifeq ($(UNAME_S),Darwin)
+	ifeq ($(UNAME_S), Darwin)
 		EXE_EXT =
 		LIBS = $(LIBS_MAC)
 		CMDS = $(CMDS_MAC)

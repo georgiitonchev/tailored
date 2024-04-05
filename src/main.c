@@ -139,8 +139,8 @@ int main() {
   printf("GLFW window created successfuly.\n");
 
   glfwMakeContextCurrent(window);
-  glfwSetCursorPosCallback(window, cursor_pos_callback);
-  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+  //glfwSetCursorPosCallback(window, cursor_pos_callback);
+  //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
   printf("Initializing GLAD...\n");
 
@@ -281,7 +281,6 @@ int main() {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, depth_map_texture);   
     render_scene(&scene, shader_program);
-
 
     // glUseProgram(depth_shader_debug_program);
     // glUniform1f(glGetUniformLocation(depth_shader_debug_program, "near_plane"), 1.0f);
