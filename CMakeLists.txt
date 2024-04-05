@@ -2,4 +2,10 @@ cmake_minimum_required(VERSION 3.10)
 
 project(tailored)
 
-add_executable(tailored src/main.c)
+# Add all source files in the specified directory
+file(GLOB_RECURSE SOURCE_FILES "src/*.c")
+
+add_executable(tailored ${SOURCE_FILES})
+
+# Copy resources preserving directory structure
+file(COPY "res" DESTINATION "${CMAKE_BINARY_DIR}")
