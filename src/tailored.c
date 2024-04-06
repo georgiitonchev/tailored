@@ -341,7 +341,7 @@ const char *read_file(const char *path) {
   char *text_buffer;
 
   FILE *file_pointer = fopen(path, "rb");
-  long file_size;
+  size_t file_size;
 
   if (file_pointer == NULL) {
     perror(path);
@@ -352,7 +352,7 @@ const char *read_file(const char *path) {
   file_size = ftell(file_pointer);
   rewind(file_pointer);
 
-  text_buffer = (char *)malloc(file_size * sizeof(char));
+  text_buffer = (char *)malloc((file_size + 1) * sizeof(char));
 
   // Read file contents into the buffer
   fread(text_buffer, sizeof(char), file_size, file_pointer);
