@@ -1,27 +1,13 @@
 #version 330 core
 
-layout (location = 0) in vec3 in_pos;
-layout (location = 1) in vec3 in_normal;
-layout (location = 2) in vec2 in_tex_coord;
+layout (location = 0) in vec4 vertex;
 
-out vec2 tex_coord;
-out vec3 normal;
-out vec3 frag_pos;
+out vec2 tex_coords;
 
-out vec4 frag_pos_light_space;
-
-uniform mat4 u_model;
-uniform mat4 u_view;
-uniform mat4 u_projection;
-uniform mat4 u_light_space_matrix;
+uniform mat4 u_mat4_model;
+uniform mat4 u_mat4_projection;
 
 void main() {
-
-    gl_Position = u_projection * u_view * u_model * vec4(in_pos, 1.0);
-
-    frag_pos = vec3(u_model * vec4(in_pos, 1));
-    //normal = mat3(transpose(inverse(u_model))) * in_normal;
-    normal = in_normal;
-    tex_coord = in_tex_coord;
-    frag_pos_light_space = u_light_space_matrix * vec4(frag_pos, 1.0);
+    tex_coords = vertex.zw;
+    gl_Position = u_mat4_projection * u_mat4_model * vec4(vertex.xy, 0.0, 1.0);
 }

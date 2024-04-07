@@ -1,6 +1,3 @@
-#include "../dep/include/cgltf/cgltf.h"
-#include <stdbool.h>
-
 typedef struct t_vec2 {
   float x;
   float y;
@@ -26,57 +23,31 @@ typedef struct t_vertex {
 
 } t_vertex;
 
-typedef struct t_material {
-  const char *base_texture_uri;
-  t_vec3 base_color;
-
-  unsigned int base_texture;
-} t_material;
-
-typedef struct t_mesh {
-  unsigned int vertices_count;
-  t_vertex *vertices;
-
-  unsigned int indices_count;
-  unsigned short *indices;
-
-  t_material material;
-
-  unsigned int gl_vertex_array;
-  unsigned int gl_array_buffer;
-  unsigned int gl_element_array_buffer;
-} t_mesh;
-
 typedef struct t_transform {
   t_vec3 position;
   t_quaternion rotation;
   t_vec3 scale;
 } t_transform;
 
-typedef struct t_node {
-  t_transform transform;
-  t_mesh mesh;
-} t_node;
+typedef struct t_texture {
+  unsigned int id;
+} t_texture;
+
+typedef struct t_camera {
+
+} t_camera;
 
 typedef struct t_scene {
-  t_node *nodes;
-  unsigned int nodes_count;
+
 } t_scene;
 
-
-void free_mesh(t_mesh *mesh);
-void free_scene(t_scene *scene);
-
-//gltf
-void process_node(cgltf_node *node);
-void process_scene(cgltf_scene *scene);
-t_mesh process_mesh(cgltf_mesh *mesh, const char *path);
-void process_gltf_file(const char *path, t_scene **scenes);
-
-//files
+// files
 const char *read_file(const char *path);
 
-//opengl
-unsigned int create_shader_program(const char* vertex_shader_path, const char* fragment_shader_path);
-void setup_mesh(t_mesh *mesh);
-void draw_mesh(t_mesh *mesh, unsigned int shader_program);
+// opengl
+unsigned int create_shader_program(const char *vertex_shader_path,
+                                   const char *fragment_shader_path);
+
+t_texture *load_texture(const char *path);
+void draw_texture(unsigned int shader, t_texture *texture, t_vec2 position,
+                  t_vec2 size);
