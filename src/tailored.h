@@ -9,6 +9,13 @@ typedef struct t_vec3 {
   float z;
 } t_vec3;
 
+typedef struct t_vec4 {
+  float x;
+  float y;
+  float z;
+  float w;
+} t_vec4;
+
 typedef struct t_quaternion {
   float x;
   float y;
@@ -26,13 +33,18 @@ typedef struct t_vertex {
 typedef struct t_transform {
   t_vec3 position;
   t_quaternion rotation;
-  t_vec3 scale;
+  t_vec3 size;
 } t_transform;
 
 typedef struct t_texture {
   unsigned int id;
 } t_texture;
 
+typedef struct t_sprite {
+  t_texture *textue;
+  t_vec4 slice_borders;
+  t_vec2 scale;
+} t_sprite;
 
 // files
 const char *read_file(const char *path);
@@ -42,5 +54,4 @@ unsigned int create_shader_program(const char *vertex_shader_path,
                                    const char *fragment_shader_path);
 
 t_texture *load_texture(const char *path);
-void draw_texture(unsigned int shader, t_texture *texture, t_vec2 position,
-                  t_vec2 size);
+void draw_sprite(t_sprite *sprite, t_transform transform);

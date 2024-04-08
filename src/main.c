@@ -25,19 +25,18 @@ float last_frame_time;
 float sprite_size_x = 48;
 float sprite_size_y = 48;
 
-void processInput(GLFWwindow *window)
-{
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
+void processInput(GLFWwindow *window) {
+  if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    glfwSetWindowShouldClose(window, true);
 
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        sprite_size_y++;
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        sprite_size_y--;
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        sprite_size_x--;
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        sprite_size_x++;
+  if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+    sprite_size_y++;
+  if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+    sprite_size_y--;
+  if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    sprite_size_x--;
+  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    sprite_size_x++;
 }
 
 void calculate_delta_time() {
@@ -77,7 +76,8 @@ void init_shader() {
   sprite_shader = create_shader_program("./res/shaders/shader.vs",
                                         "./res/shaders/shader.fs");
 
-  sprite_texture = load_texture("./res/textures/panel-border-030.png")->id;
+  sprite_texture =
+      load_texture("./res/textures/panel-transparent-center-008.png")->id;
 }
 
 void draw_scene() {
@@ -103,7 +103,7 @@ void draw_scene() {
                (vec4){1, 1, 1, 1.0f});
 
   glUniform4fv(glGetUniformLocation(sprite_shader, "u_slice_borders"), 1,
-               (vec4){10.0f, 10.0f, 10.0f, 10.0f});
+               (vec4){16.0f, 16.0f, 16.0f, 16.0f});
 
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, sprite_texture);

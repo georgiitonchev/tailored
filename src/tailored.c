@@ -150,6 +150,4 @@ t_texture *load_texture(const char *texture_path) {
 
   return texture;
 }
-
-void draw_texture(unsigned int shader, t_texture *texture, t_vec2 position,
-                  t_vec2 size) {}
+void draw_sprite(t_sprite *sprite, t_transform transform) {}
