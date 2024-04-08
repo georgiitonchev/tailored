@@ -72,7 +72,7 @@ void draw_scene() {
   mat4 mat4_model;
   glm_mat4_identity(mat4_model);
   glm_translate(mat4_model,
-                (vec3){640.0f / 2 - 50.0f, 360.0f / 2 - 50.0f, 0.0f});
+                (vec3){640.0f / 2 - 24.0f, 360.0f / 2 - 24.0f, 0.0f});
   glm_scale(mat4_model, (vec3){100.0f, 100.0f, 1.0f});
 
   glUniformMatrix4fv(glGetUniformLocation(sprite_shader, "u_mat4_projection"),
@@ -81,8 +81,11 @@ void draw_scene() {
   glUniformMatrix4fv(glGetUniformLocation(sprite_shader, "u_mat4_model"), 1,
                      GL_FALSE, (float *)mat4_model);
 
-  glUniform3fv(glGetUniformLocation(sprite_shader, "u_color"), 1,
-               (vec3){1, 1, 1});
+  glUniform4fv(glGetUniformLocation(sprite_shader, "u_color"), 1,
+               (vec4){1, 1, 1, 1.0f});
+
+  glUniform4fv(glGetUniformLocation(sprite_shader, "u_slice_borders"), 1,
+               (vec4){10.0f, 10.0f, 10.0f, 10.0f});
 
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, sprite_texture);
