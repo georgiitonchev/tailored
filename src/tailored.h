@@ -33,13 +33,6 @@ typedef struct t_texture {
   unsigned int id;
 } t_texture;
 
-typedef struct t_camera {
-
-} t_camera;
-
-typedef struct t_scene {
-
-} t_scene;
 
 // files
 const char *read_file(const char *path);

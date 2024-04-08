@@ -73,7 +73,7 @@ void draw_scene() {
   glm_mat4_identity(mat4_model);
   glm_translate(mat4_model,
                 (vec3){640.0f / 2 - 24.0f, 360.0f / 2 - 24.0f, 0.0f});
-  glm_scale(mat4_model, (vec3){100.0f, 100.0f, 1.0f});
+  glm_scale(mat4_model, (vec3){96.0f, 136.0f, 1.0f});
 
   glUniformMatrix4fv(glGetUniformLocation(sprite_shader, "u_mat4_projection"),
                      1, GL_FALSE, (float *)mat4_projection);
