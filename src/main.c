@@ -22,6 +22,24 @@ const unsigned int WINDOW_HEIGHT = 360;
 float delta_time;
 float last_frame_time;
 
+float sprite_size_x = 48;
+float sprite_size_y = 48;
+
+void processInput(GLFWwindow *window)
+{
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
+
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        sprite_size_y++;
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        sprite_size_y--;
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        sprite_size_x--;
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        sprite_size_x++;
+}
+
 void calculate_delta_time() {
   float current_frame_time = glfwGetTime();
   delta_time = current_frame_time - last_frame_time;
@@ -73,7 +91,7 @@ void draw_scene() {
   glm_mat4_identity(mat4_model);
   glm_translate(mat4_model,
                 (vec3){640.0f / 2 - 24.0f, 360.0f / 2 - 24.0f, 0.0f});
-  glm_scale(mat4_model, (vec3){96.0f, 136.0f, 1.0f});
+  glm_scale(mat4_model, (vec3){sprite_size_x, sprite_size_y, 1.0f});
 
   glUniformMatrix4fv(glGetUniformLocation(sprite_shader, "u_mat4_projection"),
                      1, GL_FALSE, (float *)mat4_projection);
@@ -151,6 +169,7 @@ int main() {
   while (!glfwWindowShouldClose(window)) {
 
     calculate_delta_time();
+    processInput(window);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(36.0 / 255, 10.0 / 255, 52.0 / 255, 1);
