@@ -150,4 +150,3 @@ t_texture *load_texture(const char *texture_path) {
 
   return texture;
 }
-void draw_sprite(t_sprite *sprite, t_transform transform) {}

@@ -1,3 +1,5 @@
+#pragma once
+
 typedef struct t_vec2 {
   float x;
   float y;
@@ -40,12 +42,6 @@ typedef struct t_texture {
   unsigned int id;
 } t_texture;
 
-typedef struct t_sprite {
-  t_texture *textue;
-  t_vec4 slice_borders;
-  t_vec2 scale;
-} t_sprite;
-
 // files
 const char *read_file(const char *path);
 
@@ -54,4 +50,3 @@ unsigned int create_shader_program(const char *vertex_shader_path,
                                    const char *fragment_shader_path);
 
 t_texture *load_texture(const char *path);
-void draw_sprite(t_sprite *sprite, t_transform transform);
