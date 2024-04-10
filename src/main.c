@@ -106,7 +106,7 @@ int main() {
 
   t_transform sprite_transform;
   sprite_transform.position = (t_vec3){100, 100, 0};
-  sprite_transform.size = (t_vec3){64, 64, 1};
+  sprite_transform.size = (t_vec3){64, 64};
 
   t_sprite sprite_b;
   sprite_b.textue = sprite.textue;
@@ -115,7 +115,7 @@ int main() {
 
   t_transform sprite_b_transform;
   sprite_b_transform.position = (t_vec3){320, 100, 0};
-  sprite_b_transform.size = (t_vec3){128, 48, 1};
+  sprite_b_transform.size = (t_vec3){128, 48};
 
   while (!glfwWindowShouldClose(window)) {
 
@@ -125,8 +125,8 @@ int main() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(36.0 / 255, 10.0 / 255, 52.0 / 255, 1);
 
-    draw_sprite(&sprite, sprite_transform);
-    draw_sprite(&sprite_b, sprite_b_transform);
+    draw_sprite_t(&sprite, sprite_transform);
+    draw_sprite_t(&sprite_b, sprite_b_transform);
 
     glfwSwapBuffers(window);
     glfwPollEvents();

@@ -42,8 +42,7 @@ void init_sprite_renderer() {
   init_quad();
 }
 
-void draw_sprite(t_sprite *sprite, t_transform transform) {
-
+void draw_sprite(t_sprite* sprite, t_vec2 position, t_vec2 size) {
   glUseProgram(sprite_shader);
 
   mat4 mat4_projection;
@@ -52,20 +51,20 @@ void draw_sprite(t_sprite *sprite, t_transform transform) {
   mat4 mat4_model;
   glm_mat4_identity(mat4_model);
   glm_translate(mat4_model,
-                (vec3){transform.position.x, transform.position.y, 0.0f});
-  glm_scale(mat4_model, (vec3){transform.size.x, transform.size.y, 1.0f});
+                (vec3){position.x, position.y, 0.0f});
+  glm_scale(mat4_model, (vec3){size.x, size.y, 1.0f});
 
   glUniformMatrix4fv(glGetUniformLocation(sprite_shader, "u_mat4_projection"),
-                     1, GL_FALSE, (float *)mat4_projection);
+                      1, GL_FALSE, (float *)mat4_projection);
 
   glUniformMatrix4fv(glGetUniformLocation(sprite_shader, "u_mat4_model"), 1,
-                     GL_FALSE, (float *)mat4_model);
+                      GL_FALSE, (float *)mat4_model);
 
   glUniform4fv(glGetUniformLocation(sprite_shader, "u_color"), 1,
-               (vec4){1, 1, 1, 1.0f});
+                (vec4){1, 1, 1, 1.0f});
 
   glUniform4fv(glGetUniformLocation(sprite_shader, "u_slice_borders"), 1,
-               (vec4){sprite->slice_borders.x, sprite->slice_borders.y,
+                (vec4){sprite->slice_borders.x, sprite->slice_borders.y,
                       sprite->slice_borders.z, sprite->slice_borders.w});
 
   glActiveTexture(GL_TEXTURE0);
@@ -74,4 +73,8 @@ void draw_sprite(t_sprite *sprite, t_transform transform) {
   glBindVertexArray(sprite_quad_vao);
   glDrawArrays(GL_TRIANGLES, 0, 6);
   glBindVertexArray(0);
+}
+
+void draw_sprite_t(t_sprite *sprite, t_transform transform) {
+    draw_sprite(sprite, (t_vec2){transform.position.x, transform.position.y}, (t_vec2) {transform.size.x, transform.size.y});
 }
