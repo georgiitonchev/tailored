@@ -99,19 +99,21 @@ int main() {
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   t_sprite sprite;
-  sprite.textue =
+  sprite.texture =
       load_texture("./res/textures/panel-transparent-center-008.png");
   sprite.slice_borders = (t_vec4){16, 16, 16, 16};
   sprite.scale = (t_vec2){1, 1};
+  sprite.color = (t_vec4){1, 1, 1, 1};
 
   t_transform sprite_transform;
   sprite_transform.position = (t_vec3){100, 100, 0};
-  sprite_transform.size = (t_vec3){64, 64};
+  sprite_transform.size = (t_vec3){sprite.texture->size.x, sprite.texture->size.x};
 
   t_sprite sprite_b;
-  sprite_b.textue = sprite.textue;
+  sprite_b.texture = sprite.texture;
   sprite_b.slice_borders = (t_vec4){16, 16, 16, 16};
   sprite_b.scale = (t_vec2){1, 1};
+  sprite_b.color = (t_vec4){1, 0.2, 0.2, 1};
 
   t_transform sprite_b_transform;
   sprite_b_transform.position = (t_vec3){320, 100, 0};

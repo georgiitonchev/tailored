@@ -40,6 +40,8 @@ typedef struct t_transform {
 
 typedef struct t_texture {
   unsigned int id;
+  t_vec2 size;
+  unsigned int channels;
 } t_texture;
 
 // files

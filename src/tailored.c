@@ -147,6 +147,9 @@ t_texture *load_texture(const char *texture_path) {
 
   t_texture *texture = malloc(sizeof(t_texture));
   texture->id = texture_id;
-
+  texture->size.x = width;
+  texture->size.y = width;
+  texture->channels = channels;
+  
   return texture;
 }
