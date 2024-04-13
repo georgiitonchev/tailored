@@ -46,6 +46,34 @@ void calculate_delta_time() {
   last_frame_time = current_frame_time;
 }
 
+
+t_vec4 get_character(char character) {
+  int rows = 8;
+  int columns = 16;
+
+  int row = ((int)character) / columns;
+  int column = ((int)character % columns);
+
+  int left = column * 32;
+  int top = row * 32;
+
+  t_vec4 slice = {left, top, 32, 32};
+  return slice;
+}
+
+void draw_text(const char* text, t_texture* font, t_vec2 position) {
+
+  for (int i = 0; i < strlen(text); i++) {
+      t_sprite sprite_letter_a;
+      sprite_letter_a.texture = font;
+      sprite_letter_a.texture_slice = get_character(text[i]);
+      sprite_letter_a.scale = (t_vec2){1, 1};
+      sprite_letter_a.color = (t_vec4){1, 1, 1, 1};
+
+      draw_sprite(&sprite_letter_a, (t_vec2){position.x + i * 32, position.y}, (t_vec2){32, 32});
+  }
+}
+
 int main() {
   printf("Initializing GLFW...\n");
 
@@ -101,13 +129,10 @@ int main() {
   t_sprite sprite;
   sprite.texture =
       load_texture("./res/textures/panel-transparent-center-008.png");
-  sprite.slice_borders = (t_vec4){16, 16, 16, 16};
+  //sprite.slice_borders = (t_vec4){16, 16, 16, 16};
   sprite.scale = (t_vec2){1, 1};
   sprite.color = (t_vec4){1, 1, 1, 1};
-
-  t_transform sprite_transform;
-  sprite_transform.position = (t_vec3){100, 100, 0};
-  sprite_transform.size = (t_vec3){sprite.texture->size.x, sprite.texture->size.x};
+  sprite.texture_slice = (t_vec4){2, 2, 24, 24};
 
   t_sprite sprite_b;
   sprite_b.texture = sprite.texture;
@@ -115,20 +140,26 @@ int main() {
   sprite_b.scale = (t_vec2){1, 1};
   sprite_b.color = (t_vec4){1, 0.2, 0.2, 1};
 
-  t_transform sprite_b_transform;
-  sprite_b_transform.position = (t_vec3){320, 100, 0};
-  sprite_b_transform.size = (t_vec3){128, 48};
+
+  t_texture* font_texture = load_texture("./res/textures/font.png");
 
   while (!glfwWindowShouldClose(window)) {
 
     calculate_delta_time();
-    processInput(window);
+    //processInput(window);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(36.0 / 255, 10.0 / 255, 52.0 / 255, 1);
 
-    draw_sprite_t(&sprite, sprite_transform);
-    draw_sprite_t(&sprite_b, sprite_b_transform);
+    //draw_sprite(&sprite, (t_vec2){64, 64}, (t_vec2){64, 64});
+    //draw_sprite(&sprite_b, (t_vec2){164, 64}, (t_vec2){64, 64});
+
+    char str[20]; // Assuming the string won't exceed 20 characters
+
+    // Convert float to string
+    sprintf_s(str, 20, "FPS: %d", (int)((1 / delta_time) + .5f));
+
+    draw_text(str, font_texture, (t_vec2){16, 16});
 
     glfwSwapBuffers(window);
     glfwPollEvents();

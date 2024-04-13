@@ -11,11 +11,21 @@ typedef struct t_vec3 {
   float z;
 } t_vec3;
 
-typedef struct t_vec4 {
-  float x;
-  float y;
-  float z;
-  float w;
+typedef union t_vec4 {
+  struct {
+    float x;
+    float y;
+    float z;
+    float w;
+  };
+
+  struct {
+    float r;
+    float g;
+    float b;
+    float a;
+  };
+ 
 } t_vec4;
 
 typedef struct t_quaternion {
