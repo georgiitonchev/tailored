@@ -42,7 +42,7 @@ void init_sprite_renderer() {
   init_quad();
 }
 
-void draw_sprite(t_sprite* sprite, t_vec2 position, t_vec2 size) {
+void draw_sprite(t_sprite* sprite, float x, float y, float width, float height) {
   glUseProgram(sprite_shader);
 
   mat4 mat4_projection;
@@ -51,8 +51,8 @@ void draw_sprite(t_sprite* sprite, t_vec2 position, t_vec2 size) {
   mat4 mat4_model;
   glm_mat4_identity(mat4_model);
   glm_translate(mat4_model,
-                (vec3){position.x, position.y, 0.0f});
-  glm_scale(mat4_model, (vec3){size.x, size.y, 1.0f});
+                (vec3){x, y, 0.0f});
+  glm_scale(mat4_model, (vec3){width, height, 1.0f});
 
   glUniformMatrix4fv(glGetUniformLocation(sprite_shader, "u_mat4_projection"),
                       1, GL_FALSE, (float *)mat4_projection);
@@ -79,15 +79,14 @@ void draw_sprite(t_sprite* sprite, t_vec2 position, t_vec2 size) {
   glBindVertexArray(0);
 }
 
-void draw_sprite_t(t_sprite *sprite, t_transform transform) {
+void draw_sprite_t(t_sprite *sprite, t_rect rect) {
     draw_sprite(
       sprite, 
-      (t_vec2){transform.position.x, transform.position.y}, 
-      (t_vec2){transform.size.x, transform.size.y});
+      rect.x, rect.y, rect.width, rect.height);
 }
 
 void create_sprite(const char* path, t_sprite* sprite) {
   sprite->texture = load_texture(path);
-  sprite->color = (t_vec4){1, 1, 1, 1};
+  sprite->color = (t_color){1, 1, 1, 1};
   sprite->scale = (t_vec2){1, 1};
 } 

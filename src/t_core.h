@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdbool.h>
+
 typedef struct t_vec2 {
   float x;
   float y;
@@ -11,22 +13,29 @@ typedef struct t_vec3 {
   float z;
 } t_vec3;
 
-typedef union t_vec4 {
-  struct {
-    float x;
-    float y;
-    float z;
-    float w;
-  };
+typedef struct t_vec4 {
+  float x;
+  float y;
+  float z;
+  float w;
 
-  struct {
-    float r;
-    float g;
-    float b;
-    float a;
-  };
- 
 } t_vec4;
+
+typedef struct t_color {
+  float r;
+  float g;
+  float b;
+  float a;
+
+} t_color;
+
+typedef struct t_rect {
+  float x; 
+  float y;
+  float width;
+  float height;
+
+} t_rect;
 
 typedef struct t_quaternion {
   float x;
@@ -54,6 +63,29 @@ typedef struct t_texture {
   unsigned int channels;
 } t_texture;
 
+typedef struct t_input_state {
+
+  struct t_mouse_state {
+    struct t_btn_state {
+      bool is_pressed;
+      bool is_down;
+      bool is_released;
+    } buttons[2];
+
+  } mouse_state;
+
+  struct t_keyboard_state {
+
+  } keyboard_state;
+
+} t_inpus_state;
+
+typedef struct t_global_state {
+  t_vec2 mouse_pos;
+
+  t_inpus_state input_state;
+} t_global_state;
+
 // files
 const char *read_file(const char *path);
 
@@ -64,7 +96,7 @@ unsigned int create_shader_program(const char *vertex_shader_path,
 t_texture *load_texture(const char *path);
 
 
-#define WHITE (t_vec4) { 1, 1, 1, 1 }
-#define RED (t_vec4) { 1, 0, 0, 1 }
-#define GREEN (t_vec4) { 0, 1, 0, 1 }
-#define BLUE (t_vec4) { 0, 0, 1, 1 }
+#define WHITE (t_color) { 1, 1, 1, 1 }
+#define RED (t_color) { 1, 0, 0, 1 }
+#define GREEN (t_color) { 0, 1, 0, 1 }
+#define BLUE (t_color) { 0, 0, 1, 1 }

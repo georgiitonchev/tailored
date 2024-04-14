@@ -1,9 +1,10 @@
+#pragma once
 #include "t_core.h"
 
 typedef struct t_sprite {
   t_texture *texture;
   t_vec4 slice_borders;
-  t_vec4 color;
+  t_color color;
   t_vec2 scale;
   t_vec4 texture_slice;
   
@@ -13,5 +14,5 @@ void init_sprite_renderer();
 
 void create_sprite(const char* path, t_sprite* sprite);
 
-void draw_sprite_t(t_sprite *sprite, t_transform transform);
-void draw_sprite(t_sprite* sprite, t_vec2 position, t_vec2 size);
+void draw_sprite_t(t_sprite *sprite, t_rect rect);
+void draw_sprite(t_sprite* sprite, float x, float y, float width, float height);

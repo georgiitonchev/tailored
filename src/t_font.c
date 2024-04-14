@@ -53,7 +53,7 @@ static t_vec4 get_character(char character) {
   return slice;
 }
 
-static void draw_texture_slice(t_vec4 texture_slice, t_vec2 position, t_vec2 size, t_vec4 color) {
+static void draw_texture_slice(t_vec4 texture_slice, t_vec2 position, t_vec2 size, t_color color) {
   glUseProgram(font_shader);
 
   mat4 mat4_projection;
@@ -93,7 +93,7 @@ void init_font_renderer() {
   font_texture = load_texture("./res/textures/font.png")->id;
 }
 
-void draw_text(const char* text, t_vec2 position, int size , t_vec4 color) {
+void draw_text(const char* text, t_vec2 position, int size , t_color color) {
   for (int i = 0; i < strlen(text); i++) {
       draw_texture_slice(get_character(text[i]), (t_vec2){ position.x + i * size, position.y }, (t_vec2){ size, size }, color);
   }
