@@ -10,8 +10,8 @@ static unsigned int sprite_quad_vao;
 static unsigned int sprite_shader;
 
 static void init_shader() {
-  sprite_shader = create_shader_program("./res/shaders/shader.vs",
-                                        "./res/shaders/shader.fs");
+  sprite_shader = create_shader_program("./res/shaders/sprite_shader.vs",
+                                        "./res/shaders/sprite_shader.fs");
 }
 
 static void init_quad() {

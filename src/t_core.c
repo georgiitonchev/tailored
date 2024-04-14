@@ -1,4 +1,4 @@
-#include "tailored.h"
+#include "t_core.h"
 
 #include "../dep/include/glad/glad.h"
 #include <stdlib.h>

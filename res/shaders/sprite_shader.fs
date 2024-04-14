@@ -22,7 +22,6 @@ void main() {
     size.x = length(u_mat4_model[0].xyz);
     size.y = length(u_mat4_model[1].xyz);
 
-    vec4 debug_color = vec4(1.0, 1.0, 1.0, 1.0);
     vec2 tex_coord = tex_coords;
 
     //left
@@ -85,6 +84,6 @@ void main() {
                         s_offset_y, s_offset_y + (1 / s_slice.y));
     }
 
-    color = debug_color* u_color * texture(u_texture, tex_coord);
+    color = u_color * texture(u_texture, tex_coord);
 
 }

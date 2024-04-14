@@ -62,3 +62,9 @@ unsigned int create_shader_program(const char *vertex_shader_path,
                                    const char *fragment_shader_path);
 
 t_texture *load_texture(const char *path);
+
+
+#define WHITE (t_vec4) { 1, 1, 1, 1 }
+#define RED (t_vec4) { 1, 0, 0, 1 }
+#define GREEN (t_vec4) { 0, 1, 0, 1 }
+#define BLUE (t_vec4) { 0, 0, 1, 1 }

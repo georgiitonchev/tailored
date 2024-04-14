@@ -1,4 +1,4 @@
-#include "tailored.h"
+#include "t_core.h"
 
 typedef struct t_sprite {
   t_texture *texture;
