@@ -51,7 +51,7 @@ void draw_sprite(t_sprite* sprite, float x, float y, float width, float height) 
   mat4 mat4_model;
   glm_mat4_identity(mat4_model);
   glm_translate(mat4_model,
-                (vec3){x, y, 0.0f});
+                (vec3){x, y, -0.2f});
   glm_scale(mat4_model, (vec3){width, height, 1.0f});
 
   glUniformMatrix4fv(glGetUniformLocation(sprite_shader, "u_mat4_projection"),

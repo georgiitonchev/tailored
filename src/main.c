@@ -7,11 +7,14 @@
 #include <string.h>
 #include <stdint.h>
 
+// Audio
+#define MINIAUDIO_IMPLEMENTATION
+#include "miniaudio.h"
+
 // GL loader
 #include "../dep/include/glad/glad.h"
 // Windowing
 #include "../dep/include/GLFW/glfw3.h"
-
 // MATH
 #include "../dep/include/cglm/cglm.h"
 
@@ -35,6 +38,8 @@ bool left_mouse_button_pressed;
 
 int clicked_count = 0;
 
+ma_result result;
+ma_engine engine;
 
 void process_input(GLFWwindow *window) {
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -88,6 +93,7 @@ void calculate_delta_time() {
 void on_button_clicked(t_ui_btn* button)
 {
   clicked_count ++;
+  ma_engine_play_sound(&engine, "./res/audio/click_002.wav", NULL);
 }
 
 int main() {
@@ -141,9 +147,28 @@ int main() {
   init_sprite_renderer();
   init_font_renderer();
 
+  // BEGIN AUDIO
+
+    printf("Initializing miniaudio...\n");
+
+    result = ma_engine_init(NULL, &engine);
+    if (result != MA_SUCCESS) {
+        return -1;
+    } 
+    printf("miniaudio initialized successsfuly.\n");
+
+  // END AUDIO
+
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+  t_sprite sprite_rune;
+  sprite_rune.texture = load_texture("./res/textures/runeBlue_slabOutline_030.png");;
+  sprite_rune.slice_borders = (t_vec4){0, 0, 0, 0};
+  sprite_rune.scale = (t_vec2){1, 1};
+  sprite_rune.color = WHITE;
+  sprite_rune.texture_slice = (t_vec4){ 0, 0, 0, 0};
 
   t_sprite sprite;
   sprite.texture = load_texture("./res/textures/panel-transparent-center-008.png");;
@@ -157,7 +182,7 @@ int main() {
   button.rect = (t_rect){width / 2 - 128 / 2, height / 2 - 48 / 2, 128, 48};
   button.color_default = WHITE;
   button.color_mouseover = RED;
-  button.color_clicked = GREEN;
+  button.color_clicked = BLUE;
   button.on_clicked = on_button_clicked;
 
   while (!glfwWindowShouldClose(window)) {
@@ -168,8 +193,7 @@ int main() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(36.0 / 255, 10.0 / 255, 52.0 / 255, 1);
 
-    //draw_sprite(&sprite, width / 2 - 128 / 2, height / 2 - 48 / 2, 128, 48);
-
+    draw_sprite(&sprite_rune, width / 2 - 128 / 2, 164, 56, 93);
     draw_ui_button(&button);
     char str[20]; // Assuming the string won't exceed 20 characters
 
@@ -177,7 +201,7 @@ int main() {
     sprintf_s(str, 20, "Clicks: %d", clicked_count);
 
     draw_text(str, (t_vec2){16, 16}, 18, WHITE);
-    draw_text("Hey!", (t_vec2){16, 146}, 32, RED);
+    draw_text("Hey!", (t_vec2){176, 146}, 32, RED);
 
     glfwSwapBuffers(window);
     glfwPollEvents();

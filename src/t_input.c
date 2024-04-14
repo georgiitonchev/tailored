@@ -1,4 +1,4 @@
-#include "t_core.h";
+#include "t_core.h"
 #include "t_input.h"
 
 extern t_global_state global_state;
