@@ -17,10 +17,14 @@ typedef struct t_ui_btn {
     t_color color_clicked;
     t_color color_disabled;
 
-    void (*on_clicked)(struct t_ui_btn*);
+    void (*on_released)(struct t_ui_btn*);
+    void (*on_mouse_enter)();
+    void (*on_mouse_exit)();
+    void (*on_pressed)();
 
-    bool was_clicked_ptr;
-    bool is_selected_ptr;
+    bool mouse_entered;
+    bool was_clicked;
+    bool is_selected;
 
 } t_ui_btn;
 

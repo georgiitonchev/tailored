@@ -90,9 +90,22 @@ void calculate_delta_time() {
   last_frame_time = current_frame_time;
 }
 
-void on_button_clicked(t_ui_btn *button) {
+void on_button_start_clicked(t_ui_btn *button) {
   clicked_count++;
   ma_engine_play_sound(&engine, "./res/audio/click_003.wav", NULL);
+}
+
+void on_button_quit_clicked(t_ui_btn *button) {
+  clicked_count--;
+  ma_engine_play_sound(&engine, "./res/audio/click_003.wav", NULL);
+}
+
+void on_button_mouse_enter() {
+  ma_engine_play_sound(&engine, "./res/audio/click_004.wav", NULL);
+}
+
+void on_button_mouse_exit() {
+  ma_engine_play_sound(&engine, "./res/audio/click_004.wav", NULL);
 }
 
 int main() {
@@ -162,31 +175,35 @@ int main() {
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-  t_sprite sprite_rune;
-  sprite_rune.texture =
-      load_texture("./res/textures/runeBlue_slabOutline_030.png");
-  ;
-  sprite_rune.slice_borders = (t_vec4){0, 0, 0, 0};
-  sprite_rune.scale = (t_vec2){1, 1};
-  sprite_rune.color = WHITE;
-  sprite_rune.texture_slice = (t_vec4){0, 0, 0, 0};
-
   t_sprite sprite;
   sprite.texture =
       load_texture("./res/textures/panel-transparent-center-008.png");
-  ;
+  
   sprite.slice_borders = (t_vec4){16, 16, 16, 16};
   sprite.scale = (t_vec2){1, 1};
   sprite.color = WHITE;
   sprite.texture_slice = (t_vec4){0, 0, 48, 48};
 
-  t_ui_btn button;
-  button.sprite = &sprite;
-  button.rect = (t_rect){WINDOW_WIDTH / 2 - 128 / 2, WINDOW_HEIGHT / 2 - 48 / 2, 128, 48};
-  button.color_default = WHITE;
-  button.color_mouseover = RED;
-  button.color_clicked = BLUE;
-  button.on_clicked = on_button_clicked;
+  t_ui_btn button_start;
+  button_start.sprite = &sprite;
+  button_start.rect = (t_rect){WINDOW_WIDTH / 2 - 128 / 2, (WINDOW_HEIGHT / 2 - 48 / 2) - 32, 128, 48};
+  button_start.color_default = WHITE;
+  button_start.color_mouseover = LIGHT_GRAY;
+  button_start.color_clicked = DARK_GRAY;
+  button_start.on_released = on_button_start_clicked;
+  button_start.on_mouse_enter = on_button_mouse_enter;
+  button_start.on_mouse_exit = on_button_mouse_exit;
+
+  t_ui_btn button_quit;
+  button_quit.sprite = &sprite;
+  button_quit.rect = (t_rect){WINDOW_WIDTH / 2 - 128 / 2, (WINDOW_HEIGHT / 2 - 48 / 2) + 32, 128, 48};
+  button_quit.color_default = WHITE;
+  button_quit.color_mouseover = LIGHT_GRAY;
+  button_quit.color_clicked = DARK_GRAY;
+  button_quit.on_released = on_button_quit_clicked;
+  button_quit.on_released = on_button_quit_clicked;
+  button_quit.on_mouse_enter = on_button_mouse_enter;
+  button_quit.on_mouse_exit = on_button_mouse_exit;
 
   while (!glfwWindowShouldClose(window)) {
 
@@ -196,15 +213,17 @@ int main() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(36.0 / 255, 10.0 / 255, 52.0 / 255, 1);
 
-    draw_sprite(&sprite_rune, WINDOW_WIDTH / 2 - 128 / 2, 164, 56, 93);
-    draw_ui_button(&button);
     char str[20]; // Assuming the string won't exceed 20 characters
 
     // Convert float to string
     sprintf(str, "Clicks: %d", clicked_count);
-
     draw_text(str, (t_vec2){16, 16}, 18, WHITE);
-    draw_text("Hey!", (t_vec2){176, 146}, 32, RED);
+
+    draw_ui_button(&button_start);
+    draw_text("START", (t_vec2){ button_start.rect.x + button_start.rect.width / 2 - strlen("START") * 8, button_start.rect.y + button_start.rect.height / 2 - 8}, 16, button_start.sprite->color);
+
+    draw_ui_button(&button_quit);
+    draw_text("QUIT", (t_vec2){ button_quit.rect.x + button_quit.rect.width / 2 - strlen("QUIT") * 8, button_quit.rect.y + button_quit.rect.height / 2 - 8}, 16, button_quit.sprite->color);
 
     glfwSwapBuffers(window);
     glfwPollEvents();

@@ -11,23 +11,36 @@ void draw_ui_button(t_ui_btn* button) {
 
     if (is_point_in_rect(global_state.mouse_pos, button->rect))
     {
+        if (!button->mouse_entered) {
+            button->mouse_entered = true;
+
+            if (button->on_mouse_enter)
+                button->on_mouse_enter();
+        }
+
         color = button->color_mouseover;
 
         if (is_mouse_button_pressed(MOUSE_BUTTON_LEFT))
-            button->was_clicked_ptr = 1;
+            button->was_clicked = 1;
 
-        if (button->was_clicked_ptr)
+        if (button->was_clicked)
             color = button->color_clicked;
 
         if (is_mouse_button_released(MOUSE_BUTTON_LEFT))
-            if (button->was_clicked_ptr && button->on_clicked)
-                button->on_clicked(button);
+            if (button->was_clicked && button->on_released)
+                button->on_released(button);
+    }
+    else {
+        if (button->mouse_entered && button->on_mouse_exit)
+            button->on_mouse_exit();
+
+        button->mouse_entered = false;
     }
 
     if (is_mouse_button_released(MOUSE_BUTTON_LEFT))
-        button->was_clicked_ptr = 0;
+        button->was_clicked = 0;
 
-    if (button->is_selected_ptr)
+    if (button->is_selected)
         color = button->color_clicked;
 
     button->sprite->color = color;

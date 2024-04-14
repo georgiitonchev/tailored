@@ -97,6 +97,8 @@ t_texture *load_texture(const char *path);
 
 
 #define WHITE (t_color) { 1, 1, 1, 1 }
+#define LIGHT_GRAY (t_color) { .64f, .64f, .64f, 1 }
+#define DARK_GRAY (t_color) { .32f, .32f, .32f, 1 }
 #define RED (t_color) { 1, 0, 0, 1 }
 #define GREEN (t_color) { 0, 1, 0, 1 }
 #define BLUE (t_color) { 0, 0, 1, 1 }
