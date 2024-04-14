@@ -2,10 +2,10 @@
 #include <OpenGL/OpenGL.h>
 #endif
 
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdint.h>
 
 // Audio
 #define MINIAUDIO_IMPLEMENTATION
@@ -19,8 +19,8 @@
 #include "../dep/include/cglm/cglm.h"
 
 #include "t_core.h"
-#include "t_sprite.h"
 #include "t_font.h"
+#include "t_sprite.h"
 #include "t_ui.h"
 
 const unsigned int WINDOW_WIDTH = 640;
@@ -55,33 +55,33 @@ void process_input(GLFWwindow *window) {
     sprite_size_x++;
 }
 
-void cursor_pos_callback(GLFWwindow* window, double pos_x, double pos_y) {
+void cursor_pos_callback(GLFWwindow *window, double pos_x, double pos_y) {
   global_state.mouse_pos.x = pos_x;
-   global_state.mouse_pos.y = pos_y;
+  global_state.mouse_pos.y = pos_y;
 }
 
-void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
-{
-    //reset state
-    for (uint8_t i = 0; i < 2; i++) {
-      global_state.input_state.mouse_state.buttons[i].is_pressed = false;
-      global_state.input_state.mouse_state.buttons[i].is_released = false;
-    } 
+void mouse_button_callback(GLFWwindow *window, int button, int action,
+                           int mods) {
+  // reset state
+  for (uint8_t i = 0; i < 2; i++) {
+    global_state.input_state.mouse_state.buttons[i].is_pressed = false;
+    global_state.input_state.mouse_state.buttons[i].is_released = false;
+  }
 
-    //update state
-    if (action == GLFW_RELEASE) {
-      global_state.input_state.mouse_state.buttons[button].is_down = false;
+  // update state
+  if (action == GLFW_RELEASE) {
+    global_state.input_state.mouse_state.buttons[button].is_down = false;
 
-      global_state.input_state.mouse_state.buttons[button].is_pressed = false;
-      global_state.input_state.mouse_state.buttons[button].is_released = true;
-    }
- 
-    else if(action == GLFW_PRESS) {
-      global_state.input_state.mouse_state.buttons[button].is_down = true;
-      global_state.input_state.mouse_state.buttons[button].is_pressed = true;
+    global_state.input_state.mouse_state.buttons[button].is_pressed = false;
+    global_state.input_state.mouse_state.buttons[button].is_released = true;
+  }
 
-      global_state.input_state.mouse_state.buttons[button].is_released = false;
-    }
+  else if (action == GLFW_PRESS) {
+    global_state.input_state.mouse_state.buttons[button].is_down = true;
+    global_state.input_state.mouse_state.buttons[button].is_pressed = true;
+
+    global_state.input_state.mouse_state.buttons[button].is_released = false;
+  }
 }
 
 void calculate_delta_time() {
@@ -90,10 +90,9 @@ void calculate_delta_time() {
   last_frame_time = current_frame_time;
 }
 
-void on_button_clicked(t_ui_btn* button)
-{
-  clicked_count ++;
-  ma_engine_play_sound(&engine, "./res/audio/click_002.wav", NULL);
+void on_button_clicked(t_ui_btn *button) {
+  clicked_count++;
+  ma_engine_play_sound(&engine, "./res/audio/click_003.wav", NULL);
 }
 
 int main() {
@@ -149,13 +148,13 @@ int main() {
 
   // BEGIN AUDIO
 
-    printf("Initializing miniaudio...\n");
+  printf("Initializing miniaudio...\n");
 
-    result = ma_engine_init(NULL, &engine);
-    if (result != MA_SUCCESS) {
-        return -1;
-    } 
-    printf("miniaudio initialized successsfuly.\n");
+  result = ma_engine_init(NULL, &engine);
+  if (result != MA_SUCCESS) {
+    return -1;
+  }
+  printf("miniaudio initialized successsfuly.\n");
 
   // END AUDIO
 
@@ -164,22 +163,26 @@ int main() {
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   t_sprite sprite_rune;
-  sprite_rune.texture = load_texture("./res/textures/runeBlue_slabOutline_030.png");;
+  sprite_rune.texture =
+      load_texture("./res/textures/runeBlue_slabOutline_030.png");
+  ;
   sprite_rune.slice_borders = (t_vec4){0, 0, 0, 0};
   sprite_rune.scale = (t_vec2){1, 1};
   sprite_rune.color = WHITE;
-  sprite_rune.texture_slice = (t_vec4){ 0, 0, 0, 0};
+  sprite_rune.texture_slice = (t_vec4){0, 0, 0, 0};
 
   t_sprite sprite;
-  sprite.texture = load_texture("./res/textures/panel-transparent-center-008.png");;
+  sprite.texture =
+      load_texture("./res/textures/panel-transparent-center-008.png");
+  ;
   sprite.slice_borders = (t_vec4){16, 16, 16, 16};
   sprite.scale = (t_vec2){1, 1};
   sprite.color = WHITE;
-  sprite.texture_slice = (t_vec4){ 0, 0, 48, 48 };
+  sprite.texture_slice = (t_vec4){0, 0, 48, 48};
 
   t_ui_btn button;
   button.sprite = &sprite;
-  button.rect = (t_rect){width / 2 - 128 / 2, height / 2 - 48 / 2, 128, 48};
+  button.rect = (t_rect){WINDOW_WIDTH / 2 - 128 / 2, WINDOW_HEIGHT / 2 - 48 / 2, 128, 48};
   button.color_default = WHITE;
   button.color_mouseover = RED;
   button.color_clicked = BLUE;
@@ -188,7 +191,7 @@ int main() {
   while (!glfwWindowShouldClose(window)) {
 
     calculate_delta_time();
-    //processInput(window);
+    // processInput(window);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(36.0 / 255, 10.0 / 255, 52.0 / 255, 1);
@@ -198,7 +201,7 @@ int main() {
     char str[20]; // Assuming the string won't exceed 20 characters
 
     // Convert float to string
-    sprintf_s(str, 20, "Clicks: %d", clicked_count);
+    sprintf(str, "Clicks: %d", clicked_count);
 
     draw_text(str, (t_vec2){16, 16}, 18, WHITE);
     draw_text("Hey!", (t_vec2){176, 146}, 32, RED);
