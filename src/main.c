@@ -196,7 +196,7 @@ int main() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(36.0 / 255, 10.0 / 255, 52.0 / 255, 1);
 
-    draw_sprite(&sprite_rune, width / 2 - 128 / 2, 164, 56, 93);
+    draw_sprite(&sprite_rune, WINDOW_WIDTH / 2 - 128 / 2, 164, 56, 93);
     draw_ui_button(&button);
     char str[20]; // Assuming the string won't exceed 20 characters
 
