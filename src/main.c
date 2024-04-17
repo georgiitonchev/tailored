@@ -105,7 +105,7 @@ void on_button_mouse_enter() {
 }
 
 void on_button_mouse_exit() {
-  ma_engine_play_sound(&engine, "./res/audio/click_004.wav", NULL);
+  //ma_engine_play_sound(&engine, "./res/audio/click_004.wav", NULL);
 }
 
 int main() {
@@ -184,23 +184,12 @@ int main() {
   sprite.color = WHITE;
   sprite.texture_slice = (t_vec4){0, 0, 48, 48};
 
-  t_ui_btn button_start;
-  button_start.sprite = &sprite;
-  button_start.rect = (t_rect){WINDOW_WIDTH / 2 - 128 / 2, (WINDOW_HEIGHT / 2 - 48 / 2) - 32, 128, 48};
-  button_start.color_default = WHITE;
-  button_start.color_mouseover = LIGHT_GRAY;
-  button_start.color_clicked = DARK_GRAY;
+  t_ui_btn button_start = create_ui_button(&sprite, (t_rect){WINDOW_WIDTH / 2 - 128 / 2, (WINDOW_HEIGHT / 2 - 48 / 2) - 32, 128, 48});
   button_start.on_released = on_button_start_clicked;
   button_start.on_mouse_enter = on_button_mouse_enter;
   button_start.on_mouse_exit = on_button_mouse_exit;
 
-  t_ui_btn button_quit;
-  button_quit.sprite = &sprite;
-  button_quit.rect = (t_rect){WINDOW_WIDTH / 2 - 128 / 2, (WINDOW_HEIGHT / 2 - 48 / 2) + 32, 128, 48};
-  button_quit.color_default = WHITE;
-  button_quit.color_mouseover = LIGHT_GRAY;
-  button_quit.color_clicked = DARK_GRAY;
-  button_quit.on_released = on_button_quit_clicked;
+  t_ui_btn button_quit = create_ui_button(&sprite, (t_rect){WINDOW_WIDTH / 2 - 128 / 2, (WINDOW_HEIGHT / 2 - 48 / 2) + 32, 128, 48});
   button_quit.on_released = on_button_quit_clicked;
   button_quit.on_mouse_enter = on_button_mouse_enter;
   button_quit.on_mouse_exit = on_button_mouse_exit;

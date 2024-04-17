@@ -28,4 +28,5 @@ typedef struct t_ui_btn {
 
 } t_ui_btn;
 
+t_ui_btn create_ui_button(t_sprite* sprite, t_rect rect);
 void draw_ui_button(t_ui_btn* button);
