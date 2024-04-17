@@ -22,6 +22,7 @@
 #include "t_font.h"
 #include "t_sprite.h"
 #include "t_ui.h"
+#include "t_models.h"
 
 const unsigned int WINDOW_WIDTH = 640;
 const unsigned int WINDOW_HEIGHT = 360;
@@ -178,7 +179,7 @@ int main() {
   t_sprite sprite;
   sprite.texture =
       load_texture("./res/textures/panel-transparent-center-008.png");
-  
+
   sprite.slice_borders = (t_vec4){16, 16, 16, 16};
   sprite.scale = (t_vec2){1, 1};
   sprite.color = WHITE;

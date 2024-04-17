@@ -30,7 +30,7 @@ typedef struct t_color {
 } t_color;
 
 typedef struct t_rect {
-  float x; 
+  float x;
   float y;
   float width;
   float height;
@@ -55,6 +55,7 @@ typedef struct t_transform {
   t_vec3 position;
   t_quaternion rotation;
   t_vec3 size;
+  t_vec3 scale;
 } t_transform;
 
 typedef struct t_texture {

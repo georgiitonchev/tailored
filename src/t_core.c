@@ -13,26 +13,6 @@
 // MATH
 #include "../dep/include/cglm/cglm.h"
 
-const char *get_directory_path(const char *path) {
-  const char *last_slash = strrchr(path, '/');
-
-  if (last_slash != NULL) {
-    // Calculate the length of the substring
-    size_t length = last_slash - path;
-
-    // Allocate memory for the substring
-    char *substring = malloc((length + 1) * sizeof(char));
-
-    // Copy the substring
-    strncpy(substring, path, length);
-    substring[length] = '\0'; // Null-terminate the string
-
-    return substring;
-  }
-
-  return NULL;
-}
-
 const char *read_file(const char *path) {
   char *text_buffer;
 
@@ -102,7 +82,7 @@ GLuint create_shader_program(const char *vertex_shader_path,
   glAttachShader(shader_program, vertex_shader);
   glAttachShader(shader_program, fragment_shader);
   glLinkProgram(shader_program);
- 
+
   GLint link_status;
   glGetProgramiv(shader_program, GL_LINK_STATUS, &link_status);
 
@@ -164,6 +144,6 @@ t_texture *load_texture(const char *texture_path) {
   texture->size.x = width;
   texture->size.y = width;
   texture->channels = channels;
-  
+
   return texture;
 }
