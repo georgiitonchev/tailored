@@ -1,1 +1,1 @@
-Learning C and OpenGL by making a very simple 2d game framework.
+Learning C and OpenGL.
