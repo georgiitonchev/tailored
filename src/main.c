@@ -89,14 +89,16 @@ void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
   }
 }
 
-void GLAPIENTRY debug_message_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) {
-    printf("OpenGL error. \n");
-}
-
 void calculate_delta_time() {
   float current_frame_time = glfwGetTime();
   delta_time = current_frame_time - last_frame_time;
   last_frame_time = current_frame_time;
+}
+
+void APIENTRY debug_callback(GLenum source, GLenum type, GLuint id,
+  GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
+{
+  printf("OpenGL Debug: %s\n", message);
 }
 
 void on_button_start_clicked(t_ui_btn *button) {
@@ -165,8 +167,7 @@ int main() {
 
   printf("GLAD initialized successsfuly.\n");
 
-   // Enable debug output
-  //glDebugMessageCallback(debug_message_callback, 0);
+  glDebugMessageCallback(debug_callback, NULL);
 
   int width, height;
   glfwGetFramebufferSize(window, &width, &height);
