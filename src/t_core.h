@@ -1,4 +1,5 @@
 #pragma once
+#define UNUSED(x) (void)(x)
 
 #include <stdbool.h>
 

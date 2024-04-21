@@ -49,7 +49,7 @@ static GLuint compile_shader(const char* shader_path, unsigned int shader_type) 
   glShaderSource(shader_id, 1, &shader_source, NULL);
   glCompileShader(shader_id);
 
-  free(shader_source);
+  free((void *)shader_source);
 
   GLint compile_status;
   glGetShaderiv(shader_id, GL_COMPILE_STATUS, &compile_status);

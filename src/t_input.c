@@ -16,6 +16,6 @@ bool is_mouse_button_released(int button) {
 }
 
 //keyboard
-bool is_key_pressed(int key){ return false;}
-bool is_key_down(int key) {return false;}
-bool is_key_released(int key) {return false;}
+bool is_key_pressed(int key){ UNUSED(key); return false;}
+bool is_key_down(int key) { UNUSED(key); return false;}
+bool is_key_released(int key) { UNUSED(key); return false;}

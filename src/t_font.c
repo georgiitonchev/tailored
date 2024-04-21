@@ -40,7 +40,6 @@ static void init_shader() {
 }
 
 static t_vec4 get_character(char character) {
-  int rows = 8;
   int columns = 16;
 
   int row = ((int)character) / columns;
@@ -94,7 +93,7 @@ void init_font_renderer() {
 }
 
 void draw_text(const char* text, t_vec2 position, int size , t_color color) {
-  for (int i = 0; i < strlen(text); i++) {
+  for (int i = 0; i < (int) strlen(text); i++) {
       draw_texture_slice(get_character(text[i]), (t_vec2){ position.x + i * size, position.y }, (t_vec2){ size, size }, color);
   }
 }

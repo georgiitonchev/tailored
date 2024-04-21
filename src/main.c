@@ -57,12 +57,16 @@ void process_input(GLFWwindow *window) {
 }
 
 void cursor_pos_callback(GLFWwindow *window, double pos_x, double pos_y) {
+  UNUSED(window);
+
   global_state.mouse_pos.x = pos_x;
   global_state.mouse_pos.y = pos_y;
 }
 
-void mouse_button_callback(GLFWwindow *window, int button, int action,
-                           int mods) {
+void mouse_button_callback(GLFWwindow *window, int button, int action, int mods) {
+  UNUSED(window);
+  UNUSED(mods);
+
   // reset state
   for (uint8_t i = 0; i < 2; i++) {
     global_state.input_state.mouse_state.buttons[i].is_pressed = false;
@@ -85,6 +89,10 @@ void mouse_button_callback(GLFWwindow *window, int button, int action,
   }
 }
 
+void GLAPIENTRY debug_message_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) {
+    printf("OpenGL error. \n");
+}
+
 void calculate_delta_time() {
   float current_frame_time = glfwGetTime();
   delta_time = current_frame_time - last_frame_time;
@@ -92,11 +100,15 @@ void calculate_delta_time() {
 }
 
 void on_button_start_clicked(t_ui_btn *button) {
+  UNUSED(button);
+
   clicked_count++;
   ma_engine_play_sound(&engine, "./res/audio/click_003.wav", NULL);
 }
 
 void on_button_quit_clicked(t_ui_btn *button) {
+  UNUSED(button);
+
   clicked_count--;
   ma_engine_play_sound(&engine, "./res/audio/click_003.wav", NULL);
 }
@@ -124,7 +136,8 @@ int main() {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-
+  glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+  
   printf("Creating GLFW window...\n");
   GLFWwindow *window =
       glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Tailored", NULL, NULL);
@@ -152,10 +165,13 @@ int main() {
 
   printf("GLAD initialized successsfuly.\n");
 
+   // Enable debug output
+  //glDebugMessageCallback(debug_message_callback, 0);
+
   int width, height;
   glfwGetFramebufferSize(window, &width, &height);
   glViewport(0, 0, width, height);
-  const float ratio = width / (float)height;
+  //const float ratio = width / (float)height;
 
   init_sprite_renderer();
   init_font_renderer();
@@ -183,7 +199,7 @@ int main() {
   sprite.slice_borders = (t_vec4){16, 16, 16, 16};
   sprite.scale = (t_vec2){1, 1};
   sprite.color = WHITE;
-  sprite.texture_slice = (t_vec4){0, 0, 48, 48};
+  //sprite.texture_slice = (t_vec4){0, 0, 48, 48};
 
   t_ui_btn button_start = create_ui_button(&sprite, (t_rect){WINDOW_WIDTH / 2 - 128 / 2, (WINDOW_HEIGHT / 2 - 48 / 2) - 32, 128, 48});
   button_start.on_released = on_button_start_clicked;
