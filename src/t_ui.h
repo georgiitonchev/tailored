@@ -3,10 +3,6 @@
 #include "t_core.h"
 #include "t_sprite.h"
 
-typedef struct t_ui_el {
-
-} t_ui_el;
-
 typedef struct t_ui_btn {
 
     t_rect rect;

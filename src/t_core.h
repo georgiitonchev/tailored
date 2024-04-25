@@ -77,7 +77,7 @@ typedef struct t_input_state {
   } mouse_state;
 
   struct t_keyboard_state {
-
+    bool active;
   } keyboard_state;
 
 } t_inpus_state;

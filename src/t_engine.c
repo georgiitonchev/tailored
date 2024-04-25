@@ -83,8 +83,8 @@ static void mouse_button_callback(GLFWwindow *window, int button, int action, in
 static void cursor_pos_callback(GLFWwindow *window, double pos_x, double pos_y) {
   UNUSED(window);
 
-  global_state.mouse_pos.x = pos_x;
-  global_state.mouse_pos.y = pos_y;
+  global_state.mouse_pos.x = (float) pos_x;
+  global_state.mouse_pos.y = (float) pos_y;
 }
 
 int t_begin(int window_width, int window_height, const char* title) {
@@ -153,14 +153,14 @@ int t_begin(int window_width, int window_height, const char* title) {
 
     // BEGIN AUDIO
 
-    printf("Initializing miniaudio...\n");
+    // printf("Initializing miniaudio...\n");
 
-    ma_engine engine;
-    ma_result result = ma_engine_init(NULL, &engine);
-    if (result != MA_SUCCESS) {
-      return -1;
-    }
-    printf("miniaudio initialized successsfuly.\n");
+    // ma_engine engine;
+    // ma_result result = ma_engine_init(NULL, &engine);
+    // if (result != MA_SUCCESS) {
+    //   return -1;
+    // }
+    // printf("miniaudio initialized successsfuly.\n");
 
     // END AUDIO
 

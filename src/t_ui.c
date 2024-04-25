@@ -7,7 +7,7 @@ extern t_global_state global_state;
 
 t_ui_btn create_ui_button(t_sprite* sprite, t_rect rect) {
 
-    t_ui_btn ui_button = {};
+    t_ui_btn ui_button;
 
     ui_button.sprite = sprite;
     ui_button.rect = rect;
