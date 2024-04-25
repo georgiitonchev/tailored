@@ -2,6 +2,7 @@
 #include <OpenGL/OpenGL.h>
 #endif
 
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,10 +36,22 @@ static void calculate_delta_time() {
   last_frame_time = current_frame_time;
 }
 
-static void APIENTRY debug_callback(GLenum source, GLenum type, GLuint id,
+void APIENTRY debug_callback(GLenum source, GLenum type, GLuint id,
   GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
 {
-  printf("OpenGL Debug: %s\n", message);
+  UNUSED(source);
+  UNUSED(type);
+  UNUSED(id);
+  UNUSED(length);
+  UNUSED(userParam);
+
+  const char* severityStr = 
+    severity == GL_DEBUG_SEVERITY_HIGH ? "High" :
+    severity == GL_DEBUG_SEVERITY_MEDIUM ? "Medium" :
+    severity == GL_DEBUG_SEVERITY_LOW ? "Low" :
+    severity == GL_DEBUG_SEVERITY_NOTIFICATION ? "Notification" : "";
+
+  printf("OpenGL %s : %s\n", severityStr, message);
 }
 
 static void mouse_button_callback(GLFWwindow *window, int button, int action, int mods) {
@@ -164,10 +177,14 @@ bool t_loop() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(36.0 / 255, 10.0 / 255, 52.0 / 255, 1);
 
+   
+    return !glfwWindowShouldClose(m_window);
+}
+
+void t_loop_end() {
+  
     glfwSwapBuffers(m_window);
     glfwPollEvents();
-
-    return !glfwWindowShouldClose(m_window);
 }
 
 void t_end() {
