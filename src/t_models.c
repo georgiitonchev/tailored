@@ -277,7 +277,7 @@ void setup_mesh(t_mesh *mesh) {
 
   if (mesh->material.base_texture_uri != NULL) {
     printf("Loading material base texture.\n");
-    mesh->material.base_texture = load_texture(mesh->material.base_texture_uri)->id;
+    mesh->material.base_texture = load_texture(mesh->material.base_texture_uri).id;
   }
 }
 

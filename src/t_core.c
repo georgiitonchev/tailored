@@ -107,16 +107,34 @@ GLuint create_shader_program(const char *vertex_shader_path,
   return shader_program;
 }
 
-t_texture *load_texture(const char *texture_path) {
+t_texture_data load_texture_data(const char* path) {
   int width, height, channels;
-  unsigned char *data = stbi_load(texture_path, &width, &height, &channels, 0);
+  unsigned char *data = stbi_load(path, &width, &height, &channels, 0);
+
+  if (data == NULL) {
+    printf("error loading texture: %s\n", path);
+  }
+
+  t_texture_data texture_data = {
+    .data = data,
+    .channels = channels,
+    .width = width,
+    .height = height
+  };
+
+  return texture_data;
+}
+
+t_texture load_texture(const char *texture_path) {
+
+  t_texture_data texture_data = load_texture_data(texture_path);
 
   GLenum texture_format = 0;
-  if (channels == 1)
+  if (texture_data.channels == 1)
     texture_format = GL_RED;
-  else if (channels == 3)
+  else if (texture_data.channels == 3)
     texture_format = GL_RGB;
-  else if (channels == 4)
+  else if (texture_data.channels == 4)
     texture_format = GL_RGBA;
 
   unsigned int texture_id;
@@ -132,18 +150,30 @@ t_texture *load_texture(const char *texture_path) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-  glTexImage2D(GL_TEXTURE_2D, 0, texture_format, width, height, 0,
-               texture_format, GL_UNSIGNED_BYTE, data);
-  glGenerateMipmap(GL_TEXTURE_2D);
+  glTexImage2D(GL_TEXTURE_2D, 0, texture_format, texture_data.width, texture_data.height, 0,
+               texture_format, GL_UNSIGNED_BYTE, texture_data.data);
+
+
+  //glGenerateMipmap(GL_TEXTURE_2D);
+
   glBindTexture(GL_TEXTURE_2D, 0);
 
-  stbi_image_free(data);
+  stbi_image_free(texture_data.data);
 
-  t_texture *texture = malloc(sizeof(t_texture));
-  texture->id = texture_id;
-  texture->size.x = width;
-  texture->size.y = width;
-  texture->channels = channels;
+  t_texture texture;// = malloc(sizeof(t_texture));
+      texture.id = texture_id;
+      texture.size.x = texture_data.width;
+      texture.size.y = texture_data.height;
+      texture.channels = texture_data.channels;
 
   return texture;
+}
+
+void free_texture(t_texture* texture) 
+{
+    glDeleteTextures(1, &texture->id);
+}
+
+void clear_color(t_color color) {
+    glClearColor(color.r / 255, color.g / 255, color.b / 255, color.a);
 }

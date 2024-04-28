@@ -1,4 +1,5 @@
 #include <string.h>
+#include "t_font.h"
 #include "t_core.h"
 
 // GL loader
@@ -9,7 +10,7 @@
 
 static unsigned int font_quad_vao;
 static unsigned int font_shader;
-static unsigned int font_texture;
+static t_texture font_texture;
 
 static void init_quad() {
   // configure VAO/VBO
@@ -78,7 +79,7 @@ static void draw_texture_slice(t_vec4 texture_slice, t_vec2 position, t_vec2 siz
                         texture_slice.z, texture_slice.w});
 
   glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, font_texture);
+  glBindTexture(GL_TEXTURE_2D, font_texture.id);
 
   glBindVertexArray(font_quad_vao);
   glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -89,11 +90,19 @@ void init_font_renderer() {
   init_quad();
   init_shader();
 
-  font_texture = load_texture("./res/textures/font.png")->id;
+  font_texture = load_texture("./res/textures/font.png");
+}
+
+void terminate_font_renderer() {
+    free_texture(&font_texture);
 }
 
 void draw_text(const char* text, t_vec2 position, int size , t_color color) {
   for (int i = 0; i < (int) strlen(text); i++) {
       draw_texture_slice(get_character(text[i]), (t_vec2){ position.x + i * size, position.y }, (t_vec2){ size, size }, color);
   }
+}
+
+t_vec2 measure_text_size(const char* text, int size) {
+    return (t_vec2) { size * strlen(text), size };
 }

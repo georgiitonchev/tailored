@@ -42,7 +42,7 @@ void init_sprite_renderer() {
   init_quad();
 }
 
-void draw_sprite(t_sprite* sprite, float x, float y, float width, float height) {
+void draw_sprite(t_sprite* sprite, float x, float y, float width, float height, t_color color) {
   glUseProgram(sprite_shader);
 
   mat4 mat4_projection;
@@ -61,7 +61,7 @@ void draw_sprite(t_sprite* sprite, float x, float y, float width, float height) 
                       GL_FALSE, (float *)mat4_model);
 
   glUniform4fv(glGetUniformLocation(sprite_shader, "u_color"), 1,
-                (vec4){sprite->color.r, sprite->color.g, sprite->color.b, sprite->color.a});
+                (vec4){color.r / 255.0, color.g / 255.0, color.b / 255.0, color.a / 255.0});
 
   glUniform4fv(glGetUniformLocation(sprite_shader, "u_slice_borders"), 1,
                 (vec4){sprite->slice_borders.x, sprite->slice_borders.y,
@@ -72,21 +72,27 @@ void draw_sprite(t_sprite* sprite, float x, float y, float width, float height) 
                         sprite->texture_slice.z, sprite->texture_slice.w});
 
   glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, sprite->texture->id);
+  glBindTexture(GL_TEXTURE_2D, sprite->texture.id);
 
   glBindVertexArray(sprite_quad_vao);
   glDrawArrays(GL_TRIANGLES, 0, 6);
   glBindVertexArray(0);
 }
 
-void draw_sprite_t(t_sprite *sprite, t_rect rect) {
+void draw_sprite_t(t_sprite *sprite, t_rect rect, t_color color) {
     draw_sprite(
       sprite, 
-      rect.x, rect.y, rect.width, rect.height);
+      rect.x, rect.y, rect.width, rect.height, color);
 }
 
 void create_sprite(const char* path, t_sprite* sprite) {
   sprite->texture = load_texture(path);
-  sprite->color = (t_color){1, 1, 1, 1};
-  sprite->scale = (t_vec2){1, 1};
-} 
+  sprite->scale = (t_vec2){ 1, 1 };
+  sprite->texture_slice = (t_vec4){ 0, 0, sprite->texture.size.x, sprite->texture.size.y };
+  sprite->slice_borders = (t_vec4){ 0, 0, 0, 0 };
+
+}
+void delete_sprite(t_sprite* sprite)
+{
+    free_texture(&sprite->texture);
+}

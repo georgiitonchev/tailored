@@ -2,6 +2,8 @@
 #include <OpenGL/OpenGL.h>
 #endif
 
+#include "t_engine.h"
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -24,11 +26,29 @@
 #include "t_font.h"
 
 static GLFWwindow* m_window;
+static ma_engine m_engine;
 
 static float delta_time;
 static float last_frame_time;
 
 t_global_state global_state;
+
+void t_play_audio(const char* path) {
+  ma_engine_play_sound(&m_engine, path, NULL);
+}
+
+void t_set_cursor(const char* path) {
+
+  t_texture_data texture_data = load_texture_data(path);
+
+  GLFWimage image;
+  image.width = texture_data.width;
+  image.height = texture_data.height;
+  image.pixels = texture_data.data;
+  
+  GLFWcursor* cursor = glfwCreateCursor(&image, 12, 10);
+  glfwSetCursor(m_window, cursor);
+ }
 
 static void calculate_delta_time() {
   float current_frame_time = glfwGetTime();
@@ -36,6 +56,7 @@ static void calculate_delta_time() {
   last_frame_time = current_frame_time;
 }
 
+#ifndef __APPLE__
 void APIENTRY debug_callback(GLenum source, GLenum type, GLuint id,
   GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
 {
@@ -53,6 +74,7 @@ void APIENTRY debug_callback(GLenum source, GLenum type, GLuint id,
 
   printf("OpenGL %s : %s\n", severityStr, message);
 }
+#endif
 
 static void mouse_button_callback(GLFWwindow *window, int button, int action, int mods) {
   UNUSED(window);
@@ -131,13 +153,13 @@ int t_begin(int window_width, int window_height, const char* title) {
     printf("GLAD initialized successsfuly.\n");
     printf("OpenGL version: %s\n", glGetString(GL_VERSION));
 
-    GLint extensions_count;
-    glGetIntegerv(GL_NUM_EXTENSIONS, &extensions_count);
+    // GLint extensions_count;
+    // glGetIntegerv(GL_NUM_EXTENSIONS, &extensions_count);
 
-    printf("OpenGL extensions:\n");
-    for (GLint i = 0; i < extensions_count; i++) {
-        printf("%s\n", glGetStringi(GL_EXTENSIONS, i));
-    }
+    // printf("OpenGL extensions:\n");
+    // for (GLint i = 0; i < extensions_count; i++) {
+    //     printf("%s\n", glGetStringi(GL_EXTENSIONS, i));
+    // }
 
     #ifndef __APPLE__
       glDebugMessageCallback(debug_callback, NULL);
@@ -153,18 +175,18 @@ int t_begin(int window_width, int window_height, const char* title) {
 
     // BEGIN AUDIO
 
-    // printf("Initializing miniaudio...\n");
+    printf("Initializing miniaudio...\n");
 
-    // ma_engine engine;
-    // ma_result result = ma_engine_init(NULL, &engine);
-    // if (result != MA_SUCCESS) {
-    //   return -1;
-    // }
-    // printf("miniaudio initialized successsfuly.\n");
+    ma_result result = ma_engine_init(NULL, &m_engine);
+    if (result != MA_SUCCESS) {
+      printf("Problem initializing miniaudio: %d\n", result);
+      return -1;
+    }
+    printf("miniaudio initialized successsfuly.\n");
 
     // END AUDIO
 
-    glEnable(GL_DEPTH_TEST);
+    //glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -175,8 +197,6 @@ bool t_loop() {
 
     calculate_delta_time();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glClearColor(36.0 / 255, 10.0 / 255, 52.0 / 255, 1);
-
    
     return !glfwWindowShouldClose(m_window);
 }
@@ -188,6 +208,7 @@ void t_loop_end() {
 }
 
 void t_end() {
+    terminate_font_renderer();
     glfwDestroyWindow(m_window);
     glfwTerminate();
 }

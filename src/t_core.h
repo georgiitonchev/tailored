@@ -3,6 +3,11 @@
 
 #include <stdbool.h>
 
+typedef enum {
+  t_success = 0,
+  t_error = 1
+} t_result;
+
 typedef struct t_vec2 {
   float x;
   float y;
@@ -65,6 +70,13 @@ typedef struct t_texture {
   unsigned int channels;
 } t_texture;
 
+typedef struct t_texture_data {
+  unsigned char* data;
+  unsigned int width;
+  unsigned int height;
+  unsigned int channels; 
+} t_texture_data;
+
 typedef struct t_input_state {
 
   struct t_mouse_state {
@@ -95,12 +107,15 @@ const char *read_file(const char *path);
 unsigned int create_shader_program(const char *vertex_shader_path,
                                    const char *fragment_shader_path);
 
-t_texture *load_texture(const char *path);
+void clear_color(t_color color);
 
+t_texture_data load_texture_data(const char* path);
+t_texture load_texture(const char *path);
+void free_texture(t_texture* texture);
 
-#define WHITE (t_color) { 1, 1, 1, 1 }
-#define LIGHT_GRAY (t_color) { .64f, .64f, .64f, 1 }
-#define DARK_GRAY (t_color) { .32f, .32f, .32f, 1 }
-#define RED (t_color) { 1, 0, 0, 1 }
-#define GREEN (t_color) { 0, 1, 0, 1 }
-#define BLUE (t_color) { 0, 0, 1, 1 }
+#define WHITE (t_color) { 255, 255, 255, 255 }
+#define LIGHT_GRAY (t_color) { 163, 163, 163, 255 }
+#define DARK_GRAY (t_color) { 81, 81, 81, 255 }
+#define RED (t_color) { 255, 0, 0, 255 }
+#define GREEN (t_color) { 0, 255, 0, 255 }
+#define BLUE (t_color) { 0, 0, 255, 255 }
