@@ -16,3 +16,7 @@ void delete_sprite(t_sprite* sprite);
 
 void draw_sprite_t(t_sprite *sprite, t_rect rect, t_color color);
 void draw_sprite(t_sprite* sprite, float x, float y, float width, float height, t_color color);
+
+void t_begin_clip_area(int x, int y, int width, int height);
+void t_end_clip_area();
+

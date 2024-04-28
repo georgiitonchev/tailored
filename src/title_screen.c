@@ -127,6 +127,7 @@ void draw_title_screen() {
 
     // RIGHT SIDE BACKGROUND
     draw_sprite(&m_button_sprite, 256, 16, 368, 328, CC_LIGHT_RED);
+    t_begin_clip_area(256 + 16, 16, 368 - 32, 328);
 
     // CHARACTER ELEMENTS
     draw_sprite(&m_button_sprite, 272, 32, 128, 223, CC_BLACK);
@@ -139,6 +140,8 @@ void draw_title_screen() {
     // CHARACTER BUTTONS    
     draw_ui_button(&m_begin_button);
     draw_ui_button(&m_edit_button);
+
+    t_end_clip_area();
 
     clear_ui();
 }

@@ -96,3 +96,13 @@ void delete_sprite(t_sprite* sprite)
 {
     free_texture(&sprite->texture);
 }
+
+void t_begin_clip_area(int x, int y, int width, int height) {
+  glUniform4fv(glGetUniformLocation(sprite_shader, "u_clip_area"), 1,
+                (vec4){ x, y, width, height });
+}
+
+void t_end_clip_area() {
+  glUniform4fv(glGetUniformLocation(sprite_shader, "u_clip_area"), 1,
+                (vec4){ 0, 0, 0, 0 });
+}

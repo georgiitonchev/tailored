@@ -10,11 +10,20 @@ uniform vec4 u_color;
 uniform vec4 u_slice_borders;
 uniform vec4 u_texture_slice;
 
+uniform vec4 u_clip_area;
+
 float map(float value, float from_min, float from_max, float to_min, float to_max) {
     return (value - from_min) / (from_max - from_min) * (to_max - to_min) + to_min;
 } 
 
 void main() {
+
+    if (u_clip_area.z + u_clip_area.w > 0) {
+        if (!(gl_FragCoord.x > u_clip_area.x && gl_FragCoord.x < u_clip_area.x + u_clip_area.z) &&
+             (gl_FragCoord.y > u_clip_area.y && gl_FragCoord.y < u_clip_area.y + u_clip_area.w)) {
+            discard;
+        }
+    }
 
     vec2 texture_size = textureSize(u_texture, 0);
 
