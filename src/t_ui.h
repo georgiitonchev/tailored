@@ -4,8 +4,6 @@
 #include "t_sprite.h"
 
 typedef struct t_ui_button {
-
-    t_rect rect;
     t_sprite* sprite;
 
     t_color color_default;
@@ -18,9 +16,11 @@ typedef struct t_ui_button {
     void (*on_mouse_exit)();
     void (*on_pressed)();
 
-    bool mouse_entered;
+    bool is_mouse_over;
     bool was_clicked;
     bool is_selected;
+
+    t_vec2 mouse_clicked_at;
 
 } t_ui_button;
 
@@ -48,8 +48,8 @@ typedef struct t_ui_dropdown {
 
 } t_ui_dropdown;
 
-t_ui_button create_ui_button(t_sprite* sprite, t_rect rect);
-void draw_ui_button(t_ui_button* button);
+t_ui_button create_ui_button(t_sprite* sprite);
+void draw_ui_button(t_ui_button* button, int x, int y, int width, int height);
 
 t_ui_dropdown create_ui_dropdown(t_sprite* sprite, t_rect rect);
 void draw_ui_dropdown(t_ui_dropdown* dropdown);

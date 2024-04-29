@@ -25,7 +25,7 @@ int main() {
         return 1;
     }
 
-    t_set_cursor("./res/textures/hand_thin_small_point.png");
+    t_set_cursor("./res/textures/pointer_b.png");
     load_title_screen();
 
     while(t_loop()) {

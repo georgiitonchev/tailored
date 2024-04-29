@@ -177,3 +177,11 @@ void free_texture(t_texture* texture)
 void clear_color(t_color color) {
     glClearColor(color.r / 255, color.g / 255, color.b / 255, color.a);
 }
+
+t_vec2 vec2_sub(t_vec2 a, t_vec2 b) {
+  return (t_vec2) { a.x - b.x, a.y - b.y };
+}
+
+float map(float value, float from_min, float from_max, float to_min, float to_max) {
+    return (value - from_min) / (from_max - from_min) * (to_max - to_min) + to_min;
+} 

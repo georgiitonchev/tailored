@@ -95,9 +95,11 @@ typedef struct t_input_state {
 } t_inpus_state;
 
 typedef struct t_global_state {
-  t_vec2 mouse_pos;
 
+  t_vec2 mouse_pos;
   t_inpus_state input_state;
+  t_vec2 window_size;
+
 } t_global_state;
 
 // files
@@ -113,9 +115,18 @@ t_texture_data load_texture_data(const char* path);
 t_texture load_texture(const char *path);
 void free_texture(t_texture* texture);
 
+
+// COLORS
 #define WHITE (t_color) { 255, 255, 255, 255 }
 #define LIGHT_GRAY (t_color) { 163, 163, 163, 255 }
 #define DARK_GRAY (t_color) { 81, 81, 81, 255 }
 #define RED (t_color) { 255, 0, 0, 255 }
 #define GREEN (t_color) { 0, 255, 0, 255 }
 #define BLUE (t_color) { 0, 0, 255, 255 }
+
+// VECTORS
+#define VEC2_ZERO (t_vec2) { 0, 0 }
+#define VEC2_ONE (t_vec2) { 1, 1 }
+
+t_vec2 vec2_sub(t_vec2 a, t_vec2 b);
+float map(float value, float from_min, float from_max, float to_min, float to_max);

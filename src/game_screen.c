@@ -31,7 +31,7 @@ void load_game_screen() {
     create_sprite("./res/textures/panel-border-030.png", &m_button_sprite);
     m_button_sprite.slice_borders = (t_vec4){ 16, 16, 16, 16 };
 
-    m_quit_button = create_ui_button(&m_button_sprite, (t_rect) { 16, 16 + 64 + 16, 96, 32 });
+    m_quit_button = create_ui_button(&m_button_sprite);
     m_quit_button.on_released = on_quit_button_clicked;
     m_quit_button.on_mouse_enter = on_button_mouse_enter;
 }
@@ -46,5 +46,5 @@ void update_game_screen() {
 
 void draw_game_screen() {
     clear_color(BLUE);
-    draw_ui_button(&m_quit_button);
+    draw_ui_button(&m_quit_button, 16, 16 + 64 + 16, 96, 32);
 }

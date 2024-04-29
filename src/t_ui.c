@@ -3,9 +3,9 @@
 #include "t_input.h"
 #include "t_shapes.h"
 #include "t_sprite.h"
+#include "t_core.h"
 
 #include <stdio.h>
-
 
 // EXTERN
 extern t_global_state global_state;
@@ -14,17 +14,16 @@ extern t_global_state global_state;
 static int m_currently_over_ui = 0;
 static t_rect m_focused_rect;
 
-t_ui_button create_ui_button(t_sprite* sprite, t_rect rect) {
+t_ui_button create_ui_button(t_sprite* sprite) {
 
     t_ui_button ui_button;
 
     ui_button.sprite = sprite;
-    ui_button.rect = rect;
     ui_button.color_default = WHITE;
     ui_button.color_mouseover = LIGHT_GRAY;
     ui_button.color_clicked = DARK_GRAY;
 
-    ui_button.mouse_entered = false;
+    ui_button.is_mouse_over = false;
     ui_button.was_clicked = false;
     ui_button.is_selected = false;
 
@@ -32,18 +31,19 @@ t_ui_button create_ui_button(t_sprite* sprite, t_rect rect) {
     ui_button.on_mouse_enter = NULL;
     ui_button.on_mouse_exit = NULL;
     ui_button.on_pressed = NULL;
+    ui_button.mouse_clicked_at = VEC2_ZERO;
 
     return ui_button;
 }
 
-void draw_ui_button(t_ui_button* button) {
+void draw_ui_button(t_ui_button* button, int x, int y, int width, int height) {
 
     t_color color = button->color_default;
 
-    if (is_point_in_rect(global_state.mouse_pos, button->rect))
+    if (is_point_in_rect(global_state.mouse_pos, (t_rect){ x, y, width, height }))
     {
-        if (!button->mouse_entered) {
-            button->mouse_entered = true;
+        if (!button->is_mouse_over) {
+            button->is_mouse_over = true;
 
             if (button->on_mouse_enter)
                 button->on_mouse_enter();
@@ -51,8 +51,10 @@ void draw_ui_button(t_ui_button* button) {
 
         color = button->color_mouseover;
 
-        if (is_mouse_button_pressed(MOUSE_BUTTON_LEFT))
-            button->was_clicked = 1;
+        if (!button->was_clicked && is_mouse_button_pressed(MOUSE_BUTTON_LEFT)) {
+            button->was_clicked = true;
+            button->mouse_clicked_at = vec2_sub(global_state.mouse_pos, (t_vec2){ x, y });
+        }
 
         if (button->was_clicked)
             color = button->color_clicked;
@@ -62,19 +64,23 @@ void draw_ui_button(t_ui_button* button) {
                 button->on_released(button);
     }
     else {
-        if (button->mouse_entered && button->on_mouse_exit)
+        if (button->is_mouse_over && button->on_mouse_exit)
             button->on_mouse_exit();
 
-        button->mouse_entered = false;
+        button->is_mouse_over = false;
     }
 
     if (is_mouse_button_released(MOUSE_BUTTON_LEFT))
-        button->was_clicked = 0;
+        button->was_clicked = false;
+
+    if (button->was_clicked && button->on_pressed) {
+        button->on_pressed();
+    }
 
     if (button->is_selected)
         color = button->color_clicked;
 
-    draw_sprite_t(button->sprite, button->rect, color);
+    draw_sprite(button->sprite, x, y, width, height, color);
 }
 
 t_ui_dropdown create_ui_dropdown(t_sprite* sprite, t_rect rect) {

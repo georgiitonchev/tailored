@@ -46,7 +46,7 @@ void t_set_cursor(const char* path) {
   image.height = texture_data.height;
   image.pixels = texture_data.data;
   
-  GLFWcursor* cursor = glfwCreateCursor(&image, 12, 10);
+  GLFWcursor* cursor = glfwCreateCursor(&image, 8, 6);
   glfwSetCursor(m_window, cursor);
  }
 
@@ -135,6 +135,7 @@ int t_begin(int window_width, int window_height, const char* title) {
       exit(EXIT_FAILURE);
     }
 
+    global_state.window_size = (t_vec2) { window_width, window_height };
     printf("GLFW window created successfuly.\n");
 
     glfwMakeContextCurrent(m_window);
