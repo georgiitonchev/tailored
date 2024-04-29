@@ -107,6 +107,17 @@ void add_to_list(t_list* list, const void* element) {
 }
 
 void* element_at_list(t_list* list, unsigned int index) {
+
+    if (!list) {
+        printf("ERROR: list is NULL at element_at_list.\n");
+        return NULL;
+    }
+
+    if (index >= list->size) {
+        printf("ERROR: index is out of bounds.\n");
+        return NULL;
+    }
+
     void* element = (char*)list->elements + (list->element_size * index);
     return element;
 }

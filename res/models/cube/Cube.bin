@@ -5,5 +5,5 @@ could not figure out why clip area was not working
 
 
 TO DO:
-	- adjust clip area for inversed Y in opengl
-	- ui mouse_entered -> is_mouseover
+	- clipped areas should be a UI thing
+	- ui should have it's own shaders -> seperate t_ui and t_sprite?

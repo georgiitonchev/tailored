@@ -40,10 +40,6 @@ static t_ui_button m_settings_button;
 static t_ui_button m_quit_button;
 static t_ui_button m_begin_button;
 static t_ui_button m_edit_button;
-//   CHARACTERS
-static t_ui_button m_character_1_button;
-static t_ui_button m_character_2_button;
-static t_ui_button m_character_3_button;
 
 // SLIDER KNOB
 static t_ui_button m_slider_knob_button;
@@ -72,6 +68,8 @@ static void on_start_button_clicked() {
     m_start_button.sprite = &m_button_sprite_selected;
     m_settings_button.sprite = &m_button_sprite;
     m_quit_button.sprite = &m_button_sprite;
+
+    // destroy_list(m_characters_list);
 }
 
 static void on_settings_button_clicked() {
@@ -96,6 +94,19 @@ static void on_quit_button_clicked() {
     m_start_button.sprite = &m_button_sprite;
     m_settings_button.sprite = &m_button_sprite;
     m_quit_button.sprite = &m_button_sprite_selected;
+}
+
+static t_ui_button* m_selected_character;
+
+static void on_character_button_clicked(t_ui_button* button) {
+    if (m_selected_character != button) {
+        if (m_selected_character != NULL) { 
+            m_selected_character->sprite = &m_button_sprite;
+        }
+
+        button->sprite = &m_button_sprite_selected;
+        m_selected_character = button;
+    }
 }
 
 static float scroll_area_width = 416;
@@ -128,17 +139,19 @@ static void draw_characters() {
     // CHARACTER ELEMENTS
     t_begin_clip_area(256 + 16, 16, 368 - 32, 328);
     for (int i = 0; i < m_characters_list->size; i ++) {
-        draw_ui_button(&m_character_1_button, (272 + i * 128 + i * 16) - scroll_area_offset, 32, 128, 223);
+
+        t_ui_button* character_button = (t_ui_button*)element_at_list(m_characters_list, i);
+        draw_ui_button(character_button, (272 + i * 128 + i * 16) - scroll_area_offset, 32, 128, 223);
     }
     t_end_clip_area();
 
-    draw_ui_button(&m_slider_knob_button, slider_knob_rect.x, slider_knob_rect.y, slider_knob_rect.width, slider_knob_rect.height);
     t_rect slider_rect = (t_rect) { 272, 328 - 64, 336, m_slider_background_sprite.texture.size.y };
 
+    t_begin_clip_area_inverse(1, slider_knob_rect.x, slider_knob_rect.y, slider_knob_rect.width, slider_knob_rect.height);
     if (!m_slider_knob_button.is_mouse_over && is_point_in_rect(global_state.mouse_pos, slider_rect)) {
 
         if (is_mouse_button_pressed(MOUSE_BUTTON_LEFT))
-            slider_knob_rect.x = global_state.mouse_pos.x - slider_knob_rect.width / 2;
+           slider_knob_rect.x = global_state.mouse_pos.x - slider_knob_rect.width / 2;
 
         t_rect slider_knob_small_rect = (t_rect) { global_state.mouse_pos.x - m_slider_knob_small_sprite.texture.size.x / 2, slider_rect.y, m_slider_knob_small_sprite.texture.size.x, m_slider_knob_small_sprite.texture.size.y };
 
@@ -154,11 +167,11 @@ static void draw_characters() {
 
     // SLIDER
     // t_begin_clip_area_inverse_r(m_slider_knob_button.rect);
-    t_begin_clip_area_inverse(1, slider_knob_rect.x, slider_knob_rect.y, slider_knob_rect.width, slider_knob_rect.height);
     draw_sprite_t(&m_slider_background_sprite, slider_rect, CC_BLACK);
- 
     t_end_clip_area_inverse(0);
     t_end_clip_area_inverse(1);
+
+    draw_ui_button(&m_slider_knob_button, slider_knob_rect.x, slider_knob_rect.y, slider_knob_rect.width, slider_knob_rect.height);
 
     // CHARACTER BUTTONS    
     draw_ui_button(&m_begin_button, 368, 292, 112, 40);
@@ -221,26 +234,19 @@ void load_title_screen() {
 
     slider_knob_rect= (t_rect){ 272, 328 - 66, m_slider_knob_big_sprite.texture.size.x, m_slider_knob_big_sprite.texture.size.y };
 
-    m_character_1_button = create_ui_button(&m_button_sprite);
-    m_character_1_button.color_default = CC_BLACK;
-    m_character_1_button.color_mouseover = CC_DARK_RED;
-    m_character_1_button.color_clicked = CC_RED;
-
-    m_character_2_button = create_ui_button(&m_button_sprite);
-    m_character_2_button.color_default = CC_BLACK;
-    m_character_2_button.color_mouseover = CC_DARK_RED;
-    m_character_2_button.color_clicked = CC_RED;
-
-    m_character_3_button = create_ui_button(&m_button_sprite);
-    m_character_3_button.color_default = CC_BLACK;
-    m_character_3_button.color_mouseover = CC_DARK_RED;
-    m_character_3_button.color_clicked = CC_RED;
-
-    m_characters_list = create_list(sizeof(int));
+    m_characters_list = create_list(sizeof(t_ui_button));
     for (int i = 0; i < 10; i++) {
 
-        int* element = (int*)malloc(sizeof(int));
-        add_to_list(m_characters_list, element);
+        t_ui_button* character_button = (t_ui_button*)malloc(sizeof(t_ui_button));
+        *character_button = create_ui_button(&m_button_sprite);
+
+        character_button->color_default = CC_BLACK;
+        character_button->color_mouseover = CC_DARK_RED;
+        character_button->color_clicked = CC_RED;
+
+        character_button->on_released = on_character_button_clicked;
+
+        add_to_list(m_characters_list, character_button);
     }
 
     scroll_area_width = m_characters_list->size * 128 + (m_characters_list->size - 1) * 16;

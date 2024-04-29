@@ -127,6 +127,7 @@ void free_texture(t_texture* texture);
 // VECTORS
 #define VEC2_ZERO (t_vec2) { 0, 0 }
 #define VEC2_ONE (t_vec2) { 1, 1 }
+#define RECT_ZERO (t_rect) { 0, 0, 0, 0 }
 
 t_vec2 vec2_sub(t_vec2 a, t_vec2 b);
 float map(float value, float from_min, float from_max, float to_min, float to_max);

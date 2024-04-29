@@ -9,6 +9,7 @@
 
 // EXTERN
 extern t_global_state global_state;
+extern t_rect clip_areas[2];
 
 // STATIC
 static int m_currently_over_ui = 0;
@@ -40,7 +41,11 @@ void draw_ui_button(t_ui_button* button, int x, int y, int width, int height) {
 
     t_color color = button->color_default;
 
-    if (is_point_in_rect(global_state.mouse_pos, (t_rect){ x, y, width, height }))
+    bool is_inside_clip_area =
+        clip_areas[0].width + clip_areas[0].height > 0 ? 
+        is_point_in_rect(global_state.mouse_pos, clip_areas[0]) : true;
+
+    if (is_inside_clip_area && is_point_in_rect(global_state.mouse_pos, (t_rect){ x, y, width, height }))
     {
         if (!button->is_mouse_over) {
             button->is_mouse_over = true;

@@ -80,17 +80,11 @@ static void mouse_button_callback(GLFWwindow *window, int button, int action, in
   UNUSED(window);
   UNUSED(mods);
 
-  // reset state
-  for (uint8_t i = 0; i < 2; i++) {
-    global_state.input_state.mouse_state.buttons[i].is_pressed = false;
-    global_state.input_state.mouse_state.buttons[i].is_released = false;
-  }
-
   // update state
   if (action == GLFW_RELEASE) {
     global_state.input_state.mouse_state.buttons[button].is_down = false;
-
     global_state.input_state.mouse_state.buttons[button].is_pressed = false;
+
     global_state.input_state.mouse_state.buttons[button].is_released = true;
   }
 
@@ -195,7 +189,6 @@ int t_begin(int window_width, int window_height, const char* title) {
 }
 
 bool t_loop() {
-
     calculate_delta_time();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
    
@@ -204,6 +197,11 @@ bool t_loop() {
 
 void t_loop_end() {
   
+    for (uint8_t i = 0; i < 2; i++) {
+      global_state.input_state.mouse_state.buttons[i].is_pressed = false;
+      global_state.input_state.mouse_state.buttons[i].is_released = false;
+    }
+
     glfwSwapBuffers(m_window);
     glfwPollEvents();
 }
