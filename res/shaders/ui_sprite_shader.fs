@@ -10,7 +10,6 @@ uniform vec4 u_color;
 uniform vec4 u_slice_borders;
 uniform vec4 u_texture_slice;
 
-uniform vec4 u_clip_area;
 uniform vec4 u_clip_area_inverse_0;
 uniform vec4 u_clip_area_inverse_1;
 
@@ -19,14 +18,6 @@ float map(float value, float from_min, float from_max, float to_min, float to_ma
 } 
 
 void main() {
-
-    // clip area
-    if (u_clip_area.z + u_clip_area.w > 0) {
-        if (!(gl_FragCoord.x > u_clip_area.x && gl_FragCoord.x < u_clip_area.x + u_clip_area.z) &&
-             (gl_FragCoord.y > u_clip_area.y && gl_FragCoord.y < u_clip_area.y + u_clip_area.w)) {
-            discard;
-        }
-    }
 
     // clip area inverse    
     if (u_clip_area_inverse_0.z + u_clip_area_inverse_0.w > 0) {

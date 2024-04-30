@@ -7,3 +7,6 @@ could not figure out why clip area was not working
 TO DO:
 	- clipped areas should be a UI thing
 	- ui should have it's own shaders -> seperate t_ui and t_sprite?
+
+	- ! - USE stencil buffer + scissor test for inverse clip area?
+	- ! - IMPLEMENT motion blur

@@ -100,6 +100,7 @@ typedef struct t_global_state {
   t_inpus_state input_state;
   t_vec2 window_size;
   t_vec2 framebuffer_size;
+  float delta_time;
 
 } t_global_state;
 

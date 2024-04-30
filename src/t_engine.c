@@ -54,6 +54,8 @@ static void calculate_delta_time() {
   float current_frame_time = glfwGetTime();
   delta_time = current_frame_time - last_frame_time;
   last_frame_time = current_frame_time;
+
+  global_state.delta_time = delta_time;
 }
 
 #ifndef __APPLE__
@@ -215,4 +217,13 @@ void t_end() {
     terminate_font_renderer();
     glfwDestroyWindow(m_window);
     glfwTerminate();
+}
+
+void t_begin_scissor(int x, int y, int width, int height) {
+  glEnable(GL_SCISSOR_TEST);
+  glScissor(x, y, width, height);
+}
+
+void t_end_scissor() {
+  glDisable(GL_SCISSOR_TEST);
 }
