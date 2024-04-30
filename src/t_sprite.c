@@ -74,8 +74,8 @@ void draw_sprite(t_sprite* sprite, float x, float y, float width, float height, 
                 (vec4){sprite->slice_borders.x, sprite->slice_borders.y,
                       sprite->slice_borders.z, sprite->slice_borders.w});
 
-  glUniform4fv(glGetUniformLocation(sprite_shader, "u_texture_slice"), 1, 
-                (vec4){sprite->texture_slice.x, sprite->texture_slice.y, 
+  glUniform4fv(glGetUniformLocation(sprite_shader, "u_texture_slice"), 1,
+                (vec4){sprite->texture_slice.x, sprite->texture_slice.y,
                         sprite->texture_slice.z, sprite->texture_slice.w});
 
   glActiveTexture(GL_TEXTURE0);
@@ -88,7 +88,7 @@ void draw_sprite(t_sprite* sprite, float x, float y, float width, float height, 
 
 void draw_sprite_t(t_sprite *sprite, t_rect rect, t_color color) {
     draw_sprite(
-      sprite, 
+      sprite,
       rect.x, rect.y, rect.width, rect.height, color);
 }
 
@@ -104,19 +104,22 @@ void delete_sprite(t_sprite* sprite)
     free_texture(&sprite->texture);
 }
 
+static void t_set_clip_area(const char* key, int x, int y, int width, int height) {
+    glUniform4fv(glGetUniformLocation(sprite_shader, key), 1,
+                  (vec4){
+                      (x / global_state.window_size.x) * global_state.framebuffer_size.x,
+                      ((global_state.window_size.y - y - height) / global_state.window_size.y) * global_state.framebuffer_size.y,
+                      (width / global_state.window_size.x) * global_state.framebuffer_size.x,
+                      (height / global_state.window_size.y) * global_state.framebuffer_size.y });
+}
+
 void t_begin_clip_area(int x, int y, int width, int height) {
 
   clip_areas[0] = (t_rect){ x, y, width, height };
-
-  glUniform4fv(glGetUniformLocation(sprite_shader, "u_clip_area"), 1,
-                (vec4){ x, global_state.window_size.y - y - height, width, height });
+  t_set_clip_area("u_clip_area", x, y, width, height);
 }
 void t_begin_clip_area_r(t_rect rect) {
-
-  clip_areas[0] = rect;
-
-  glUniform4fv(glGetUniformLocation(sprite_shader, "u_clip_area"), 1,
-                (vec4){ rect.x, global_state.window_size.y - rect.y - rect.height, rect.width, rect.height });
+    t_begin_clip_area(rect.x, rect.y, rect.width, rect.height);
 }
 
 void t_begin_clip_area_inverse(int index, int x, int y, int width, int height) {
@@ -124,12 +127,10 @@ void t_begin_clip_area_inverse(int index, int x, int y, int width, int height) {
   char uniform_name[22];
   sprintf(uniform_name, "u_clip_area_inverse_%d", index);
 
-  glUniform4fv(glGetUniformLocation(sprite_shader, uniform_name), 1,
-                (vec4){ x, global_state.window_size.y - y - height, width, height });
+  t_set_clip_area(uniform_name, x, y, width, height);
 }
-void t_begin_clip_area_inverse_r(t_rect rect) {
-  glUniform4fv(glGetUniformLocation(sprite_shader, "u_clip_area_inverse"), 1,
-                (vec4){ rect.x, rect.y, rect.width, rect.height });
+void t_begin_clip_area_inverse_r(int index, t_rect rect) {
+    t_begin_clip_area_inverse(index, rect.x, rect.y, rect.width, rect.height);
 }
 
 void t_end_clip_area() {

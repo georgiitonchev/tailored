@@ -8,4 +8,4 @@ void t_loop_end();
 void t_end();
 
 void t_play_audio(const char* path);
-void t_set_cursor(const char* path);
+void t_set_cursor(const char* path, int xhot, int yhot);

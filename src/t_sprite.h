@@ -6,7 +6,7 @@ typedef struct t_sprite {
   t_vec4 slice_borders;
   t_vec2 scale;
   t_vec4 texture_slice;
-  
+
 } t_sprite;
 
 void init_sprite_renderer();
@@ -22,6 +22,5 @@ void t_begin_clip_area_r(t_rect rect);
 void t_end_clip_area();
 
 void t_begin_clip_area_inverse(int index, int x, int y, int width, int height);
-void t_begin_clip_area_inverse_r(t_rect rect);
+void t_begin_clip_area_inverse_r(int index, t_rect rect);
 void t_end_clip_area_inverse(int index);
-

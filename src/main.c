@@ -20,17 +20,17 @@ void on_free_button_released() {
 int main() {
 
     t_result result = t_begin(640, 360, "Imps & Fairies");
-    
+
     if (result != t_success) {
         return 1;
     }
 
-    t_set_cursor("./res/textures/pointer_b.png");
+    t_set_cursor("./res/textures/pointer_b.png", 8, 6);
     load_title_screen();
 
     while(t_loop()) {
 
-        switch (m_current_screen) 
+        switch (m_current_screen)
         {
             case SPLASH: update_splash_screen(); break;
             case TITLE: update_title_screen(); break;
@@ -47,7 +47,7 @@ int main() {
                 case GAME: unload_game_screen(); break;
             }
 
-            switch (m_should_change_screen_to) 
+            switch (m_should_change_screen_to)
             {
                 case SPLASH: load_splash_screen(); break;
                 case TITLE: load_title_screen(); break;
@@ -56,8 +56,8 @@ int main() {
 
             m_current_screen = m_should_change_screen_to;
         }
-            
-        switch (m_current_screen) 
+
+        switch (m_current_screen)
         {
             case SPLASH: draw_splash_screen(); break;
             case TITLE: draw_title_screen(); break;

@@ -74,7 +74,7 @@ typedef struct t_texture_data {
   unsigned char* data;
   unsigned int width;
   unsigned int height;
-  unsigned int channels; 
+  unsigned int channels;
 } t_texture_data;
 
 typedef struct t_input_state {
@@ -99,6 +99,7 @@ typedef struct t_global_state {
   t_vec2 mouse_pos;
   t_inpus_state input_state;
   t_vec2 window_size;
+  t_vec2 framebuffer_size;
 
 } t_global_state;
 

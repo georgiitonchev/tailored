@@ -37,7 +37,7 @@ void t_play_audio(const char* path) {
   ma_engine_play_sound(&m_engine, path, NULL);
 }
 
-void t_set_cursor(const char* path) {
+void t_set_cursor(const char* path, int xhot, int yhot) {
 
   t_texture_data texture_data = load_texture_data(path);
 
@@ -45,8 +45,8 @@ void t_set_cursor(const char* path) {
   image.width = texture_data.width;
   image.height = texture_data.height;
   image.pixels = texture_data.data;
-  
-  GLFWcursor* cursor = glfwCreateCursor(&image, 8, 6);
+
+  GLFWcursor* cursor = glfwCreateCursor(&image, xhot, yhot);
   glfwSetCursor(m_window, cursor);
  }
 
@@ -66,7 +66,7 @@ void APIENTRY debug_callback(GLenum source, GLenum type, GLuint id,
   UNUSED(length);
   UNUSED(userParam);
 
-  const char* severityStr = 
+  const char* severityStr =
     severity == GL_DEBUG_SEVERITY_HIGH ? "High" :
     severity == GL_DEBUG_SEVERITY_MEDIUM ? "Medium" :
     severity == GL_DEBUG_SEVERITY_LOW ? "Low" :
@@ -129,7 +129,6 @@ int t_begin(int window_width, int window_height, const char* title) {
       exit(EXIT_FAILURE);
     }
 
-    global_state.window_size = (t_vec2) { window_width, window_height };
     printf("GLFW window created successfuly.\n");
 
     glfwMakeContextCurrent(m_window);
@@ -165,6 +164,12 @@ int t_begin(int window_width, int window_height, const char* title) {
     glViewport(0, 0, width, height);
     //const float ratio = width / (float)height;
 
+    global_state.window_size = (t_vec2) { window_width, window_height };
+    global_state.framebuffer_size = (t_vec2) { width, height };
+
+    printf("window_size: %d, %d\n", window_width, window_height);
+    printf("framebuffer_size: %d, %d\n", width, height);
+
     init_sprite_renderer();
     init_font_renderer();
 
@@ -191,12 +196,12 @@ int t_begin(int window_width, int window_height, const char* title) {
 bool t_loop() {
     calculate_delta_time();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-   
+
     return !glfwWindowShouldClose(m_window);
 }
 
 void t_loop_end() {
-  
+
     for (uint8_t i = 0; i < 2; i++) {
       global_state.input_state.mouse_state.buttons[i].is_pressed = false;
       global_state.input_state.mouse_state.buttons[i].is_released = false;
