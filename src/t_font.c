@@ -40,7 +40,7 @@ static void init_shader() {
                                         "./res/shaders/font_shader.fs");
 }
 
-static t_vec4 get_character(char character) {
+t_vec4 get_character(char character) {
   int columns = 16;
 
   int row = ((int)character) / columns;
@@ -74,8 +74,8 @@ static void draw_texture_slice(t_vec4 texture_slice, t_vec2 position, t_vec2 siz
   glUniform4fv(glGetUniformLocation(font_shader, "u_color"), 1,
                 (vec4){color.r, color.g, color.b, color.a});
 
-  glUniform4fv(glGetUniformLocation(font_shader, "u_texture_slice"), 1, 
-                (vec4){texture_slice.x, texture_slice.y, 
+  glUniform4fv(glGetUniformLocation(font_shader, "u_texture_slice"), 1,
+                (vec4){texture_slice.x, texture_slice.y,
                         texture_slice.z, texture_slice.w});
 
   glActiveTexture(GL_TEXTURE0);
