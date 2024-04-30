@@ -221,7 +221,11 @@ void t_end() {
 
 void t_begin_scissor(int x, int y, int width, int height) {
   glEnable(GL_SCISSOR_TEST);
-  glScissor(x, y, width, height);
+  glScissor(
+      (x / global_state.window_size.x) * global_state.framebuffer_size.x,
+      ((global_state.window_size.y - y - height) / global_state.window_size.y) * global_state.framebuffer_size.y,
+      (width / global_state.window_size.x) * global_state.framebuffer_size.x,
+      (height / global_state.window_size.y) * global_state.framebuffer_size.y);
 }
 
 void t_end_scissor() {
