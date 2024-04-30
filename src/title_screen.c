@@ -75,11 +75,11 @@ static float ease_out_quint(float x) {
 
 static float s_ease_out(float* timer, float* value, float from, float to) {
 
-    *timer += global_state.delta_time * 5;
+    *timer += global_state.delta_time * 2;
 
-    *value = 
-        from + 
-        (to - from) * 
+    *value =
+        from +
+        (to - from) *
         ease_out_quint(*timer);
 
     return *timer;
@@ -151,7 +151,7 @@ static t_ui_button* m_selected_character;
 
 static void on_character_button_clicked(t_ui_button* button) {
     if (m_selected_character != button) {
-        if (m_selected_character != NULL) { 
+        if (m_selected_character != NULL) {
             m_selected_character->sprite = &m_button_sprite;
         }
 
@@ -188,7 +188,7 @@ static void draw_characters() {
 
     // CHARACTER ELEMENTS
     // t_begin_clip_area(256 + 16 + characters_area_offset_x, 16, 368 - 32, 328);
-    t_begin_scissor(256 + 16, 16 - s_offset_y_characters, 368 - 32, 328);
+    t_begin_scissor(256 + 16, 16 + s_offset_y_characters, 368 - 32, 328);
     for (int i = 0; i < m_characters_list->size; i ++) {
 
         t_ui_button* character_button = (t_ui_button*)element_at_list(m_characters_list, i);
@@ -225,7 +225,7 @@ static void draw_characters() {
 
     draw_ui_button(&m_slider_knob_button, slider_knob_rect.x, slider_knob_rect.y + s_offset_y_characters, slider_knob_rect.width, slider_knob_rect.height);
 
-    // CHARACTER BUTTONS    
+    // CHARACTER BUTTONS
     draw_ui_button(&m_begin_button, 368, 292 + s_offset_y_characters, 112, 40);
     draw_ui_button(&m_edit_button, 496, 292 + s_offset_y_characters, 112, 40);
 }
@@ -329,7 +329,7 @@ void draw_title_screen() {
     draw_ui_button(&m_settings_button, 64, 92 + 48 + 16, 128, 48);
     draw_ui_button(&m_about_button, 64, 92 + 48 + 48 + 16 + 16, 128, 48);
 
-    if (s_ease_in_characters) { 
+    if (s_ease_in_characters) {
         float progress = s_ease_out(&s_ease_out_timer_characters, &s_offset_y_characters, 360, 0);
 
         if (progress >= 1) {
@@ -349,7 +349,7 @@ void draw_title_screen() {
         }
     }
 
-    if (s_ease_in_settings) { 
+    if (s_ease_in_settings) {
         float progress = s_ease_out(&s_ease_out_timer_settings, &s_offset_y_settings, 360, 0);
 
         if (progress >= 1) {
@@ -368,8 +368,8 @@ void draw_title_screen() {
             m_draw_settings = false;
         }
     }
-    
-    if (s_ease_in_about) { 
+
+    if (s_ease_in_about) {
         float progress = s_ease_out(&s_ease_out_timer_about, &s_offset_y_about, 360, 0);
 
         if (progress >= 1) {
@@ -388,15 +388,15 @@ void draw_title_screen() {
             m_draw_about = false;
         }
     }
-    
+
 
     if (m_draw_characters) {
         draw_characters();
     }
-    if (m_draw_settings) { 
+    if (m_draw_settings) {
         draw_settings();
     }
-    if (m_draw_about) { 
+    if (m_draw_about) {
         draw_about();
     }
 
