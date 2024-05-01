@@ -1,17 +1,17 @@
 #include "screens.h"
-#include "t_sprite.h"
-#include "t_ui.h"
+#include "./engine/t_sprite.h"
+#include "./engine/t_ui.h"
 
 #include "stdio.h"
 #include "stdbool.h"
 #include "stdlib.h"
 
-#include "t_list.h"
-#include "t_shapes.h"
-#include "t_engine.h"
-#include "t_input.h"
+#include "./engine/tailored.h"
+#include "./engine/t_list.h"
+#include "./engine/t_shapes.h"
+#include "./engine/t_input.h"
 
-#include "math.h"
+#include "./engine/t_easings.h"
 
 #define CC_LIGHT_RED (t_color) { 242, 97, 63, 255 }
 #define CC_RED (t_color) { 155, 57, 34, 255 }
@@ -21,12 +21,14 @@
 // EXTERN
 extern const int SCREEN_WIDTH_DEFAULT;
 extern const int SCREEN_HEIGHT_DEFAULT;
-extern t_global_state global_state;
+extern t_input_state input_state;
 
 extern bool m_should_change_screen;
 extern t_screen m_should_change_screen_to;
 
 // SPRITES
+static t_sprite m_logo_sprite;
+
 static t_sprite m_button_sprite;
 static t_sprite m_button_sprite_selected;
 static t_sprite m_dropdown_sprite;
@@ -69,21 +71,6 @@ static bool s_ease_in_about = false;
 static bool s_ease_out_about = false;
 static float s_offset_y_about = 0;
 
-static float ease_out_quint(float x) {
-    return 1 - pow(1 - x, 5);
-}
-
-static float s_ease_out(float* timer, float* value, float from, float to) {
-
-    *timer += global_state.delta_time * 2;
-
-    *value =
-        from +
-        (to - from) *
-        ease_out_quint(*timer);
-
-    return *timer;
-}
 // BUTTON CALLBACKS
 
 static void on_button_mouse_enter() {
@@ -170,7 +157,7 @@ static t_rect slider_knob_rect;
 static t_list* m_characters_list;
 
 static void on_slider_knob_button_pressed() {
-    slider_knob_rect.x = global_state.mouse_pos.x - m_slider_knob_button.mouse_clicked_at.x;
+    slider_knob_rect.x = input_state.mouse_state.position.x - m_slider_knob_button.mouse_clicked_at.x;
 
     // limits
     if (slider_knob_rect.x < slider_pos.x)
@@ -189,7 +176,7 @@ static void draw_characters() {
     // CHARACTER ELEMENTS
     // t_begin_clip_area(256 + 16 + characters_area_offset_x, 16, 368 - 32, 328);
     t_begin_scissor(256 + 16, 16 + s_offset_y_characters, 368 - 32, 328);
-    for (int i = 0; i < m_characters_list->size; i ++) {
+    for (unsigned int i = 0; i < m_characters_list->size; i ++) {
 
         t_ui_button* character_button = (t_ui_button*)element_at_list(m_characters_list, i);
         draw_ui_button(character_button, (272 + i * 128 + i * 16) - scroll_area_offset, 32 + s_offset_y_characters, 128, 223);
@@ -200,12 +187,12 @@ static void draw_characters() {
     t_rect slider_rect = (t_rect) { 272, 328 - 64 + s_offset_y_characters, 336, m_slider_background_sprite.texture.size.y };
 
     t_begin_clip_area_inverse(1, slider_knob_rect.x, slider_knob_rect.y + s_offset_y_characters, slider_knob_rect.width, slider_knob_rect.height);
-    if (!m_slider_knob_button.is_mouse_over && is_point_in_rect(global_state.mouse_pos, slider_rect)) {
+    if (!m_slider_knob_button.is_mouse_over && is_point_in_rect(input_state.mouse_state.position, slider_rect)) {
 
         if (is_mouse_button_pressed(MOUSE_BUTTON_LEFT))
-           slider_knob_rect.x = global_state.mouse_pos.x - slider_knob_rect.width / 2;
+           slider_knob_rect.x = input_state.mouse_state.position.x - slider_knob_rect.width / 2;
 
-        t_rect slider_knob_small_rect = (t_rect) { global_state.mouse_pos.x - m_slider_knob_small_sprite.texture.size.x / 2, slider_rect.y + s_offset_y_characters, m_slider_knob_small_sprite.texture.size.x, m_slider_knob_small_sprite.texture.size.y };
+        t_rect slider_knob_small_rect = (t_rect) { input_state.mouse_state.position.x - m_slider_knob_small_sprite.texture.size.x / 2, slider_rect.y + s_offset_y_characters, m_slider_knob_small_sprite.texture.size.x, m_slider_knob_small_sprite.texture.size.y };
 
         //limits
         if (slider_knob_small_rect.x < slider_pos.x)
@@ -239,6 +226,8 @@ static void draw_about() {
 }
 
 void load_title_screen() {
+
+    create_sprite("./res/textures/imps_fairies_logo.png", &m_logo_sprite);
 
     create_sprite("./res/textures/panel-border-030.png", &m_dropdown_sprite);
     m_dropdown_sprite.slice_borders = (t_vec4){ 16, 16, 16, 16 };
@@ -322,15 +311,17 @@ void update_title_screen() {
 
 void draw_title_screen() {
 
-    clear_color(CC_BLACK);
+    t_clear_color(CC_BLACK);
+
+    draw_sprite(&m_logo_sprite, 0, 0, m_logo_sprite.texture.size.x, m_logo_sprite.texture.size.y, CC_LIGHT_RED);
 
     // LEFT SIDE BUTTONS
-    draw_ui_button(&m_characters_button, 64, 92, 128, 48);
-    draw_ui_button(&m_settings_button, 64, 92 + 48 + 16, 128, 48);
-    draw_ui_button(&m_about_button, 64, 92 + 48 + 48 + 16 + 16, 128, 48);
+    draw_ui_button(&m_characters_button, 64, 92 + 48, 128, 48);
+    draw_ui_button(&m_settings_button, 64, 92 + 48 + 16 + 48, 128, 48);
+    draw_ui_button(&m_about_button, 64, 92 + 48 + 48 + 16 + 16 + 48, 128, 48);
 
     if (s_ease_in_characters) {
-        float progress = s_ease_out(&s_ease_out_timer_characters, &s_offset_y_characters, 360, 0);
+        float progress = t_ease_out_quint(&s_ease_out_timer_characters, &s_offset_y_characters, 360, 0, .5f);
 
         if (progress >= 1) {
             s_ease_out_timer_characters = 0;
@@ -340,7 +331,7 @@ void draw_title_screen() {
 
     if (s_ease_out_characters) {
 
-        float progress = s_ease_out(&s_ease_out_timer_characters, &s_offset_y_characters, 0, -360);
+        float progress = t_ease_out_quint(&s_ease_out_timer_characters, &s_offset_y_characters, 0, -360, .5f);
 
         if (progress >= 1) {
             s_ease_out_timer_characters = 0;
@@ -350,7 +341,7 @@ void draw_title_screen() {
     }
 
     if (s_ease_in_settings) {
-        float progress = s_ease_out(&s_ease_out_timer_settings, &s_offset_y_settings, 360, 0);
+        float progress = t_ease_out_quint(&s_ease_out_timer_settings, &s_offset_y_settings, 360, 0, .5f);
 
         if (progress >= 1) {
             s_ease_out_timer_settings = 0;
@@ -360,7 +351,7 @@ void draw_title_screen() {
 
     if (s_ease_out_settings) {
 
-        float progress = s_ease_out(&s_ease_out_timer_settings, &s_offset_y_settings, 0, -360);
+        float progress = t_ease_out_quint(&s_ease_out_timer_settings, &s_offset_y_settings, 0, -360, .5f);
 
         if (progress >= 1) {
             s_ease_out_timer_settings = 0;
@@ -370,7 +361,7 @@ void draw_title_screen() {
     }
 
     if (s_ease_in_about) {
-        float progress = s_ease_out(&s_ease_out_timer_about, &s_offset_y_about, 360, 0);
+        float progress = t_ease_out_quint(&s_ease_out_timer_about, &s_offset_y_about, 360, 0, .5f);
 
         if (progress >= 1) {
             s_ease_out_timer_about = 0;
@@ -380,7 +371,7 @@ void draw_title_screen() {
 
     if (s_ease_out_about) {
 
-        float progress = s_ease_out(&s_ease_out_timer_about, &s_offset_y_about, 0, -360);
+        float progress = t_ease_out_quint(&s_ease_out_timer_about, &s_offset_y_about, 0, -360, .5f);
 
         if (progress >= 1) {
             s_ease_out_timer_about = 0;

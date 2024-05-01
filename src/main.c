@@ -1,13 +1,11 @@
-#include "t_core.h"
-#include "t_engine.h"
-#include "t_sprite.h"
-#include "t_font.h"
-#include "t_ui.h"
+#include <stdlib.h>
+
+#include "./engine/tailored.h"
+#include "./engine/t_sprite.h"
+#include "./engine/t_font.h"
+#include "./engine/t_ui.h"
 
 #include "screens.h"
-
-const int SCREEN_WIDTH_DEFAULT = 640;
-const int SCREEN_HEIGHT_DEFAULT = 360;
 
 t_screen m_current_screen = TITLE;
 
@@ -22,7 +20,7 @@ int main() {
     t_result result = t_begin(640, 360, "Imps & Fairies");
 
     if (result != t_success) {
-        return 1;
+        exit(EXIT_FAILURE);
     }
 
     t_set_cursor("./res/textures/pointer_b.png", 8, 6);
@@ -63,7 +61,8 @@ int main() {
             case TITLE: draw_title_screen(); break;
             case GAME: draw_game_screen(); break;
         }
-
+        
+        t_draw_scene();
         t_loop_end();
     }
 

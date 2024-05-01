@@ -1,6 +1,5 @@
-#include <stdbool.h>
 
-#include "t_core.h"
+#include "tailored.h"
 #include "t_sprite.h"
 
 typedef struct t_ui_button {

@@ -1,12 +1,12 @@
 #include "t_sprite.h"
 
 // GL loader
-#include "../dep/include/glad/glad.h"
+#include "../../dep/include/glad/glad.h"
 
 // MATH
-#include "../dep/include/cglm/cglm.h"
+#include "../../dep/include/cglm/cglm.h"
 
-extern t_global_state global_state;
+extern t_input_state input_state;
 
 static unsigned int sprite_quad_vao;
 static unsigned int sprite_shader;
@@ -14,7 +14,7 @@ static unsigned int sprite_shader;
 t_rect clip_areas[2];
 
 static void init_shader() {
-  sprite_shader = create_shader_program("./res/shaders/sprite_shader.vs",
+  sprite_shader = t_create_shader_program("./res/shaders/sprite_shader.vs",
                                         "./res/shaders/sprite_shader.fs");
 }
 
@@ -66,7 +66,7 @@ void draw_sprite(t_sprite* sprite, float x, float y, float width, float height, 
 
   glUniformMatrix4fv(glGetUniformLocation(sprite_shader, "u_mat4_model"), 1,
                       GL_FALSE, (float *)mat4_model);
-
+                      
   glUniform4fv(glGetUniformLocation(sprite_shader, "u_color"), 1,
                 (vec4){color.r / 255.0, color.g / 255.0, color.b / 255.0, color.a / 255.0});
 
@@ -93,7 +93,7 @@ void draw_sprite_t(t_sprite *sprite, t_rect rect, t_color color) {
 }
 
 void create_sprite(const char* path, t_sprite* sprite) {
-  sprite->texture = load_texture(path);
+  sprite->texture = t_load_texture(path);
   sprite->scale = (t_vec2){ 1, 1 };
   sprite->texture_slice = (t_vec4){ 0, 0, sprite->texture.size.x, sprite->texture.size.y };
   sprite->slice_borders = (t_vec4){ 0, 0, 0, 0 };
@@ -101,16 +101,20 @@ void create_sprite(const char* path, t_sprite* sprite) {
 }
 void delete_sprite(t_sprite* sprite)
 {
-    free_texture(&sprite->texture);
+    t_free_texture(&sprite->texture);
 }
 
 static void t_set_clip_area(const char* key, int x, int y, int width, int height) {
-    glUniform4fv(glGetUniformLocation(sprite_shader, key), 1,
+
+  const t_vec2 window_size = t_window_size();
+  const t_vec2 framebuffer_size = t_framebuffer_size();
+
+  glUniform4fv(glGetUniformLocation(sprite_shader, key), 1,
                   (vec4){
-                      (x / global_state.window_size.x) * global_state.framebuffer_size.x,
-                      ((global_state.window_size.y - y - height) / global_state.window_size.y) * global_state.framebuffer_size.y,
-                      (width / global_state.window_size.x) * global_state.framebuffer_size.x,
-                      (height / global_state.window_size.y) * global_state.framebuffer_size.y });
+                      (x / window_size.x) * framebuffer_size.x,
+                      ((window_size.y - y - height) / window_size.y) * framebuffer_size.y,
+                      (width / window_size.x) * framebuffer_size.x,
+                      (height / window_size.y) * framebuffer_size.y });
 }
 
 void t_begin_clip_area_inverse(int index, int x, int y, int width, int height) {
@@ -130,4 +134,25 @@ void t_end_clip_area_inverse(int index) {
 
   glUniform4fv(glGetUniformLocation(sprite_shader, uniform_name), 1,
                 (vec4){ 0, 0, 0, 0 });
+}
+
+void t_begin_scissor(int x, int y, int width, int height) {
+
+  const t_vec2 window_size = t_window_size();
+  const t_vec2 framebuffer_size = t_framebuffer_size();
+
+  clip_areas[0] = (t_rect) { x, y, width, height };
+
+  glEnable(GL_SCISSOR_TEST);
+  glScissor(
+      (x / window_size.x) * framebuffer_size.x,
+      ((window_size.y - y - height) / window_size.y) * framebuffer_size.y,
+      (width / window_size.x) * framebuffer_size.x,
+      (height / window_size.y) * framebuffer_size.y);
+}
+
+void t_end_scissor() {
+
+  clip_areas[0] = RECT_ZERO;
+  glDisable(GL_SCISSOR_TEST);
 }

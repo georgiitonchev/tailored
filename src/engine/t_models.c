@@ -1,17 +1,16 @@
-#include "t_core.h"
 #include "t_models.h"
 
-#include "../dep/include/glad/glad.h"
+#include "../../dep/include/glad/glad.h"
 
 #define CGLTF_IMPLEMENTATION
-#include "../dep/include/cgltf/cgltf.h"
+#include "../../dep/include/cgltf/cgltf.h"
 
 // STB
-#include "../dep/include/stb/stb_image.h"
-#include "../dep/include/stb/stb_ds.h"
+#include "../../dep/include/stb/stb_image.h"
+#include "../../dep/include/stb/stb_ds.h"
 
 // MATH
-#include "../dep/include/cglm/cglm.h"
+#include "../../dep/include/cglm/cglm.h"
 
 static const char *get_directory_path(const char *path) {
   const char *last_slash = strrchr(path, '/');
@@ -277,7 +276,7 @@ void setup_mesh(t_mesh *mesh) {
 
   if (mesh->material.base_texture_uri != NULL) {
     printf("Loading material base texture.\n");
-    mesh->material.base_texture = load_texture(mesh->material.base_texture_uri).id;
+    mesh->material.base_texture = t_load_texture(mesh->material.base_texture_uri).id;
   }
 }
 

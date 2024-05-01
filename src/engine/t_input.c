@@ -1,18 +1,18 @@
-#include "t_core.h"
+#include "tailored.h"
 #include "t_input.h"
 
-extern t_global_state global_state;
+extern t_input_state input_state;
 
 bool is_mouse_button_pressed(int button) {
-    return global_state.input_state.mouse_state.buttons[button].is_pressed;
+    return input_state.mouse_state.buttons[button].is_pressed;
 }
 
 bool is_mouse_button_down(int button) {
-    return global_state.input_state.mouse_state.buttons[button].is_down;
+    return input_state.mouse_state.buttons[button].is_down;
 }
 
 bool is_mouse_button_released(int button) {
-    return global_state.input_state.mouse_state.buttons[button].is_released;
+    return input_state.mouse_state.buttons[button].is_released;
 }
 
 //keyboard

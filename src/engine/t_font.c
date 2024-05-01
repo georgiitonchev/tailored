@@ -1,12 +1,12 @@
-#include <string.h>
 #include "t_font.h"
-#include "t_core.h"
+
+#include <string.h>
 
 // GL loader
-#include "../dep/include/glad/glad.h"
+#include "../../dep/include/glad/glad.h"
 
 // MATH
-#include "../dep/include/cglm/cglm.h"
+#include "../../dep/include/cglm/cglm.h"
 
 static unsigned int font_quad_vao;
 static unsigned int font_shader;
@@ -36,7 +36,7 @@ static void init_quad() {
 }
 
 static void init_shader() {
-  font_shader = create_shader_program("./res/shaders/font_shader.vs",
+  font_shader = t_create_shader_program("./res/shaders/font_shader.vs",
                                         "./res/shaders/font_shader.fs");
 }
 
@@ -90,11 +90,11 @@ void init_font_renderer() {
   init_quad();
   init_shader();
 
-  font_texture = load_texture("./res/textures/font.png");
+  font_texture = t_load_texture("./res/textures/font.png");
 }
 
 void terminate_font_renderer() {
-    free_texture(&font_texture);
+    t_free_texture(&font_texture);
 }
 
 void draw_text(const char* text, t_vec2 position, int size , t_color color) {

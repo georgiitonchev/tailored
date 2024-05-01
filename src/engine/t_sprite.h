@@ -1,5 +1,5 @@
 #pragma once
-#include "t_core.h"
+#include "tailored.h"
 
 typedef struct t_sprite {
   t_texture texture;
@@ -20,3 +20,6 @@ void draw_sprite(t_sprite* sprite, float x, float y, float width, float height, 
 void t_begin_clip_area_inverse(int index, int x, int y, int width, int height);
 void t_begin_clip_area_inverse_r(int index, t_rect rect);
 void t_end_clip_area_inverse(int index);
+
+void t_begin_scissor(int x, int y, int width, int height);
+void t_end_scissor();

@@ -1,5 +1,5 @@
 #include "screens.h"
-#include "t_core.h"
+#include "./engine/tailored.h"
 
 void load_splash_screen() {
 
@@ -14,5 +14,5 @@ void update_splash_screen() {
 }
 
 void draw_splash_screen() {
-     clear_color(RED);
+     t_clear_color(RED);
 }

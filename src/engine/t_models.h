@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../dep/include/cgltf/cgltf.h"
+#include "../../dep/include/cgltf/cgltf.h"
 
-#include "t_core.h"
+#include "tailored.h"
 
 typedef struct t_material {
   const char *base_texture_uri;

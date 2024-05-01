@@ -1,8 +1,8 @@
 #include "screens.h"
 
-#include "t_engine.h"
-#include "t_sprite.h"
-#include "t_ui.h"
+#include "./engine/tailored.h"
+#include "./engine/t_sprite.h"
+#include "./engine/t_ui.h"
 
 #include "stdio.h"
 #include "stdbool.h"
@@ -45,6 +45,6 @@ void update_game_screen() {
 }
 
 void draw_game_screen() {
-    clear_color(BLUE);
+    t_clear_color(BLUE);
     draw_ui_button(&m_quit_button, 16, 16 + 64 + 16, 96, 32);
 }

@@ -3,7 +3,8 @@
 
 #include <stdbool.h>
 
-typedef enum {
+// SCTRUCTURE DEFINITIONS
+typedef enum t_result {
   t_success = 0,
   t_error = 1
 } t_result;
@@ -86,50 +87,65 @@ typedef struct t_input_state {
       bool is_released;
     } buttons[2];
 
+    t_vec2 position;
   } mouse_state;
 
   struct t_keyboard_state {
     bool active;
   } keyboard_state;
 
-} t_inpus_state;
+} t_input_state;
 
-typedef struct t_global_state {
+// FILE FUNCTIONS
+const char *t_read_file(const char *path);
 
-  t_vec2 mouse_pos;
-  t_inpus_state input_state;
-  t_vec2 window_size;
-  t_vec2 framebuffer_size;
-  float delta_time;
+// SHADER FUNCTIONS
+unsigned int t_create_shader_program(const char *vertex_shader_path, const char *fragment_shader_path);
 
-} t_global_state;
+// COLOR FUNCTIONS
+void t_clear_color(t_color color);
 
-// files
-const char *read_file(const char *path);
+// TEXTURE FUNCTIONS
+t_texture_data t_load_texture_data(const char* path);
+t_texture t_load_texture(const char *path);
+void t_free_texture(t_texture* texture);
 
-// opengl
-unsigned int create_shader_program(const char *vertex_shader_path,
-                                   const char *fragment_shader_path);
+// MATH FUNCTIONS
+t_vec2 t_vec2_sub(t_vec2 a, t_vec2 b);
+float t_map(float value, float from_min, float from_max, float to_min, float to_max);
 
-void clear_color(t_color color);
+// ENGINE FUNCTIONS
+int t_begin(int window_width, int window_height, const char* title);
+bool t_loop();
+void t_loop_end();
+void t_end();
 
-t_texture_data load_texture_data(const char* path);
-t_texture load_texture(const char *path);
-void free_texture(t_texture* texture);
+void t_draw_scene();
+
+// CORE FUNCTIONS
+void t_play_audio(const char* path);
+void t_set_cursor(const char* path, int xhot, int yhot);
+float t_delta_time();
+t_vec2 t_window_size();
+t_vec2 t_framebuffer_size();
 
 
-// COLORS
+// STRUCTURE VALUES
 #define WHITE (t_color) { 255, 255, 255, 255 }
 #define LIGHT_GRAY (t_color) { 163, 163, 163, 255 }
 #define DARK_GRAY (t_color) { 81, 81, 81, 255 }
+#define BLACK (t_color) { 0, 0, 0, 255 }
 #define RED (t_color) { 255, 0, 0, 255 }
 #define GREEN (t_color) { 0, 255, 0, 255 }
 #define BLUE (t_color) { 0, 0, 255, 255 }
 
-// VECTORS
 #define VEC2_ZERO (t_vec2) { 0, 0 }
 #define VEC2_ONE (t_vec2) { 1, 1 }
-#define RECT_ZERO (t_rect) { 0, 0, 0, 0 }
 
-t_vec2 vec2_sub(t_vec2 a, t_vec2 b);
-float map(float value, float from_min, float from_max, float to_min, float to_max);
+#define VEC3_ZERO (t_vec3) { 0, 0, 0 }
+#define VEC3_ONE (t_vec3) { 1, 1, 1 }
+
+#define VEC4_ZERO (t_vec4) { 0, 0, 0, 0 }
+#define VEC4_ONE (t_vec4) { 1, 1, 1, 1 }
+
+#define RECT_ZERO (t_rect) { 0, 0, 0, 0 }

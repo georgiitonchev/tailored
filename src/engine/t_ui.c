@@ -3,12 +3,11 @@
 #include "t_input.h"
 #include "t_shapes.h"
 #include "t_sprite.h"
-#include "t_core.h"
 
 #include <stdio.h>
 
 // EXTERN
-extern t_global_state global_state;
+extern t_input_state input_state;
 extern t_rect clip_areas[2];
 
 // STATIC
@@ -39,13 +38,18 @@ t_ui_button create_ui_button(t_sprite* sprite) {
 
 void draw_ui_button(t_ui_button* button, int x, int y, int width, int height) {
 
+    if (clip_areas[0].width + clip_areas[0].height > 0) {
+        if (!does_rect_overlap_rect((t_rect){x, y, width, height}, clip_areas[0]))
+        return;
+    }
+
     t_color color = button->color_default;
 
     bool is_inside_clip_area =
         clip_areas[0].width + clip_areas[0].height > 0 ? 
-        is_point_in_rect(global_state.mouse_pos, clip_areas[0]) : true;
+        is_point_in_rect(input_state.mouse_state.position, clip_areas[0]) : true;
 
-    if (is_inside_clip_area && is_point_in_rect(global_state.mouse_pos, (t_rect){ x, y, width, height }))
+    if (is_inside_clip_area && is_point_in_rect(input_state.mouse_state.position, (t_rect){ x, y, width, height }))
     {
         if (!button->is_mouse_over) {
             button->is_mouse_over = true;
@@ -58,7 +62,7 @@ void draw_ui_button(t_ui_button* button, int x, int y, int width, int height) {
 
         if (!button->was_clicked && is_mouse_button_pressed(MOUSE_BUTTON_LEFT)) {
             button->was_clicked = true;
-            button->mouse_clicked_at = vec2_sub(global_state.mouse_pos, (t_vec2){ x, y });
+            button->mouse_clicked_at = t_vec2_sub(input_state.mouse_state.position, (t_vec2){ x, y });
         }
 
         if (button->was_clicked)
@@ -115,7 +119,7 @@ void draw_ui_dropdown(t_ui_dropdown* dropdown) {
 
     t_color color = dropdown->color_default;
 
-    if (/*!is_point_in_rect(global_state.mouse_pos, m_focused_rect) && !m_currently_over_ui &&*/ is_point_in_rect(global_state.mouse_pos, dropdown->rect))
+    if (/*!is_point_in_rect(global_state.mouse_pos, m_focused_rect) && !m_currently_over_ui &&*/ is_point_in_rect(input_state.mouse_state.position, dropdown->rect))
     {
         m_currently_over_ui = true;
         color = dropdown->color_mouseover;
@@ -153,7 +157,7 @@ void draw_ui_dropdown(t_ui_dropdown* dropdown) {
         {
             t_rect optionRect = { dropdown->rect.x + 1, dropdown->rect.y + dropdown->rect.height + dropdown->rect.height * i , dropdown->rect.width - 2, dropdown->rect.height - 2 };
 
-            if (is_point_in_rect(global_state.mouse_pos, optionRect))
+            if (is_point_in_rect(input_state.mouse_state.position, optionRect))
             {
                 m_currently_over_ui = 1;
                 // DrawRectangle(optionRect.x, optionRect.y, optionRect.width, optionRect.height, (t_color) { 48, 48, 48, 255 });

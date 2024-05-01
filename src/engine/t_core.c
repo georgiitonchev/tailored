@@ -1,17 +1,17 @@
-#include "t_core.h"
+#include "tailored.h"
 
-#include "../dep/include/glad/glad.h"
 #include <stdlib.h>
 #include <string.h>
 
+#include "../../dep/include/glad/glad.h"
 // STB
 #define STB_IMAGE_IMPLEMENTATION
-#include "../dep/include/stb/stb_image.h"
+#include "../../dep/include/stb/stb_image.h"
 #define STB_DS_IMPLEMENTATION
-#include "../dep/include/stb/stb_ds.h"
+#include "../../dep/include/stb/stb_ds.h"
 
 // MATH
-#include "../dep/include/cglm/cglm.h"
+#include "../../dep/include/cglm/cglm.h"
 
 const char *read_file(const char *path) {
   char *text_buffer;
@@ -71,8 +71,7 @@ static GLuint compile_shader(const char* shader_path, unsigned int shader_type) 
   return shader_id;
 }
 
-GLuint create_shader_program(const char *vertex_shader_path,
-                                   const char *fragment_shader_path) {
+GLuint t_create_shader_program(const char *vertex_shader_path, const char *fragment_shader_path) {
 
   GLuint vertex_shader = compile_shader(vertex_shader_path, GL_VERTEX_SHADER);
   GLuint fragment_shader = compile_shader(fragment_shader_path, GL_FRAGMENT_SHADER);
@@ -107,7 +106,7 @@ GLuint create_shader_program(const char *vertex_shader_path,
   return shader_program;
 }
 
-t_texture_data load_texture_data(const char* path) {
+t_texture_data t_load_texture_data(const char* path) {
   int width, height, channels;
   unsigned char *data = stbi_load(path, &width, &height, &channels, 0);
 
@@ -125,9 +124,9 @@ t_texture_data load_texture_data(const char* path) {
   return texture_data;
 }
 
-t_texture load_texture(const char *texture_path) {
+t_texture t_load_texture(const char *texture_path) {
 
-  t_texture_data texture_data = load_texture_data(texture_path);
+  t_texture_data texture_data = t_load_texture_data(texture_path);
 
   GLenum texture_format = 0;
   if (texture_data.channels == 1)
@@ -169,19 +168,19 @@ t_texture load_texture(const char *texture_path) {
   return texture;
 }
 
-void free_texture(t_texture* texture) 
+void t_free_texture(t_texture* texture) 
 {
     glDeleteTextures(1, &texture->id);
 }
 
-void clear_color(t_color color) {
+void t_clear_color(t_color color) {
     glClearColor(color.r / 255, color.g / 255, color.b / 255, color.a);
 }
 
-t_vec2 vec2_sub(t_vec2 a, t_vec2 b) {
+t_vec2 t_vec2_sub(t_vec2 a, t_vec2 b) {
   return (t_vec2) { a.x - b.x, a.y - b.y };
 }
 
-float map(float value, float from_min, float from_max, float to_min, float to_max) {
+float t_map(float value, float from_min, float from_max, float to_min, float to_max) {
     return (value - from_min) / (from_max - from_min) * (to_max - to_min) + to_min;
-} 
+}

@@ -1,5 +1,5 @@
 #pragma once
-#include "t_core.h"
+#include "tailored.h"
 
 void init_font_renderer();
 void terminate_font_renderer();
