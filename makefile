@@ -12,7 +12,7 @@ LIBS_LINUX =
 
 CMDS_MAC = install_name_tool -add_rpath @executable_path $(BUILD_DIR)/tailored
 
-SRCS = $(wildcard $(SRC_DIR)/*.c) $(wildcard $(SRC_DIR)/*/*.c)
+SRCS = $(wildcard $(SRC_DIR)/*.c $(SRC_DIR)/*/*.c $(SRC_DIR)/*/*/*.c)
 
 ifeq ($(OS), Windows_NT)
 	EXE_EXT = .exe

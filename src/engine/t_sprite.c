@@ -53,7 +53,8 @@ void draw_sprite(t_sprite* sprite, float x, float y, float width, float height, 
   glUseProgram(sprite_shader);
 
   mat4 mat4_projection;
-  glm_ortho(0, 640, 360, 0, 0.0, 1.0, mat4_projection);
+  t_vec2 window_size = t_window_size();
+  glm_ortho(0, window_size.x, window_size.y, 0, 0.0, 1.0, mat4_projection);
 
   mat4 mat4_model;
   glm_mat4_identity(mat4_model);
@@ -90,6 +91,13 @@ void draw_sprite_t(t_sprite *sprite, t_rect rect, t_color color) {
     draw_sprite(
       sprite,
       rect.x, rect.y, rect.width, rect.height, color);
+}
+
+void create_sprite_t(t_texture* texture, t_sprite* sprite) {
+  sprite->texture = *texture;
+  sprite->scale = (t_vec2){ 1, 1 };
+  sprite->texture_slice = (t_vec4){ 0, 0, sprite->texture.size.x, sprite->texture.size.y };
+  sprite->slice_borders = (t_vec4){ 0, 0, 0, 0 };
 }
 
 void create_sprite(const char* path, t_sprite* sprite) {

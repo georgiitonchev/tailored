@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "./engine/tailored.h"
 #include "./engine/t_sprite.h"
@@ -6,6 +7,8 @@
 #include "./engine/t_ui.h"
 
 #include "screens.h"
+
+#include "./engine/extern/stb_truetype.h"
 
 t_screen m_current_screen = TITLE;
 
@@ -61,7 +64,7 @@ int main() {
             case TITLE: draw_title_screen(); break;
             case GAME: draw_game_screen(); break;
         }
-        
+
         t_draw_scene();
         t_loop_end();
     }

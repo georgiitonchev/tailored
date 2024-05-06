@@ -1,11 +1,8 @@
 #version 330 core
 
 in vec2 tex_coords;
-in vec4 clip_space_pos;
-in vec4 clip_space_pos_prev;
 
 layout (location = 0) out vec4 color;
-layout (location = 1) out vec4 motion_vector;
 
 uniform sampler2D u_texture;
 uniform mat4 u_mat4_model;
@@ -106,9 +103,4 @@ void main() {
     }
 
     color = u_color * texture(u_texture, tex_coord);
-
-    vec3 ndc_pos = (clip_space_pos / clip_space_pos.w).xyz;
-    vec3 prev_ndc_pos = (clip_space_pos_prev / clip_space_pos_prev.w).xyz;
-    motion_vector = vec4((ndc_pos - prev_ndc_pos).xy, 0, 1);
-    //motion_vector = vec4(1, 0, 0, 1);
 }

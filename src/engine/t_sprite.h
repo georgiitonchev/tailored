@@ -12,6 +12,8 @@ typedef struct t_sprite {
 void init_sprite_renderer();
 
 void create_sprite(const char* path, t_sprite* sprite);
+void create_sprite_t(t_texture* texture, t_sprite* sprite);
+
 void delete_sprite(t_sprite* sprite);
 
 void draw_sprite_t(t_sprite *sprite, t_rect rect, t_color color);

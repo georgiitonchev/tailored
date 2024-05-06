@@ -76,6 +76,7 @@ typedef struct t_texture_data {
   unsigned int width;
   unsigned int height;
   unsigned int channels;
+
 } t_texture_data;
 
 typedef struct t_input_state {
@@ -97,7 +98,7 @@ typedef struct t_input_state {
 } t_input_state;
 
 // FILE FUNCTIONS
-const char *t_read_file(const char *path);
+const char *t_read_file(const char *path, long* file_size);
 
 // SHADER FUNCTIONS
 unsigned int t_create_shader_program(const char *vertex_shader_path, const char *fragment_shader_path);
@@ -108,6 +109,7 @@ void t_clear_color(t_color color);
 // TEXTURE FUNCTIONS
 t_texture_data t_load_texture_data(const char* path);
 t_texture t_load_texture(const char *path);
+t_texture t_load_texture_from_data(const t_texture_data* texture_data);
 void t_free_texture(t_texture* texture);
 
 // MATH FUNCTIONS

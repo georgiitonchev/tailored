@@ -41,5 +41,9 @@ void main() {
                         s_offset_y, s_offset_y + (1 / s_slice.y));
     }
 
-    color = u_color * texture(u_texture, tex_coord);
+    //color = texture(u_texture, tex_coord);
+
+
+    vec4 sampled = vec4(1.0, 1.0, 1.0, texture(u_texture, tex_coord).r);
+    color = sampled;
 }

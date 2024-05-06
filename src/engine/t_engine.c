@@ -11,7 +11,7 @@
 
 // Audio
 #define MINIAUDIO_IMPLEMENTATION
-#include "miniaudio.h"
+#include "./extern/miniaudio.h"
 
 // GL loader
 #include "../../dep/include/glad/glad.h"
@@ -292,7 +292,7 @@ int t_begin(int window_width, int window_height, const char* title) {
 
     // END AUDIO
 
-    //glEnable(GL_DEPTH_TEST);
+    // glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -307,32 +307,32 @@ int t_begin(int window_width, int window_height, const char* title) {
 bool t_loop() {
     calculate_delta_time();
 
-    bind_framebuffer(frame_buffer_id);
+    // bind_framebuffer(frame_buffer_id);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     return !glfwWindowShouldClose(s_window);
 }
 
 void t_draw_scene() {
-    bind_framebuffer(0);
+    // bind_framebuffer(0);
 
-    glClearColor(0, 0, 0, 1);
-    glClear(GL_COLOR_BUFFER_BIT);
+    // glClearColor(0, 0, 0, 1);
+    // glClear(GL_COLOR_BUFFER_BIT);
 
-    glUseProgram(motion_blur_shader_id);
-    glBindVertexArray(motion_blur_quad_vao);
-    glDisable(GL_DEPTH_TEST);
+    // glUseProgram(motion_blur_shader_id);
+    // glBindVertexArray(motion_blur_quad_vao);
+    // glDisable(GL_DEPTH_TEST);
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, first_pass_texture_id);
+    // glActiveTexture(GL_TEXTURE0);
+    // glBindTexture(GL_TEXTURE_2D, first_pass_texture_id);
 
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, motion_vector_texture_id);
+    // glActiveTexture(GL_TEXTURE1);
+    // glBindTexture(GL_TEXTURE_2D, motion_vector_texture_id);
 
-    glUniform1i(glGetUniformLocation(motion_blur_shader_id, "u_texture"), 0);
-    glUniform1i(glGetUniformLocation(motion_blur_shader_id, "u_motion_texture"), 1);
+    // glUniform1i(glGetUniformLocation(motion_blur_shader_id, "u_texture"), 0);
+    // glUniform1i(glGetUniformLocation(motion_blur_shader_id, "u_motion_texture"), 1);
 
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    // glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
 void t_loop_end() {

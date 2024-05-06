@@ -10,6 +10,7 @@
 #include "./engine/t_list.h"
 #include "./engine/t_shapes.h"
 #include "./engine/t_input.h"
+#include "./engine/t_font.h"
 
 #include "./engine/t_easings.h"
 
@@ -320,6 +321,8 @@ void draw_title_screen() {
     draw_ui_button(&m_settings_button, 64, 92 + 48 + 16 + 48, 128, 48);
     draw_ui_button(&m_about_button, 64, 92 + 48 + 48 + 16 + 16 + 48, 128, 48);
 
+    draw_text_ttf("Characters", (t_vec2) {64, 92 + 48}, WHITE);
+    
     if (s_ease_in_characters) {
         float progress = t_ease_out_quint(&s_ease_out_timer_characters, &s_offset_y_characters, 360, 0, .5f);
 
