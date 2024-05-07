@@ -33,9 +33,14 @@ static t_sprite m_logo_sprite;
 static t_sprite m_button_sprite;
 static t_sprite m_button_sprite_selected;
 static t_sprite m_dropdown_sprite;
+
 static t_sprite m_slider_background_sprite;
 static t_sprite m_slider_knob_small_sprite;
 static t_sprite m_slider_knob_big_sprite;
+
+static t_sprite m_slider_background_sprite_v;
+static t_sprite m_slider_knob_small_sprite_v;
+static t_sprite m_slider_knob_big_sprite_v;
 
 // UI
 //  BUTTONS
@@ -48,6 +53,7 @@ static t_ui_button m_edit_button;
 
 // SLIDER KNOB
 static t_ui_button m_slider_knob_button;
+static t_ui_button m_slider_knob_button_v;
 
 //  OTHER
 static t_ui_dropdown m_dropdown;
@@ -79,7 +85,7 @@ static float s_offset_y_about = 0;
 // BUTTON CALLBACKS
 
 static void on_button_mouse_enter() {
-    // t_play_audio("./res/audio/click_003.wav");
+     //t_play_audio("./res/audio/click_003.wav");
 }
 
 static void on_characters_button_clicked() {
@@ -174,19 +180,38 @@ static void on_slider_knob_button_pressed() {
     scroll_area_offset = (scroll_area_width - slider_width) * normalized_knob_position;
 }
 
+static float scroll_area_height_v = 700;
+static float scroll_area_offset_v = 0;
+
+static t_vec2 slider_pos_v = { 597, 32 };
+static float slider_height_v = 296;
+
+static t_rect slider_knob_rect_v;
+
+static void on_slider_knob_button_v_pressed() {
+    slider_knob_rect_v.y = input_state.mouse_state.position.y - m_slider_knob_button_v.mouse_clicked_at.y;
+
+    // limits
+    if (slider_knob_rect_v.y < slider_pos_v.y)
+        slider_knob_rect_v.y = slider_pos_v.y;
+    else if (slider_knob_rect_v.y > slider_pos_v.y + slider_height_v - slider_knob_rect_v.height)
+        slider_knob_rect_v.y = slider_pos_v.y + slider_height_v - slider_knob_rect_v.height;
+
+    float normalized_knob_position = (slider_knob_rect_v.y - slider_pos_v.y) / (slider_height_v - slider_knob_rect_v.height);
+    scroll_area_offset_v = (scroll_area_height_v - slider_height_v) * normalized_knob_position;
+}
+
 static void draw_characters() {
     // RIGHT SIDE BACKGROUND
     draw_sprite(&m_button_sprite, 256, 16 + s_offset_y_characters, 368, 328, CC_LIGHT_RED);
 
     // CHARACTER ELEMENTS
-    // t_begin_clip_area(256 + 16 + characters_area_offset_x, 16, 368 - 32, 328);
     t_begin_scissor(256 + 16, 16 + s_offset_y_characters, 368 - 32, 328);
     for (unsigned int i = 0; i < m_characters_list->size; i ++) {
 
         t_ui_button* character_button = (t_ui_button*)element_at_list(m_characters_list, i);
         draw_ui_button(character_button, (272 + i * 128 + i * 16) - scroll_area_offset, 32 + s_offset_y_characters, 128, 223);
     }
-    // t_end_clip_area();
     t_end_scissor();
 
     t_rect slider_rect = (t_rect) { 272, 328 - 64 + s_offset_y_characters, 336, m_slider_background_sprite.texture.size.y };
@@ -210,7 +235,6 @@ static void draw_characters() {
     }
 
     // SLIDER
-    // t_begin_clip_area_inverse_r(m_slider_knob_button.rect);
     draw_sprite_t(&m_slider_background_sprite, slider_rect, CC_BLACK);
     t_end_clip_area_inverse(0);
     t_end_clip_area_inverse(1);
@@ -222,10 +246,10 @@ static void draw_characters() {
     draw_ui_button(&m_edit_button, 496, 292 + s_offset_y_characters, 112, 40);
 
     t_vec2 text_size_delete = measure_text_size_ttf("Delete", &s_ui_font_m);
-    draw_text_ttf("Delete", &s_ui_font_m, (t_vec2) {368 + (112 - text_size_delete.x) / 2 , 292 + s_offset_y_characters + (40 + text_size_delete.y) / 2}, CC_LIGHT_RED, 0);
+    draw_text_ttf("Delete", &s_ui_font_m, (t_vec2) {368 + (112 - text_size_delete.x) / 2 , 292 + s_offset_y_characters + (40 + text_size_delete.y) / 2}, CC_RED, 0);
 
     t_vec2 text_size_start = measure_text_size_ttf("Start", &s_ui_font_m);
-    draw_text_ttf("Start", &s_ui_font_m, (t_vec2) {496 + (112 - text_size_start.x) / 2 , 292 + s_offset_y_characters + (40 + text_size_start.y) / 2}, CC_LIGHT_RED, 0);
+    draw_text_ttf("Start", &s_ui_font_m, (t_vec2) {496 + (112 - text_size_start.x) / 2 , 292 + s_offset_y_characters + (40 + text_size_start.y) / 2}, CC_RED, 0);
 }
 
 static void draw_settings() {
@@ -235,7 +259,40 @@ static void draw_settings() {
 static void draw_about() {
     draw_sprite(&m_button_sprite, 256, 16 + s_offset_y_about, 368, 328, CC_LIGHT_RED);
 
-    draw_text_ttf("Imps & Fairies is a very simple character creator written in C using OpenGL. It features save files, customizing UI colors, switching UI fonts and more.", &s_ui_font_s, (t_vec2) {256 + 16 , 16 + 32 + s_offset_y_about}, CC_BLACK, 368 - 32);
+    t_begin_scissor(256 + 16, 32 + s_offset_y_about, 368 - 48, 328 - 32);
+        draw_text_ttf("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Dictum sit amet justo donec. Faucibus nisl tincidunt eget nullam non. Egestas tellus rutrum tellus pellentesque eu tincidunt. Donec enim diam vulputate ut pharetra sit amet aliquam id. Quis viverra nibh cras pulvinar mattis nunc sed blandit. Posuere sollicitudin aliquam ultrices sagittis orci a scelerisque purus. In ornare quam viverra orci. Congue quisque egestas diam in arcu. Tempus urna et pharetra pharetra massa. Dolor magna eget est lorem ipsum dolor. Ut etiam sit amet nisl purus in mollis nunc sed. Cras fermentum odio eu feugiat pretium nibh ipsum consequat nisl. Consectetur purus ut faucibus pulvinar elementum. Elementum eu facilisis sed odio morbi.", &s_ui_font_s, (t_vec2) {256 + 16 , 16 + 32 + s_offset_y_about - scroll_area_offset_v}, CC_BLACK, 368 - 48);
+    t_end_scissor();
+
+    t_rect slider_rect = RECT_ZERO;
+    slider_rect.x = 597;
+    slider_rect.y = 32 + s_offset_y_about;
+    slider_rect.width = m_slider_background_sprite_v.texture.size.x;
+    slider_rect.height = 296;
+
+    t_begin_clip_area_inverse(1, 597, 32, 10, 40);
+    if (!m_slider_knob_button_v.is_mouse_over && is_point_in_rect(input_state.mouse_state.position, slider_rect)) {
+
+        if (is_mouse_button_pressed(MOUSE_BUTTON_LEFT))
+           slider_knob_rect_v.y = input_state.mouse_state.position.y - slider_knob_rect_v.height / 2;
+
+        t_rect slider_knob_small_rect = (t_rect) { slider_rect.x, input_state.mouse_state.position.y - m_slider_knob_small_sprite_v.texture.size.y / 2 + s_offset_y_about, m_slider_knob_small_sprite_v.texture.size.x, m_slider_knob_small_sprite_v.texture.size.y };
+
+        //limits
+        if (slider_knob_small_rect.y < slider_rect.y)
+            slider_knob_small_rect.y = slider_rect.y;
+        else if (slider_knob_small_rect.y > slider_rect.y + slider_rect.height- slider_knob_small_rect.height)
+            slider_knob_small_rect.y = slider_rect.y + slider_rect.height - slider_knob_small_rect.height;
+
+        draw_sprite_t(&m_slider_knob_small_sprite_v, slider_knob_small_rect, CC_BLACK);
+        //t_begin_clip_area_inverse(0, slider_knob_small_rect.x, slider_knob_small_rect.y, m_slider_knob_small_sprite_v.texture.size.x, m_slider_knob_small_sprite_v.texture.size.y);
+    }
+
+    // SLIDER
+    draw_sprite_t(&m_slider_background_sprite_v, slider_rect, CC_BLACK);
+    t_end_clip_area_inverse(1);
+    t_end_clip_area_inverse(0);
+
+    draw_ui_button(&m_slider_knob_button_v, slider_knob_rect_v.x, slider_knob_rect_v.y + s_offset_y_about, slider_knob_rect_v.width, slider_knob_rect_v.height);
 }
 
 void load_title_screen() {
@@ -298,7 +355,7 @@ void load_title_screen() {
     m_slider_knob_button.color_clicked = CC_DARK_RED;
     m_slider_knob_button.on_pressed = on_slider_knob_button_pressed;
 
-    slider_knob_rect= (t_rect){ 272, 328 - 66, m_slider_knob_big_sprite.texture.size.x, m_slider_knob_big_sprite.texture.size.y };
+    slider_knob_rect = (t_rect){ 272, 328 - 66, m_slider_knob_big_sprite.texture.size.x, m_slider_knob_big_sprite.texture.size.y };
 
     m_characters_list = create_list(sizeof(t_ui_button));
     for (int i = 0; i < 10; i++) {
@@ -316,6 +373,22 @@ void load_title_screen() {
     }
 
     scroll_area_width = m_characters_list->size * 128 + (m_characters_list->size - 1) * 16;
+
+    // ABOUT
+    create_sprite("./res/textures/slider_background_v.png", &m_slider_background_sprite_v);
+    create_sprite("./res/textures/slider_knob_small_v.png", &m_slider_knob_small_sprite_v);
+    create_sprite("./res/textures/slider_knob_big_v.png", &m_slider_knob_big_sprite_v);
+
+    m_slider_knob_button_v = create_ui_button(&m_slider_knob_big_sprite_v);
+    m_slider_knob_button_v.color_default = CC_BLACK;
+    m_slider_knob_button_v.color_mouseover = CC_DARK_RED;
+    m_slider_knob_button_v.color_clicked = CC_DARK_RED;
+    m_slider_knob_button_v.on_pressed = on_slider_knob_button_v_pressed;
+
+    //  slider_rect.x = 256 + 368 - 32 + 5;
+    //  slider_rect.y = 32 + s_offset_y_about;
+    slider_knob_rect_v = (t_rect){ 595, 32, m_slider_knob_big_sprite_v.texture.size.x, m_slider_knob_big_sprite_v.texture.size.y };
+
 }
 
 void unload_title_screen() {

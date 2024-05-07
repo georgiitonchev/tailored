@@ -117,12 +117,18 @@ static void t_set_clip_area(const char* key, int x, int y, int width, int height
   const t_vec2 window_size = t_window_size();
   const t_vec2 framebuffer_size = t_framebuffer_size();
 
-  glUniform4fv(glGetUniformLocation(sprite_shader, key), 1,
+  GLint uniform_location = glGetUniformLocation(sprite_shader, key);
+  if (uniform_location != -1) {
+    printf("Uniform location %s. \n", key);
+    glUniform4fv(uniform_location, 1,
                   (vec4){
                       (x / window_size.x) * framebuffer_size.x,
                       ((window_size.y - y - height) / window_size.y) * framebuffer_size.y,
                       (width / window_size.x) * framebuffer_size.x,
                       (height / window_size.y) * framebuffer_size.y });
+  } else {
+    printf("Uniform location %s not found. \n", key);
+  }
 }
 
 void t_begin_clip_area_inverse(int index, int x, int y, int width, int height) {
