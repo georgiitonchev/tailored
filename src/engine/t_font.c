@@ -15,8 +15,52 @@
 static unsigned int font_quad_vao;
 static unsigned int font_shader;
 static t_texture font_texture;
-static t_texture ttf_font_texture;
-static stbtt_bakedchar cdata[96];
+
+static float bake_font_bitmap(stbtt_fontinfo *font_info,
+                                float pixel_height,                     // height of font in pixels
+                                unsigned char *pixels, int pw, int ph,  // bitmap to be filled in
+                                int first_char, int num_chars,          // characters to bake
+                                t_font_character *font_characters)
+{
+   float scale;
+   int x,y,bottom_y, i;
+
+   STBTT_memset(pixels, 0, pw*ph); // background of 0 around pixels
+   x=y=1;
+   bottom_y = 1;
+
+   scale = stbtt_ScaleForPixelHeight(font_info, pixel_height);
+
+   for (i=0; i < num_chars; ++i) {
+      int advance, lsb, x0,y0,x1,y1,gw,gh;
+      int g = stbtt_FindGlyphIndex(font_info, first_char + i);
+      stbtt_GetGlyphHMetrics(font_info, g, &advance, &lsb);
+      stbtt_GetGlyphBitmapBox(font_info, g, scale, scale, &x0, &y0, &x1, &y1);
+      gw = x1-x0;
+      gh = y1-y0;
+      if (x + gw + 1 >= pw)
+         y = bottom_y, x = 1; // advance to next row
+      if (y + gh + 1 >= ph) // check if it fits vertically AFTER potentially moving to next row
+         return -i;
+      STBTT_assert(x+gw < pw);
+      STBTT_assert(y+gh < ph);
+      stbtt_MakeGlyphBitmap(font_info, pixels+x+y*pw, gw,gh,pw, scale,scale, g);
+      font_characters[i].x = (stbtt_int16) x;
+      font_characters[i].y = (stbtt_int16) y;
+      font_characters[i].width = (stbtt_int16) (gw);
+      font_characters[i].height = (stbtt_int16) (gh);
+      font_characters[i].advance = scale * advance;
+      font_characters[i].bearing_x = scale * lsb;
+      font_characters[i].xoff     = (float) x0;
+      font_characters[i].yoff     = (float) y0;
+      x = x + gw + 1;
+      if (y+gh+1 > bottom_y)
+         bottom_y = y+gh+1;
+   }
+
+   return scale;
+}
+
 
 static void init_quad() {
   // configure VAO/VBO
@@ -78,7 +122,7 @@ static void draw_texture_slice(t_texture texture, t_vec4 texture_slice, t_vec2 p
                       GL_FALSE, (float *)mat4_model);
 
   glUniform4fv(glGetUniformLocation(font_shader, "u_color"), 1,
-                (vec4){color.r, color.g, color.b, color.a});
+                (vec4){color.r / 255.0f, color.g / 255.0f, color.b / 255.0f, color.a / 255.0f});
 
   glUniform4fv(glGetUniformLocation(font_shader, "u_texture_slice"), 1,
                 (vec4){texture_slice.x, texture_slice.y,
@@ -92,26 +136,51 @@ static void draw_texture_slice(t_texture texture, t_vec4 texture_slice, t_vec2 p
   glBindVertexArray(0);
 }
 
+t_font load_ttf_font(const char* path, unsigned int font_size) {
+  
+  t_font font = { 0 };
+  font.characters = malloc(96 * sizeof(t_font_character));
+
+  long file_size;
+  unsigned char* file_data = t_read_file(path, &file_size);
+
+  unsigned char bitmap_data[512 * 512];
+
+  stbtt_fontinfo font_info = {0};
+  font_info.userdata = NULL;
+
+  if (!stbtt_InitFont(&font_info, file_data, 0))
+  {
+    printf("Eror initializing font. \n");
+  }
+
+  float scale = bake_font_bitmap(&font_info, font_size, bitmap_data, 512, 512, 32, 96, font.characters);
+  //free(file_data);
+
+  int font_ascent = 0;
+  int font_descent = 0;
+  int line_gap = 0;
+
+  stbtt_GetFontVMetrics(&font_info, &font_ascent, &font_descent, &line_gap);
+
+  t_texture_data texture_data;
+  texture_data.channels = 1;
+  texture_data.data = bitmap_data;
+  texture_data.width = 512;
+  texture_data.height = 512;
+
+  font.bitmap = t_load_texture_from_data(&texture_data);
+  font.line_height = (font_ascent - font_descent + line_gap) * scale; //ascent - *descent + *lineGap
+
+  free(file_data);
+  return font;
+}
+
 void init_font_renderer() {
     init_quad();
     init_shader();
 
     font_texture = t_load_texture("./res/textures/font.png");
-
-    long file_size;
-    unsigned char* file_data = t_read_file("./res/fonts/SedanSC-Regular.ttf", &file_size);
-
-    unsigned char bitmap_data[512 * 512];
-    
-    stbtt_BakeFontBitmap(file_data, 0, 48, bitmap_data, 512, 512, 32, 96, cdata);
-
-    t_texture_data texture_data;
-    texture_data.channels = 1;
-    texture_data.data = bitmap_data;
-    texture_data.width = 512;
-    texture_data.height = 512;
-
-    ttf_font_texture = t_load_texture_from_data(&texture_data);
 }
 
 void terminate_font_renderer() {
@@ -128,19 +197,77 @@ t_vec2 measure_text_size(const char* text, int size) {
     return (t_vec2) { size * strlen(text), size };
 }
 
-void draw_text_ttf(const char* text, t_vec2 position, t_color color) {
+t_vec2 measure_text_size_ttf(const char* text, t_font* font) {
 
-  int pos_x = position.x;
+  t_vec2 size = VEC2_ZERO;
 
-  for (int i = 0; i < (int) strlen(text); i++) {
+  size_t string_length = strlen(text);
+
+  for (int i = 0; i < (int) string_length; i++) {
     int character = text[i] - 32;
-    t_vec4 char_rect;
-    char_rect.x = cdata[character].x0;
-    char_rect.y = cdata[character].y0;
-    char_rect.z = cdata[character].x1 - cdata[character].x0;
-    char_rect.w = cdata[character].y1 - cdata[character].y0;
 
-    draw_texture_slice(ttf_font_texture, char_rect, (t_vec2){ pos_x + cdata[character].xoff, position.y + cdata[character].yoff }, (t_vec2){ char_rect.z, char_rect.w }, color);
-    pos_x += char_rect.z;
+    size.x += font->characters[character].advance;
+    size.y += font->characters[character].height;
+  }
+
+  size.y /= string_length;
+  return size;
+}
+
+void draw_text_ttf(const char* text, t_font* font, t_vec2 position, t_color color, int max_width) {
+
+  int text_length = (int) strlen(text);
+  int pos_x = position.x;
+  int pos_y = position.y;
+
+  int current_width = 0;
+
+  int current_word_width = 0;
+  int current_word_index = 0;
+  int current_word_length = 0;
+
+  for (int i = 0; i < text_length; i++) {
+
+    int character = text[i] - 32;
+
+    if (character != 0) {
+
+      current_word_length ++;
+      current_word_width += font->characters[character].advance;
+    }
+
+    if (character == 0 || i == text_length - 1) {
+
+      if (current_word_length > 0) {
+
+        if (max_width != 0 && current_width + current_word_width >= max_width) {
+
+          current_width = 0;
+          pos_x = position.x;
+          pos_y += font->line_height;
+        }
+
+        for (int j = current_word_index; j < current_word_index + current_word_length + 1; j++) {
+
+          character = text[j] - 32;
+          t_vec4 char_rect;
+          char_rect.x = font->characters[character].x;
+          char_rect.y = font->characters[character].y;
+          char_rect.z = font->characters[character].width;
+          char_rect.w = font->characters[character].height;
+
+          draw_texture_slice(font->bitmap, char_rect, (t_vec2){ pos_x + font->characters[character].bearing_x, pos_y + font->characters[character].yoff }, (t_vec2){ char_rect.z, char_rect.w }, color);
+          pos_x += font->characters[character].advance;
+          current_width += font->characters[character].advance;
+        }
+
+        current_word_index = i + 1;
+        current_word_width = 0;
+        current_word_length = 0;
+      }
+      else if (character == 0) { 
+        pos_x += font->characters[0].advance;
+      }
+    }
   }
 }

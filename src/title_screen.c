@@ -53,6 +53,10 @@ static t_ui_button m_slider_knob_button;
 static t_ui_dropdown m_dropdown;
 static char* dropdown_otions[] = { "Windowed", "Full-screen", "Borderless", "Full-screen Borderless" };
 
+static t_font s_ui_font_l;
+static t_font s_ui_font_m;
+static t_font s_ui_font_s;
+
 static bool m_draw_characters;
 static bool m_draw_settings;
 static bool m_draw_about;
@@ -216,6 +220,12 @@ static void draw_characters() {
     // CHARACTER BUTTONS
     draw_ui_button(&m_begin_button, 368, 292 + s_offset_y_characters, 112, 40);
     draw_ui_button(&m_edit_button, 496, 292 + s_offset_y_characters, 112, 40);
+
+    t_vec2 text_size_delete = measure_text_size_ttf("Delete", &s_ui_font_m);
+    draw_text_ttf("Delete", &s_ui_font_m, (t_vec2) {368 + (112 - text_size_delete.x) / 2 , 292 + s_offset_y_characters + (40 + text_size_delete.y) / 2}, CC_LIGHT_RED, 0);
+
+    t_vec2 text_size_start = measure_text_size_ttf("Start", &s_ui_font_m);
+    draw_text_ttf("Start", &s_ui_font_m, (t_vec2) {496 + (112 - text_size_start.x) / 2 , 292 + s_offset_y_characters + (40 + text_size_start.y) / 2}, CC_LIGHT_RED, 0);
 }
 
 static void draw_settings() {
@@ -224,9 +234,15 @@ static void draw_settings() {
 
 static void draw_about() {
     draw_sprite(&m_button_sprite, 256, 16 + s_offset_y_about, 368, 328, CC_LIGHT_RED);
+
+    draw_text_ttf("Imps & Fairies is a very simple character creator written in C using OpenGL. It features save files, customizing UI colors, switching UI fonts and more.", &s_ui_font_s, (t_vec2) {256 + 16 , 16 + 32 + s_offset_y_about}, CC_BLACK, 368 - 32);
 }
 
 void load_title_screen() {
+
+    s_ui_font_l = load_ttf_font("./res/fonts/Eczar-Regular.ttf", 42);
+    s_ui_font_m = load_ttf_font("./res/fonts/Eczar-Regular.ttf", 37);
+    s_ui_font_s = load_ttf_font("./res/fonts/Eczar-Regular.ttf", 32);
 
     create_sprite("./res/textures/imps_fairies_logo.png", &m_logo_sprite);
 
@@ -317,12 +333,19 @@ void draw_title_screen() {
     draw_sprite(&m_logo_sprite, 0, 0, m_logo_sprite.texture.size.x, m_logo_sprite.texture.size.y, CC_LIGHT_RED);
 
     // LEFT SIDE BUTTONS
-    draw_ui_button(&m_characters_button, 64, 92 + 48, 128, 48);
-    draw_ui_button(&m_settings_button, 64, 92 + 48 + 16 + 48, 128, 48);
-    draw_ui_button(&m_about_button, 64, 92 + 48 + 48 + 16 + 16 + 48, 128, 48);
+    draw_ui_button(&m_characters_button, 64, 140, 128, 48);
+    draw_ui_button(&m_settings_button, 64, 204, 128, 48);
+    draw_ui_button(&m_about_button, 64, 268, 128, 48);
 
-    draw_text_ttf("Characters", (t_vec2) {64, 92 + 48}, WHITE);
-    
+    t_vec2 text_size_play = measure_text_size_ttf("Play", &s_ui_font_l);
+    draw_text_ttf("Play", &s_ui_font_l, (t_vec2) {64 + (128 - text_size_play.x) / 2 , 140 + (48 + text_size_play.y) / 2}, CC_BLACK, 0);
+
+    t_vec2 text_size_settings = measure_text_size_ttf("Settings", &s_ui_font_l);
+    draw_text_ttf("Settings", &s_ui_font_l, (t_vec2) {64 + (128 - text_size_settings.x) / 2, 204 + (48 + text_size_settings.y) / 2}, CC_BLACK, 0);
+
+    t_vec2 text_size_about = measure_text_size_ttf("About", &s_ui_font_l);
+    draw_text_ttf("About", &s_ui_font_l, (t_vec2) {64 + (128 - text_size_about.x) / 2 , 268 + (48 + text_size_about.y) / 2}, CC_BLACK, 0);
+
     if (s_ease_in_characters) {
         float progress = t_ease_out_quint(&s_ease_out_timer_characters, &s_offset_y_characters, 360, 0, .5f);
 
