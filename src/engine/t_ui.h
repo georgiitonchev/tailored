@@ -18,6 +18,7 @@ typedef struct t_ui_button {
     bool is_mouse_over;
     bool was_clicked;
     bool is_selected;
+    bool is_disabled;
 
     t_vec2 mouse_clicked_at;
 

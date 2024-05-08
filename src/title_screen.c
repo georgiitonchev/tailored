@@ -95,8 +95,13 @@ static void on_characters_button_clicked() {
     if (m_draw_characters || s_ease_in_about || s_ease_in_settings) return;
 
     m_characters_button.sprite = &m_button_sprite_selected;
+    m_characters_button.is_disabled = true;
+
     m_settings_button.sprite = &m_button_sprite;
+    m_settings_button.is_disabled = false;
+
     m_about_button.sprite = &m_button_sprite;
+    m_about_button.is_disabled = false;
 
     if (m_draw_settings) {
         s_ease_out_settings = true;
@@ -114,8 +119,13 @@ static void on_settings_button_clicked() {
     if (m_draw_settings || s_ease_in_characters || s_ease_in_about) return;
 
     m_characters_button.sprite = &m_button_sprite;
+    m_characters_button.is_disabled = false;
+
     m_settings_button.sprite = &m_button_sprite_selected;
+    m_settings_button.is_disabled = true;
+
     m_about_button.sprite = &m_button_sprite;
+    m_about_button.is_disabled = false;
 
     if (m_draw_characters) {
         s_ease_out_characters = true;
@@ -133,8 +143,13 @@ static void on_about_button_clicked() {
     if (m_draw_about || s_ease_in_characters || s_ease_in_settings) return;
 
     m_characters_button.sprite = &m_button_sprite;
+    m_characters_button.is_disabled = false;
+
     m_settings_button.sprite = &m_button_sprite;
+    m_settings_button.is_disabled = false;
+
     m_about_button.sprite = &m_button_sprite_selected;
+    m_about_button.is_disabled = true;
 
     if (m_draw_characters) {
         s_ease_out_characters = true;
@@ -151,13 +166,24 @@ static t_ui_button* m_selected_character;
 
 static void on_character_button_clicked(t_ui_button* button) {
     if (m_selected_character != button) {
+
         if (m_selected_character != NULL) {
             m_selected_character->sprite = &m_button_sprite;
+            m_selected_character->is_selected = false;
         }
 
         button->sprite = &m_button_sprite_selected;
+        button->is_selected = true;
         m_selected_character = button;
+    } else { 
+
+        m_selected_character->sprite = &m_button_sprite;
+        m_selected_character->is_selected = false;
+        m_selected_character = NULL;
     }
+
+    m_edit_button.is_disabled = m_selected_character == NULL;
+    m_begin_button.is_disabled = m_selected_character == NULL;
 }
 
 static float scroll_area_width = 416;
@@ -333,16 +359,19 @@ void load_title_screen() {
 
     m_characters_button = create_ui_button(&m_button_sprite);
     m_characters_button.color_default = CC_LIGHT_RED;
+    m_characters_button.color_disabled = CC_RED;
     m_characters_button.on_released = on_characters_button_clicked;
     m_characters_button.on_mouse_enter = on_button_mouse_enter;
 
     m_settings_button = create_ui_button(&m_button_sprite);
     m_settings_button.color_default = CC_LIGHT_RED;
+    m_settings_button.color_disabled = CC_RED;
     m_settings_button.on_released = on_settings_button_clicked;
     m_settings_button.on_mouse_enter = on_button_mouse_enter;
 
     m_about_button = create_ui_button(&m_button_sprite);
     m_about_button.color_default = CC_LIGHT_RED;
+    m_about_button.color_disabled = CC_RED;
     m_about_button.on_released = on_about_button_clicked;
     m_about_button.on_mouse_enter = on_button_mouse_enter;
 
@@ -350,6 +379,8 @@ void load_title_screen() {
     m_begin_button.color_default = CC_BLACK;
     m_begin_button.color_mouseover = CC_DARK_RED;
     m_begin_button.color_clicked = CC_RED;
+    m_begin_button.color_disabled = CC_DARK_RED;
+    m_begin_button.is_disabled = true;
     // m_begin_button.on_released = on_quit_button_clicked;
     m_begin_button.on_mouse_enter = on_button_mouse_enter;
 
@@ -357,6 +388,8 @@ void load_title_screen() {
     m_edit_button.color_default = CC_BLACK;
     m_edit_button.color_mouseover = CC_DARK_RED;
     m_edit_button.color_clicked = CC_RED;
+    m_edit_button.color_disabled = CC_DARK_RED;
+    m_edit_button.is_disabled = true;
     // m_edit_button.on_released = on_quit_button_clicked;
     m_edit_button.on_mouse_enter = on_button_mouse_enter;
 

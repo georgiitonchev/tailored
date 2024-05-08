@@ -22,10 +22,12 @@ t_ui_button create_ui_button(t_sprite* sprite) {
     ui_button.color_default = WHITE;
     ui_button.color_mouseover = LIGHT_GRAY;
     ui_button.color_clicked = DARK_GRAY;
+    ui_button.color_disabled = DARK_GRAY;
 
     ui_button.is_mouse_over = false;
     ui_button.was_clicked = false;
     ui_button.is_selected = false;
+    ui_button.is_disabled = false;
 
     ui_button.on_released = NULL;
     ui_button.on_mouse_enter = NULL;
@@ -45,49 +47,54 @@ void draw_ui_button(t_ui_button* button, int x, int y, int width, int height) {
 
     t_color color = button->color_default;
 
-    bool is_inside_clip_area =
-        clip_areas[0].width + clip_areas[0].height > 0 ? 
-        is_point_in_rect(input_state.mouse_state.position, clip_areas[0]) : true;
+    if (button->is_disabled) { 
+        color = button->color_disabled;
+    }
+    else { 
+        bool is_mouse_inside_clip_area =
+            clip_areas[0].width + clip_areas[0].height > 0 ? 
+            is_point_in_rect(input_state.mouse_state.position, clip_areas[0]) : true;
 
-    if (is_inside_clip_area && is_point_in_rect(input_state.mouse_state.position, (t_rect){ x, y, width, height }))
-    {
-        if (!button->is_mouse_over) {
-            button->is_mouse_over = true;
+        if (is_mouse_inside_clip_area && is_point_in_rect(input_state.mouse_state.position, (t_rect){ x, y, width, height }))
+        {
+            if (!button->is_mouse_over) {
+                button->is_mouse_over = true;
 
-            if (button->on_mouse_enter)
-                button->on_mouse_enter();
+                if (button->on_mouse_enter)
+                    button->on_mouse_enter();
+            }
+
+            color = button->color_mouseover;
+
+            if (!button->was_clicked && is_mouse_button_pressed(MOUSE_BUTTON_LEFT)) {
+                button->was_clicked = true;
+                button->mouse_clicked_at = t_vec2_sub(input_state.mouse_state.position, (t_vec2){ x, y });
+            }
+
+            if (button->was_clicked)
+                color = button->color_clicked;
+
+            if (is_mouse_button_released(MOUSE_BUTTON_LEFT))
+                if (button->was_clicked && button->on_released)
+                    button->on_released(button);
         }
+        else {
+            if (button->is_mouse_over && button->on_mouse_exit)
+                button->on_mouse_exit();
 
-        color = button->color_mouseover;
-
-        if (!button->was_clicked && is_mouse_button_pressed(MOUSE_BUTTON_LEFT)) {
-            button->was_clicked = true;
-            button->mouse_clicked_at = t_vec2_sub(input_state.mouse_state.position, (t_vec2){ x, y });
+            button->is_mouse_over = false;
         }
-
-        if (button->was_clicked)
-            color = button->color_clicked;
 
         if (is_mouse_button_released(MOUSE_BUTTON_LEFT))
-            if (button->was_clicked && button->on_released)
-                button->on_released(button);
+            button->was_clicked = false;
+
+        if (button->was_clicked && button->on_pressed) {
+            button->on_pressed();
+        }
+
+        if (button->is_selected)
+            color = button->color_clicked;
     }
-    else {
-        if (button->is_mouse_over && button->on_mouse_exit)
-            button->on_mouse_exit();
-
-        button->is_mouse_over = false;
-    }
-
-    if (is_mouse_button_released(MOUSE_BUTTON_LEFT))
-        button->was_clicked = false;
-
-    if (button->was_clicked && button->on_pressed) {
-        button->on_pressed();
-    }
-
-    if (button->is_selected)
-        color = button->color_clicked;
 
     draw_sprite(button->sprite, x, y, width, height, color);
 }
