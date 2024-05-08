@@ -22,6 +22,7 @@
 
 #include "t_sprite.h"
 #include "t_font.h"
+#include "t_shapes.h"
 
 static GLFWwindow* s_window;
 static ma_engine s_audio_engine;
@@ -278,7 +279,7 @@ int t_begin(int window_width, int window_height, const char* title) {
 
     init_sprite_renderer();
     init_font_renderer();
-
+    init_shapes_renderer();
     // BEGIN AUDIO
 
     printf("Initializing miniaudio...\n");

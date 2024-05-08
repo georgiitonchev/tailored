@@ -239,6 +239,12 @@ static void draw_characters() {
 
         t_ui_button* character_button = (t_ui_button*)element_at_list(m_characters_list, i);
         draw_ui_button(character_button, (272 + i * 128 + i * 16) - scroll_area_offset, 32 + s_offset_y_characters, 128, 223);
+
+        draw_rect((272 + i * 128 + i * 16) - scroll_area_offset + 4, 32 + s_offset_y_characters + 223 - 48, 120, 32, (t_color) {12, 12, 12, 100});
+
+        const char* character_key = (const char*)character_button->user_data;
+        t_vec2 text_size = measure_text_size_ttf(character_key, &s_ui_font_s);
+        draw_text_ttf(character_key, &s_ui_font_s, (t_vec2){ (272 + i * 128 + i * 16) - scroll_area_offset + (128 - text_size.x) / 2, 32 + s_offset_y_characters + 223 - 32 + text_size.y / 2}, CC_RED, 0);
     }
     t_end_scissor();
 
@@ -418,6 +424,10 @@ void load_title_screen() {
         character_button->color_default = CC_BLACK;
         character_button->color_mouseover = CC_DARK_RED;
         character_button->color_clicked = CC_RED;
+
+        char* key = (char*) malloc(7 * sizeof(char)); // FILE 0
+        sprintf(key, "File %d", i);
+        character_button->user_data = key;
 
         character_button->on_released = on_character_button_clicked;
 

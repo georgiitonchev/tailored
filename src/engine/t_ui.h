@@ -20,6 +20,8 @@ typedef struct t_ui_button {
     bool is_selected;
     bool is_disabled;
 
+    void* user_data;
+
     t_vec2 mouse_clicked_at;
 
 } t_ui_button;

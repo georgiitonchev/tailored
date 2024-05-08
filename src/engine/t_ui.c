@@ -18,6 +18,8 @@ t_ui_button create_ui_button(t_sprite* sprite) {
 
     t_ui_button ui_button;
 
+    ui_button.user_data = NULL;
+
     ui_button.sprite = sprite;
     ui_button.color_default = WHITE;
     ui_button.color_mouseover = LIGHT_GRAY;
