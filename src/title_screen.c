@@ -14,6 +14,8 @@
 
 #include "./engine/t_easings.h"
 
+#include "../dep/include/glad/glad.h"
+
 #define CC_LIGHT_RED (t_color) { 242, 97, 63, 255 }
 #define CC_RED (t_color) { 155, 57, 34, 255 }
 #define CC_DARK_RED (t_color) { 72, 30, 20, 255 }
@@ -216,11 +218,21 @@ static void draw_characters() {
 
     t_rect slider_rect = (t_rect) { 272, 328 - 64 + s_offset_y_characters, 336, m_slider_background_sprite.texture.size.y };
 
-    t_begin_clip_area_inverse(1, slider_knob_rect.x, slider_knob_rect.y + s_offset_y_characters, slider_knob_rect.width, slider_knob_rect.height);
+    // BIG KNOB
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+    glClear(GL_STENCIL_BUFFER_BIT); 
+    glStencilFunc(GL_ALWAYS, 1, 0xFF); 
+    glStencilMask(0xFF); 
+    draw_ui_button(&m_slider_knob_button, slider_knob_rect.x, slider_knob_rect.y + s_offset_y_characters, slider_knob_rect.width, slider_knob_rect.height);
+
+    glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
     if (!m_slider_knob_button.is_mouse_over && is_point_in_rect(input_state.mouse_state.position, slider_rect)) {
 
-        if (is_mouse_button_pressed(MOUSE_BUTTON_LEFT))
-           slider_knob_rect.x = input_state.mouse_state.position.x - slider_knob_rect.width / 2;
+        if (is_mouse_button_pressed(MOUSE_BUTTON_LEFT)) {
+            slider_knob_rect.x = input_state.mouse_state.position.x - slider_knob_rect.width / 2;
+            m_slider_knob_button.was_clicked = true;
+            m_slider_knob_button.mouse_clicked_at = (t_vec2) { m_slider_knob_button.sprite->texture.size.x / 2, m_slider_knob_button.sprite->texture.size.y / 2};
+        }
 
         t_rect slider_knob_small_rect = (t_rect) { input_state.mouse_state.position.x - m_slider_knob_small_sprite.texture.size.x / 2, slider_rect.y + s_offset_y_characters, m_slider_knob_small_sprite.texture.size.x, m_slider_knob_small_sprite.texture.size.y };
 
@@ -231,15 +243,14 @@ static void draw_characters() {
             slider_knob_small_rect.x = slider_pos.x + slider_width - slider_knob_small_rect.width;
 
         draw_sprite_t(&m_slider_knob_small_sprite, slider_knob_small_rect, CC_BLACK);
-        t_begin_clip_area_inverse(0, slider_knob_small_rect.x, slider_rect.y + s_offset_y_characters, m_slider_knob_small_sprite.texture.size.x, m_slider_knob_small_sprite.texture.size.y);
     }
 
+    glStencilMask(0x00);
     // SLIDER
     draw_sprite_t(&m_slider_background_sprite, slider_rect, CC_BLACK);
-    t_end_clip_area_inverse(0);
-    t_end_clip_area_inverse(1);
 
-    draw_ui_button(&m_slider_knob_button, slider_knob_rect.x, slider_knob_rect.y + s_offset_y_characters, slider_knob_rect.width, slider_knob_rect.height);
+    glStencilMask(0xFF);
+    glStencilFunc(GL_ALWAYS, 1, 0xFF);   
 
     // CHARACTER BUTTONS
     draw_ui_button(&m_begin_button, 368, 292 + s_offset_y_characters, 112, 40);
@@ -269,11 +280,21 @@ static void draw_about() {
     slider_rect.width = m_slider_background_sprite_v.texture.size.x;
     slider_rect.height = 296;
 
-    t_begin_clip_area_inverse(1, 597, 32, 10, 40);
+    // BIG KNOB
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+    glClear(GL_STENCIL_BUFFER_BIT); 
+    glStencilFunc(GL_ALWAYS, 1, 0xFF); 
+    glStencilMask(0xFF); 
+    draw_ui_button(&m_slider_knob_button_v, slider_knob_rect_v.x, slider_knob_rect_v.y + s_offset_y_about, slider_knob_rect_v.width, slider_knob_rect_v.height);
+
+    glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
     if (!m_slider_knob_button_v.is_mouse_over && is_point_in_rect(input_state.mouse_state.position, slider_rect)) {
 
-        if (is_mouse_button_pressed(MOUSE_BUTTON_LEFT))
-           slider_knob_rect_v.y = input_state.mouse_state.position.y - slider_knob_rect_v.height / 2;
+        if (is_mouse_button_pressed(MOUSE_BUTTON_LEFT)) {
+            slider_knob_rect_v.y = input_state.mouse_state.position.y - slider_knob_rect_v.height / 2;
+            m_slider_knob_button_v.was_clicked = true;
+            m_slider_knob_button_v.mouse_clicked_at = (t_vec2) { m_slider_knob_button_v.sprite->texture.size.x / 2, m_slider_knob_button_v.sprite->texture.size.y / 2};
+        }
 
         t_rect slider_knob_small_rect = (t_rect) { slider_rect.x, input_state.mouse_state.position.y - m_slider_knob_small_sprite_v.texture.size.y / 2 + s_offset_y_about, m_slider_knob_small_sprite_v.texture.size.x, m_slider_knob_small_sprite_v.texture.size.y };
 
@@ -284,15 +305,13 @@ static void draw_about() {
             slider_knob_small_rect.y = slider_rect.y + slider_rect.height - slider_knob_small_rect.height;
 
         draw_sprite_t(&m_slider_knob_small_sprite_v, slider_knob_small_rect, CC_BLACK);
-        //t_begin_clip_area_inverse(0, slider_knob_small_rect.x, slider_knob_small_rect.y, m_slider_knob_small_sprite_v.texture.size.x, m_slider_knob_small_sprite_v.texture.size.y);
     }
 
+    glStencilMask(0x00);
     // SLIDER
     draw_sprite_t(&m_slider_background_sprite_v, slider_rect, CC_BLACK);
-    t_end_clip_area_inverse(1);
-    t_end_clip_area_inverse(0);
-
-    draw_ui_button(&m_slider_knob_button_v, slider_knob_rect_v.x, slider_knob_rect_v.y + s_offset_y_about, slider_knob_rect_v.width, slider_knob_rect_v.height);
+    glStencilMask(0xFF);
+    glStencilFunc(GL_ALWAYS, 1, 0xFF);   
 }
 
 void load_title_screen() {

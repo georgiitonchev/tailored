@@ -10,29 +10,11 @@ uniform vec4 u_color;
 uniform vec4 u_slice_borders;
 uniform vec4 u_texture_slice;
 
-uniform vec4 u_clip_area_inverse_0;
-uniform vec4 u_clip_area_inverse_1;
-
 float map(float value, float from_min, float from_max, float to_min, float to_max) {
     return (value - from_min) / (from_max - from_min) * (to_max - to_min) + to_min;
 } 
 
 void main() {
-
-    // clip area inverse    
-    if (u_clip_area_inverse_0.z + u_clip_area_inverse_0.w > 0) {
-        if ((gl_FragCoord.x > u_clip_area_inverse_0.x && gl_FragCoord.x < u_clip_area_inverse_0.x + u_clip_area_inverse_0.z) &&
-             (gl_FragCoord.y > u_clip_area_inverse_0.y && gl_FragCoord.y < u_clip_area_inverse_0.y + u_clip_area_inverse_0.w)) {
-            discard;
-        }
-    }
-
-    if (u_clip_area_inverse_1.z + u_clip_area_inverse_1.w > 0) {
-        if ((gl_FragCoord.x > u_clip_area_inverse_1.x && gl_FragCoord.x < u_clip_area_inverse_1.x + u_clip_area_inverse_1.z) &&
-             (gl_FragCoord.y > u_clip_area_inverse_1.y && gl_FragCoord.y < u_clip_area_inverse_1.y + u_clip_area_inverse_1.w)) {
-            discard;
-        }
-    }
 
     vec2 texture_size = textureSize(u_texture, 0);
 

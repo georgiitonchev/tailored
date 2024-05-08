@@ -292,9 +292,10 @@ int t_begin(int window_width, int window_height, const char* title) {
 
     // END AUDIO
 
-    // glEnable(GL_DEPTH_TEST);
+    glEnable(GL_STENCIL_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 
     //create miton blur framebuffer
     create_framebuffer();
@@ -308,8 +309,7 @@ bool t_loop() {
     calculate_delta_time();
 
     // bind_framebuffer(frame_buffer_id);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+    glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     return !glfwWindowShouldClose(s_window);
 }
 

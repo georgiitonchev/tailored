@@ -112,44 +112,6 @@ void delete_sprite(t_sprite* sprite)
     t_free_texture(&sprite->texture);
 }
 
-static void t_set_clip_area(const char* key, int x, int y, int width, int height) {
-
-  const t_vec2 window_size = t_window_size();
-  const t_vec2 framebuffer_size = t_framebuffer_size();
-
-  GLint uniform_location = glGetUniformLocation(sprite_shader, key);
-  if (uniform_location != -1) {
-    printf("Uniform location %s. \n", key);
-    glUniform4fv(uniform_location, 1,
-                  (vec4){
-                      (x / window_size.x) * framebuffer_size.x,
-                      ((window_size.y - y - height) / window_size.y) * framebuffer_size.y,
-                      (width / window_size.x) * framebuffer_size.x,
-                      (height / window_size.y) * framebuffer_size.y });
-  } else {
-    printf("Uniform location %s not found. \n", key);
-  }
-}
-
-void t_begin_clip_area_inverse(int index, int x, int y, int width, int height) {
-
-  char uniform_name[22];
-  sprintf(uniform_name, "u_clip_area_inverse_%d", index);
-
-  t_set_clip_area(uniform_name, x, y, width, height);
-}
-void t_begin_clip_area_inverse_r(int index, t_rect rect) {
-    t_begin_clip_area_inverse(index, rect.x, rect.y, rect.width, rect.height);
-}
-
-void t_end_clip_area_inverse(int index) {
-  char uniform_name[22];
-  sprintf(uniform_name, "u_clip_area_inverse_%d", index);
-
-  glUniform4fv(glGetUniformLocation(sprite_shader, uniform_name), 1,
-                (vec4){ 0, 0, 0, 0 });
-}
-
 void t_begin_scissor(int x, int y, int width, int height) {
 
   const t_vec2 window_size = t_window_size();
