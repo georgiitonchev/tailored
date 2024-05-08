@@ -8,3 +8,4 @@ bool is_rect_in_rect(t_rect this, t_rect that);
 bool does_rect_overlap_rect(t_rect this, t_rect that);
 
 void draw_rect(int x, int y, int width, int height, t_color color);
+void draw_rect_lines(int x, int y, int width, int height, t_color color);

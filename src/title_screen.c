@@ -175,7 +175,7 @@ static void on_character_button_clicked(t_ui_button* button) {
         button->sprite = &m_button_sprite_selected;
         button->is_selected = true;
         m_selected_character = button;
-    } else { 
+    } else {
 
         m_selected_character->sprite = &m_button_sprite;
         m_selected_character->is_selected = false;
@@ -240,11 +240,12 @@ static void draw_characters() {
         t_ui_button* character_button = (t_ui_button*)element_at_list(m_characters_list, i);
         draw_ui_button(character_button, (272 + i * 128 + i * 16) - scroll_area_offset, 32 + s_offset_y_characters, 128, 223);
 
-        draw_rect((272 + i * 128 + i * 16) - scroll_area_offset + 4, 32 + s_offset_y_characters + 223 - 48, 120, 32, (t_color) {12, 12, 12, 100});
+        //draw_rect((272 + i * 128 + i * 16) - scroll_area_offset + 4, 32 + s_offset_y_characters + 223 - 48, 120, 32, (t_color) {12, 12, 12, 100});
+        draw_rect_lines((272 + i * 128 + i * 16) - scroll_area_offset + 4, 32 + s_offset_y_characters + 223 - 48, 120, 32, (t_color) {12, 12, 12, 100});
 
         const char* character_key = (const char*)character_button->user_data;
         t_vec2 text_size = measure_text_size_ttf(character_key, &s_ui_font_s);
-        draw_text_ttf(character_key, &s_ui_font_s, (t_vec2){ (272 + i * 128 + i * 16) - scroll_area_offset + (128 - text_size.x) / 2, 32 + s_offset_y_characters + 223 - 32 + text_size.y / 2}, CC_RED, 0);
+        //draw_text_ttf(character_key, &s_ui_font_s, (t_vec2){ (272 + i * 128 + i * 16) - scroll_area_offset + (128 - text_size.x) / 2, 32 + s_offset_y_characters + 223 - 32 + text_size.y / 2}, CC_RED, 0);
     }
     t_end_scissor();
 
@@ -252,9 +253,9 @@ static void draw_characters() {
 
     // BIG KNOB
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-    glClear(GL_STENCIL_BUFFER_BIT); 
-    glStencilFunc(GL_ALWAYS, 1, 0xFF); 
-    glStencilMask(0xFF); 
+    glClear(GL_STENCIL_BUFFER_BIT);
+    glStencilFunc(GL_ALWAYS, 1, 0xFF);
+    glStencilMask(0xFF);
     draw_ui_button(&m_slider_knob_button, slider_knob_rect.x, slider_knob_rect.y + s_offset_y_characters, slider_knob_rect.width, slider_knob_rect.height);
 
     glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
@@ -282,7 +283,7 @@ static void draw_characters() {
     draw_sprite_t(&m_slider_background_sprite, slider_rect, CC_BLACK);
 
     glStencilMask(0xFF);
-    glStencilFunc(GL_ALWAYS, 1, 0xFF);   
+    glStencilFunc(GL_ALWAYS, 1, 0xFF);
 
     // CHARACTER BUTTONS
     draw_ui_button(&m_begin_button, 368, 292 + s_offset_y_characters, 112, 40);
@@ -314,9 +315,9 @@ static void draw_about() {
 
     // BIG KNOB
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-    glClear(GL_STENCIL_BUFFER_BIT); 
-    glStencilFunc(GL_ALWAYS, 1, 0xFF); 
-    glStencilMask(0xFF); 
+    glClear(GL_STENCIL_BUFFER_BIT);
+    glStencilFunc(GL_ALWAYS, 1, 0xFF);
+    glStencilMask(0xFF);
     draw_ui_button(&m_slider_knob_button_v, slider_knob_rect_v.x, slider_knob_rect_v.y + s_offset_y_about, slider_knob_rect_v.width, slider_knob_rect_v.height);
 
     glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
@@ -343,7 +344,7 @@ static void draw_about() {
     // SLIDER
     draw_sprite_t(&m_slider_background_sprite_v, slider_rect, CC_BLACK);
     glStencilMask(0xFF);
-    glStencilFunc(GL_ALWAYS, 1, 0xFF);   
+    glStencilFunc(GL_ALWAYS, 1, 0xFF);
 }
 
 void load_title_screen() {
