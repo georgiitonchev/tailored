@@ -16,6 +16,8 @@
 
 #include "../dep/include/glad/glad.h"
 
+#include "cJSON.h"
+
 #define CC_LIGHT_RED (t_color) { 242, 97, 63, 255 }
 #define CC_RED (t_color) { 155, 57, 34, 255 }
 #define CC_DARK_RED (t_color) { 72, 30, 20, 255 }
@@ -53,6 +55,8 @@ static t_ui_button m_about_button;
 static t_ui_button m_begin_button;
 static t_ui_button m_edit_button;
 
+static t_ui_button s_new_button;
+
 // SLIDER KNOB
 static t_ui_button m_slider_knob_button;
 static t_ui_button m_slider_knob_button_v;
@@ -84,10 +88,89 @@ static bool s_ease_in_about = false;
 static bool s_ease_out_about = false;
 static float s_offset_y_about = 0;
 
+static t_list* m_characters_list;
+
+// CHARACTERS SCROLL AREA THINGS
+static float scroll_area_width = 416;
+
+
 // BUTTON CALLBACKS
 
 static void on_button_mouse_enter() {
      //t_play_audio("./res/audio/click_003.wav");
+}
+
+
+static t_ui_button* m_selected_character;
+
+static void on_character_button_clicked(t_ui_button* button) {
+    if (m_selected_character != button) {
+
+        if (m_selected_character != NULL) {
+            m_selected_character->sprite = &m_button_sprite;
+            m_selected_character->is_selected = false;
+        }
+
+        button->sprite = &m_button_sprite_selected;
+        button->is_selected = true;
+        m_selected_character = button;
+    } else {
+
+        m_selected_character->sprite = &m_button_sprite;
+        m_selected_character->is_selected = false;
+        m_selected_character = NULL;
+    }
+
+    m_edit_button.is_disabled = m_selected_character == NULL;
+    m_begin_button.is_disabled = m_selected_character == NULL;
+}
+
+
+static void on_button_new_clicked() {
+
+    cJSON* json = cJSON_CreateObject();
+    cJSON_AddStringToObject(json, "name", "Jorko");
+
+    // cJSON* jsonColor = cJSON_AddObjectToObject(json, "color");
+    // cJSON_AddNumberToObject(jsonColor, "red", modelColor.r);
+    // cJSON_AddNumberToObject(jsonColor, "green", modelColor.g);
+    // cJSON_AddNumberToObject(jsonColor, "blue", modelColor.b);
+    // cJSON_AddNumberToObject(jsonColor, "alpha", modelColor.a);
+
+    const char* json_string = cJSON_Print(json);
+    const char* file_name = "saves/save_file.ass";
+    // bool saved = SaveFileText(TextFormat("characters/%s.ass", _nameInputField.text), jsonString);
+    FILE *file = fopen(file_name, "wt");
+    if (file != NULL)
+    {
+        int count = fprintf(file, "%s", json_string);
+
+        if (count < 0) printf("FILEIO: [%s] Failed to write text file.\n", file_name);
+        else printf("FILEIO: [%s] Text file saved successfully.\n", file_name);
+
+        fclose(file);
+    }
+    else {
+        printf("Could not create file.\n");
+    }
+
+
+    t_ui_button* character_button = (t_ui_button*)malloc(sizeof(t_ui_button));
+    *character_button = create_ui_button(&m_button_sprite);
+
+    character_button->color_default = CC_BLACK;
+    character_button->color_mouseover = CC_DARK_RED;
+    character_button->color_clicked = CC_RED;
+
+    char* key = (char*) malloc(7 * sizeof(char)); // FILE 0
+    sprintf(key, "File %d", 1);
+    character_button->user_data = key;
+
+    character_button->on_released = on_character_button_clicked;
+
+    add_to_list(m_characters_list, character_button);
+
+    scroll_area_width = m_characters_list->size * (128 + 16) - 16;
 }
 
 static void on_characters_button_clicked() {
@@ -162,38 +245,12 @@ static void on_about_button_clicked() {
     m_draw_about = true;
 }
 
-static t_ui_button* m_selected_character;
-
-static void on_character_button_clicked(t_ui_button* button) {
-    if (m_selected_character != button) {
-
-        if (m_selected_character != NULL) {
-            m_selected_character->sprite = &m_button_sprite;
-            m_selected_character->is_selected = false;
-        }
-
-        button->sprite = &m_button_sprite_selected;
-        button->is_selected = true;
-        m_selected_character = button;
-    } else {
-
-        m_selected_character->sprite = &m_button_sprite;
-        m_selected_character->is_selected = false;
-        m_selected_character = NULL;
-    }
-
-    m_edit_button.is_disabled = m_selected_character == NULL;
-    m_begin_button.is_disabled = m_selected_character == NULL;
-}
-
-static float scroll_area_width = 416;
 static float scroll_area_offset = 0;
 
 static t_vec2 slider_pos = { 272, 264 };
 static float slider_width = 336;
 
 static t_rect slider_knob_rect;
-static t_list* m_characters_list;
 
 static void on_slider_knob_button_pressed() {
     slider_knob_rect.x = input_state.mouse_state.position.x - m_slider_knob_button.mouse_clicked_at.x;
@@ -234,70 +291,98 @@ static void draw_characters() {
     draw_sprite(&m_button_sprite, 256, 16 + s_offset_y_characters, 368, 328, CC_LIGHT_RED);
 
     // CHARACTER ELEMENTS
-    t_begin_scissor(256 + 16, 16 + s_offset_y_characters, 368 - 32, 328);
-    for (unsigned int i = 0; i < m_characters_list->size; i ++) {
+    if (m_characters_list->size > 0) {
 
-        t_ui_button* character_button = (t_ui_button*)element_at_list(m_characters_list, i);
-        draw_ui_button(character_button, (272 + i * 128 + i * 16) - scroll_area_offset, 32 + s_offset_y_characters, 128, 223);
+        t_begin_scissor(256 + 16, 16 + s_offset_y_characters, 368 - 32, 328);
+        for (unsigned int i = 0; i < m_characters_list->size; i ++) {
 
-        draw_rect((272 + i * 128 + i * 16) - scroll_area_offset + 4, 32 + s_offset_y_characters + 223 - 48, 120, 32, (t_color) {12, 12, 12, 100});
-        //draw_rect_lines((272 + i * 128 + i * 16) - scroll_area_offset + 4, 32 + s_offset_y_characters + 223 - 48, 120, 32, (t_color) {12, 12, 12, 100});
+            t_ui_button* character_button = (t_ui_button*)element_at_list(m_characters_list, i);
+            draw_ui_button(character_button, (272 + i * 128 + i * 16) - scroll_area_offset, 32 + s_offset_y_characters, 128, 223);
 
-        const char* character_key = (const char*)character_button->user_data;
-        t_vec2 text_size = measure_text_size_ttf(character_key, &s_ui_font_s);
-        draw_text_ttf(character_key, &s_ui_font_s, (t_vec2){ (272 + i * 128 + i * 16) - scroll_area_offset + (128 - text_size.x) / 2, 32 + s_offset_y_characters + 223 - 32 + text_size.y / 2}, CC_RED, 0);
-    }
-    t_end_scissor();
+            draw_rect((272 + i * 128 + i * 16) - scroll_area_offset + 4, 32 + s_offset_y_characters + 223 - 48, 120, 32, (t_color) {12, 12, 12, 100});
+            //draw_rect_lines((272 + i * 128 + i * 16) - scroll_area_offset + 4, 32 + s_offset_y_characters + 223 - 48, 120, 32, (t_color) {12, 12, 12, 100});
 
-    t_rect slider_rect = (t_rect) { 272, 328 - 64 + s_offset_y_characters, 336, m_slider_background_sprite.texture.size.y };
+            const char* character_key = (const char*)character_button->user_data;
+            t_vec2 text_size = measure_text_size_ttf(character_key, &s_ui_font_s);
+            draw_text_ttf(character_key, &s_ui_font_s, (t_vec2){ (272 + i * 128 + i * 16) - scroll_area_offset + (128 - text_size.x) / 2, 32 + s_offset_y_characters + 223 - 32 + text_size.y / 2}, CC_RED, 0);
+        }
+        t_end_scissor();
 
-    // BIG KNOB
-    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-    glClear(GL_STENCIL_BUFFER_BIT);
-    glStencilFunc(GL_ALWAYS, 1, 0xFF);
-    glStencilMask(0xFF);
-    draw_ui_button(&m_slider_knob_button, slider_knob_rect.x, slider_knob_rect.y + s_offset_y_characters, slider_knob_rect.width, slider_knob_rect.height);
+        t_rect slider_rect = (t_rect) { 272, 328 - 64 + s_offset_y_characters, 336, m_slider_background_sprite.texture.size.y };
 
-    glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-    if (!m_slider_knob_button.is_mouse_over && is_point_in_rect(input_state.mouse_state.position, slider_rect)) {
+        // BIG KNOB
+        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+        glClear(GL_STENCIL_BUFFER_BIT);
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);
+        glStencilMask(0xFF);
+        draw_ui_button(&m_slider_knob_button, slider_knob_rect.x, slider_knob_rect.y + s_offset_y_characters, slider_knob_rect.width, slider_knob_rect.height);
 
-        if (is_mouse_button_pressed(MOUSE_BUTTON_LEFT)) {
-            slider_knob_rect.x = input_state.mouse_state.position.x - slider_knob_rect.width / 2;
-            m_slider_knob_button.was_clicked = true;
-            m_slider_knob_button.mouse_clicked_at = (t_vec2) { m_slider_knob_button.sprite->texture.size.x / 2, m_slider_knob_button.sprite->texture.size.y / 2};
+        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+        if (!m_slider_knob_button.is_mouse_over && is_point_in_rect(input_state.mouse_state.position, slider_rect)) {
+
+            if (is_mouse_button_pressed(MOUSE_BUTTON_LEFT)) {
+                slider_knob_rect.x = input_state.mouse_state.position.x - slider_knob_rect.width / 2;
+                m_slider_knob_button.was_clicked = true;
+                m_slider_knob_button.mouse_clicked_at = (t_vec2) { m_slider_knob_button.sprite->texture.size.x / 2, m_slider_knob_button.sprite->texture.size.y / 2};
+            }
+
+            t_rect slider_knob_small_rect = (t_rect) { input_state.mouse_state.position.x - m_slider_knob_small_sprite.texture.size.x / 2, slider_rect.y + s_offset_y_characters, m_slider_knob_small_sprite.texture.size.x, m_slider_knob_small_sprite.texture.size.y };
+
+            //limits
+            if (slider_knob_small_rect.x < slider_pos.x)
+                slider_knob_small_rect.x = slider_pos.x;
+            else if (slider_knob_small_rect.x > slider_pos.x + slider_width - slider_knob_small_rect.width)
+                slider_knob_small_rect.x = slider_pos.x + slider_width - slider_knob_small_rect.width;
+
+            draw_sprite_t(&m_slider_knob_small_sprite, slider_knob_small_rect, CC_BLACK);
         }
 
-        t_rect slider_knob_small_rect = (t_rect) { input_state.mouse_state.position.x - m_slider_knob_small_sprite.texture.size.x / 2, slider_rect.y + s_offset_y_characters, m_slider_knob_small_sprite.texture.size.x, m_slider_knob_small_sprite.texture.size.y };
+        glStencilMask(0x00);
+        // SLIDER
+        draw_sprite_t(&m_slider_background_sprite, slider_rect, CC_BLACK);
 
-        //limits
-        if (slider_knob_small_rect.x < slider_pos.x)
-            slider_knob_small_rect.x = slider_pos.x;
-        else if (slider_knob_small_rect.x > slider_pos.x + slider_width - slider_knob_small_rect.width)
-            slider_knob_small_rect.x = slider_pos.x + slider_width - slider_knob_small_rect.width;
+        glStencilMask(0xFF);
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);
 
-        draw_sprite_t(&m_slider_knob_small_sprite, slider_knob_small_rect, CC_BLACK);
+    } else {
+
+        t_vec2 text_size_no_files_info = measure_text_size_ttf("Click on \"New\" to create a new save file.", &s_ui_font_s);
+        draw_text_ttf("Click on \"New\" to create a new save file.", &s_ui_font_s, (t_vec2) { 256 + (368 - text_size_no_files_info.x) / 2 , 16 + s_offset_y_characters + (328 + text_size_no_files_info.y) / 2}, CC_BLACK, 0);
+
     }
-
-    glStencilMask(0x00);
-    // SLIDER
-    draw_sprite_t(&m_slider_background_sprite, slider_rect, CC_BLACK);
-
-    glStencilMask(0xFF);
-    glStencilFunc(GL_ALWAYS, 1, 0xFF);
-
+    
     // CHARACTER BUTTONS
-    draw_ui_button(&m_begin_button, 368, 292 + s_offset_y_characters, 112, 40);
-    draw_ui_button(&m_edit_button, 496, 292 + s_offset_y_characters, 112, 40);
+    draw_ui_button(&s_new_button, 256 + 16, 292 + s_offset_y_characters, 80, 40);
+    t_vec2 text_size_new = measure_text_size_ttf("New", &s_ui_font_m);
+    draw_text_ttf("New", &s_ui_font_m, (t_vec2) {256 + 16 + (80 - text_size_new.x) / 2 , 292 + s_offset_y_characters + (40 + text_size_new.y) / 2}, CC_RED, 0);
 
+    draw_ui_button(&m_begin_button, 368, 292 + s_offset_y_characters, 112, 40);
     t_vec2 text_size_delete = measure_text_size_ttf("Delete", &s_ui_font_m);
     draw_text_ttf("Delete", &s_ui_font_m, (t_vec2) {368 + (112 - text_size_delete.x) / 2 , 292 + s_offset_y_characters + (40 + text_size_delete.y) / 2}, CC_RED, 0);
 
+    draw_ui_button(&m_edit_button, 496, 292 + s_offset_y_characters, 112, 40);
     t_vec2 text_size_start = measure_text_size_ttf("Start", &s_ui_font_m);
     draw_text_ttf("Start", &s_ui_font_m, (t_vec2) {496 + (112 - text_size_start.x) / 2 , 292 + s_offset_y_characters + (40 + text_size_start.y) / 2}, CC_RED, 0);
 }
 
 static void draw_settings() {
     draw_sprite(&m_button_sprite, 256, 16 + s_offset_y_settings, 368, 328, CC_LIGHT_RED);
+
+    t_vec2 text_size_sound = measure_text_size_ttf("Sound", &s_ui_font_l);
+    draw_text_ttf("Sound", &s_ui_font_l, (t_vec2) {256 + (368 - text_size_sound.x) / 2, 48 + s_offset_y_settings}, CC_BLACK, 0);
+
+    draw_text_ttf("Master", &s_ui_font_s, (t_vec2) {256 + 32, 48 + 24 + 8 + s_offset_y_settings}, CC_BLACK, 0);
+    draw_sprite(&m_slider_background_sprite, 368,  48 + 22 + s_offset_y_settings, 176, m_slider_background_sprite.texture.size.y, CC_BLACK);
+    draw_text_ttf("100", &s_ui_font_s, (t_vec2) { 368 + 176 + 16, 48 + 24 + 8 + s_offset_y_settings}, CC_BLACK, 0);
+
+    draw_text_ttf("Music", &s_ui_font_s, (t_vec2) {256 + 32, 48 + 48 + 16 + s_offset_y_settings}, CC_BLACK, 0);
+    draw_sprite(&m_slider_background_sprite, 368,  48 + 48 + 6 + s_offset_y_settings, 176, m_slider_background_sprite.texture.size.y, CC_BLACK);
+    draw_text_ttf("100", &s_ui_font_s, (t_vec2) { 368 + 176 + 16, 48 + 48 + 16 + s_offset_y_settings}, CC_BLACK, 0);
+
+    draw_text_ttf("Effects", &s_ui_font_s, (t_vec2) {256 + 32, 48 + 48 + 24 + 24 + s_offset_y_settings}, CC_BLACK, 0);
+    draw_sprite(&m_slider_background_sprite, 368, 48 + 48 + 24 + 14 + s_offset_y_settings, 176, m_slider_background_sprite.texture.size.y, CC_BLACK);
+    draw_text_ttf("100", &s_ui_font_s, (t_vec2) { 368 + 176 + 16, 48 + 48 + 24 + 24 + s_offset_y_settings}, CC_BLACK, 0);
+
 }
 
 static void draw_about() {
@@ -400,6 +485,14 @@ void load_title_screen() {
     // m_edit_button.on_released = on_quit_button_clicked;
     m_edit_button.on_mouse_enter = on_button_mouse_enter;
 
+    s_new_button = create_ui_button(&m_button_sprite);
+    s_new_button.color_default = CC_BLACK;
+    s_new_button.color_mouseover = CC_DARK_RED;
+    s_new_button.color_clicked = CC_RED;
+    s_new_button.color_disabled = CC_DARK_RED;
+    s_new_button.on_mouse_enter = on_button_mouse_enter;
+    s_new_button.on_released = on_button_new_clicked;
+
     m_dropdown = create_ui_dropdown(&m_dropdown_sprite, (t_rect) { 128, 16 + 64 + 16, 144, 48 });
 
     m_dropdown.options = dropdown_otions;
@@ -417,7 +510,8 @@ void load_title_screen() {
     slider_knob_rect = (t_rect){ 272, 328 - 66, m_slider_knob_big_sprite.texture.size.x, m_slider_knob_big_sprite.texture.size.y };
 
     m_characters_list = create_list(sizeof(t_ui_button));
-    for (int i = 0; i < 10; i++) {
+    unsigned int save_files_count = 0;
+    for (int i = 0; i < save_files_count; i++) {
 
         t_ui_button* character_button = (t_ui_button*)malloc(sizeof(t_ui_button));
         *character_button = create_ui_button(&m_button_sprite);

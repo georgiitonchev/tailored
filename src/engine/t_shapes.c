@@ -32,10 +32,10 @@ static t_texture create_white_texture() {
 
 static t_texture create_white_border_texture() {
 
-    unsigned char pixels[9][9][4]; // RGBA format
-    for (int i = 0; i < 9; ++i) {
-        for (int j = 0; j < 9; ++j) {
-            if (i == 4 && j == 4) {
+    unsigned char pixels[3][3][4]; // RGBA format
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 3; ++j) {
+            if (i == 1 && j == 1) {
                 pixels[i][j][0] = 0;   // R
                 pixels[i][j][1] = 0;   // G
                 pixels[i][j][2] = 0;   // B
@@ -53,7 +53,7 @@ static t_texture create_white_border_texture() {
     glGenTextures(1, &s_white_border_texture_id);
     glBindTexture(GL_TEXTURE_2D, s_white_border_texture_id);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 9, 9, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 3, 3, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -63,8 +63,8 @@ static t_texture create_white_border_texture() {
     t_texture texture;
     texture.channels = 3;
     texture.id = s_white_border_texture_id;
-    texture.size.x = 9;
-    texture.size.y = 9;
+    texture.size.x = 3;
+    texture.size.y = 3;
 
     return texture;
 }
