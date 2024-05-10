@@ -22,6 +22,7 @@
 #define CC_RED (t_color) { 155, 57, 34, 255 }
 #define CC_DARK_RED (t_color) { 72, 30, 20, 255 }
 #define CC_BLACK (t_color) { 12, 12, 12, 255 }
+#define CC_LIGH_BLUE (t_color) { 109, 197, 209, 255 }
 
 // EXTERN
 extern const int SCREEN_WIDTH_DEFAULT;
@@ -350,7 +351,7 @@ static void draw_characters() {
         draw_text_ttf("Click on \"New\" to create a new save file.", &s_ui_font_s, (t_vec2) { 256 + (368 - text_size_no_files_info.x) / 2 , 16 + s_offset_y_characters + (328 + text_size_no_files_info.y) / 2}, CC_BLACK, 0);
 
     }
-    
+
     // CHARACTER BUTTONS
     draw_ui_button(&s_new_button, 256 + 16, 292 + s_offset_y_characters, 80, 40);
     t_vec2 text_size_new = measure_text_size_ttf("New", &s_ui_font_m);
@@ -371,16 +372,16 @@ static void draw_settings() {
     t_vec2 text_size_sound = measure_text_size_ttf("Sound", &s_ui_font_l);
     draw_text_ttf("Sound", &s_ui_font_l, (t_vec2) {256 + (368 - text_size_sound.x) / 2, 48 + s_offset_y_settings}, CC_BLACK, 0);
 
-    draw_text_ttf("Master", &s_ui_font_s, (t_vec2) {256 + 32, 48 + 24 + 8 + s_offset_y_settings}, CC_BLACK, 0);
-    draw_sprite(&m_slider_background_sprite, 368,  48 + 22 + s_offset_y_settings, 176, m_slider_background_sprite.texture.size.y, CC_BLACK);
+    draw_text_ttf("Master", &s_ui_font_s, (t_vec2) {256 + 16, 48 + 24 + 8 + s_offset_y_settings}, CC_BLACK, 0);
+    draw_sprite(&m_slider_background_sprite, 256 + 184 - 100,  48 + 22 + s_offset_y_settings, 200, m_slider_background_sprite.texture.size.y, CC_BLACK);
     draw_text_ttf("100", &s_ui_font_s, (t_vec2) { 368 + 176 + 16, 48 + 24 + 8 + s_offset_y_settings}, CC_BLACK, 0);
 
-    draw_text_ttf("Music", &s_ui_font_s, (t_vec2) {256 + 32, 48 + 48 + 16 + s_offset_y_settings}, CC_BLACK, 0);
-    draw_sprite(&m_slider_background_sprite, 368,  48 + 48 + 6 + s_offset_y_settings, 176, m_slider_background_sprite.texture.size.y, CC_BLACK);
+    draw_text_ttf("Music", &s_ui_font_s, (t_vec2) {256 + 16, 48 + 48 + 16 + s_offset_y_settings}, CC_BLACK, 0);
+    draw_sprite(&m_slider_background_sprite, 256 + 184 - 100,  48 + 48 + 6 + s_offset_y_settings, 200, m_slider_background_sprite.texture.size.y, CC_BLACK);
     draw_text_ttf("100", &s_ui_font_s, (t_vec2) { 368 + 176 + 16, 48 + 48 + 16 + s_offset_y_settings}, CC_BLACK, 0);
 
-    draw_text_ttf("Effects", &s_ui_font_s, (t_vec2) {256 + 32, 48 + 48 + 24 + 24 + s_offset_y_settings}, CC_BLACK, 0);
-    draw_sprite(&m_slider_background_sprite, 368, 48 + 48 + 24 + 14 + s_offset_y_settings, 176, m_slider_background_sprite.texture.size.y, CC_BLACK);
+    draw_text_ttf("Effects", &s_ui_font_s, (t_vec2) {256 + 16, 48 + 48 + 24 + 24 + s_offset_y_settings}, CC_BLACK, 0);
+    draw_sprite(&m_slider_background_sprite, 256 + 184 - 100, 48 + 48 + 24 + 14 + s_offset_y_settings, 200, m_slider_background_sprite.texture.size.y, CC_BLACK);
     draw_text_ttf("100", &s_ui_font_s, (t_vec2) { 368 + 176 + 16, 48 + 48 + 24 + 24 + s_offset_y_settings}, CC_BLACK, 0);
 
 }
