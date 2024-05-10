@@ -160,4 +160,8 @@ void draw_fire_particles() {
 void set_updating(bool value) {
     printf("set updateing");
     s_should_update = value;
+
+    if(!value) { 
+        t_fade_out_sound(&s_fire_crackles_sound, 1);
+    }
 }

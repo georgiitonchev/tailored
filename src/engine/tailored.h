@@ -128,6 +128,7 @@ void t_draw_scene();
 #include "./extern/miniaudio.h"
 void t_play_audio(const char* path);
 ma_result t_init_sound(const char* path, ma_sound* sound);
+void t_fade_out_sound(ma_sound* sound, int time);
 void t_start_sound(ma_sound* sound);
 void t_set_master_volume(float value);
 
