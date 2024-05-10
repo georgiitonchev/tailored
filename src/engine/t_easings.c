@@ -18,3 +18,22 @@ float t_ease_out_quint(float* timer, float* value, float from, float to, float t
 
     return *timer;
 }
+
+static float ease_in_back(float x) { 
+    const float c = 1.70158f;
+    const float cc = c + 1;
+
+    return cc * x * x * x - c * x * x;
+}
+
+float t_ease_in_back(float* timer, float* value, float from, float to, float time) {
+
+    *timer += t_delta_time() * (1 / time);
+
+    *value =
+        from +
+        (to - from) *
+        ease_in_back(*timer);
+
+    return *timer;
+}

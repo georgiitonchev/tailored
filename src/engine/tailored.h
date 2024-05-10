@@ -124,13 +124,18 @@ void t_end();
 
 void t_draw_scene();
 
-// CORE FUNCTIONS
+// AUDIO 
+#include "./extern/miniaudio.h"
 void t_play_audio(const char* path);
+ma_result t_init_sound(const char* path, ma_sound* sound);
+void t_start_sound(ma_sound* sound);
+void t_set_master_volume(float value);
+
+// CORE FUNCTIONS
 void t_set_cursor(const char* path, int xhot, int yhot);
 float t_delta_time();
 t_vec2 t_window_size();
 t_vec2 t_framebuffer_size();
-
 
 // STRUCTURE VALUES
 #define WHITE (t_color) { 255, 255, 255, 255 }

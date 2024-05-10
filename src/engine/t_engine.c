@@ -144,6 +144,25 @@ void t_play_audio(const char* path) {
   ma_engine_play_sound(&s_audio_engine, path, NULL);
 }
 
+ma_result t_init_sound(const char* path, ma_sound* sound) { 
+
+  ma_result result = ma_sound_init_from_file(&s_audio_engine, path, 0, NULL, NULL, sound);
+
+  if (result != MA_SUCCESS) {
+    printf("Could not initialize sound: %s", path);
+  }
+
+  return result;
+}
+
+void t_set_master_volume(float value) { 
+  ma_engine_set_volume(&s_audio_engine, value);
+}
+
+void t_start_sound(ma_sound* sound) {
+  ma_sound_start(sound);
+}
+
 void t_set_cursor(const char* path, int xhot, int yhot) {
 
   t_texture_data texture_data = t_load_texture_data(path);
@@ -296,7 +315,6 @@ int t_begin(int window_width, int window_height, const char* title) {
     glEnable(GL_STENCIL_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 
     //create miton blur framebuffer
     create_framebuffer();
