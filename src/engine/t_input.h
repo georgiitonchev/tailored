@@ -7,6 +7,8 @@ bool is_mouse_button_pressed(int button);
 bool is_mouse_button_down(int button);
 bool is_mouse_button_released(int button);
 
+t_vec2 mouse_position();
+
 //keyboard
 bool is_key_pressed(int key);
 bool is_key_down(int key);

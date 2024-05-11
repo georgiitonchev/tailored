@@ -20,6 +20,8 @@
 
 #include "fire_particles.h"
 
+#include "./screens/title/screen_title.h"
+
 #define CC_LIGHT_RED (t_color) { 242, 97, 63, 255 }
 #define CC_RED (t_color) { 155, 57, 34, 255 }
 #define CC_DARK_RED (t_color) { 72, 30, 20, 255 }
@@ -45,14 +47,6 @@ static t_sprite m_slider_background_sprite;
 static t_sprite m_slider_knob_small_sprite;
 static t_sprite m_slider_knob_big_sprite;
 
-static t_sprite m_slider_background_sprite_v;
-static t_sprite m_slider_knob_small_sprite_v;
-static t_sprite m_slider_knob_big_sprite_v;
-
-static t_sprite m_slider_background_slim_sprite;
-static t_sprite m_slider_knob_small_slim_sprite;
-static t_sprite m_slider_knob_big_slim_sprite;
-
 static t_sprite s_sprite_loading_bar;
 
 // UI
@@ -68,11 +62,6 @@ static t_ui_button s_new_button;
 
 // SLIDER KNOB
 static t_ui_button m_slider_knob_button;
-static t_ui_button m_slider_knob_button_v;
-
-static t_ui_button m_master_volume_slider_knob_button;
-static t_ui_button m_music_volume_slider_knob_button;
-static t_ui_button m_effects_volume_slider_knob_button;
 
 //  OTHER
 static t_ui_dropdown m_dropdown;
@@ -113,11 +102,6 @@ static float s_left_side_offset_x = 0;
 static float s_right_side_offset_x = 0;
 
 static t_list* m_characters_list;
-
-// SETTINGS
-static unsigned int volume_master = 100;
-static unsigned int volume_music = 100;
-static unsigned int volume_effects = 100;
 
 // CHARACTERS SCROLL AREA THINGS
 static float scroll_area_width = 416;
@@ -318,65 +302,6 @@ static void on_slider_knob_button_pressed() {
     scroll_area_offset = (scroll_area_width - slider_width) * normalized_knob_position;
 }
 
-static t_rect s_rect_master_volume_slider;
-static t_rect s_rect_music_volume_slider;
-static t_rect s_rect_effects_volume_slider;
-
-static void on_master_volume_slider_knob_button_pressed() { 
-    float value = (input_state.mouse_state.position.x - s_rect_master_volume_slider.x) / s_rect_master_volume_slider.width;
-
-    if (value < 0)
-        value = 0;
-    else if (value > 1)
-        value = 1;
-
-    t_set_master_volume(value);
-    volume_master = 100 * value;
-}
-
-static void on_music_volume_slider_knob_button_pressed() { 
-    float clicked_at = (input_state.mouse_state.position.x - s_rect_music_volume_slider.x) / s_rect_music_volume_slider.width;
-
-    if (clicked_at < 0)
-        clicked_at = 0;
-    else if (clicked_at > 1)
-        clicked_at = 1;
-    
-    volume_music = 100 * clicked_at;
-}
-
-static void on_effects_volume_slider_knob_button_pressed() { 
-    float clicked_at = (input_state.mouse_state.position.x - s_rect_effects_volume_slider.x) / s_rect_effects_volume_slider.width;
-
-    if (clicked_at < 0)
-        clicked_at = 0;
-    else if (clicked_at > 1)
-        clicked_at = 1;
-    
-    volume_effects = 100 * clicked_at;
-}
-
-static float scroll_area_height_v = 700;
-static float scroll_area_offset_v = 0;
-
-static t_vec2 slider_pos_v = { 597, 32 };
-static float slider_height_v = 296;
-
-static t_rect slider_knob_rect_v;
-
-static void on_slider_knob_button_v_pressed() {
-    slider_knob_rect_v.y = input_state.mouse_state.position.y - m_slider_knob_button_v.mouse_clicked_at.y;
-
-    // limits
-    if (slider_knob_rect_v.y < slider_pos_v.y)
-        slider_knob_rect_v.y = slider_pos_v.y;
-    else if (slider_knob_rect_v.y > slider_pos_v.y + slider_height_v - slider_knob_rect_v.height)
-        slider_knob_rect_v.y = slider_pos_v.y + slider_height_v - slider_knob_rect_v.height;
-
-    float normalized_knob_position = (slider_knob_rect_v.y - slider_pos_v.y) / (slider_height_v - slider_knob_rect_v.height);
-    scroll_area_offset_v = (scroll_area_height_v - slider_height_v) * normalized_knob_position;
-}
-
 static void draw_characters() {
     // RIGHT SIDE BACKGROUND
     draw_sprite(&m_button_sprite, 256 + s_right_side_offset_x, 16 + s_offset_y_characters, 368, 328, CC_LIGHT_RED);
@@ -456,125 +381,10 @@ static void draw_characters() {
     draw_text_ttf("Start", &s_ui_font_m, (t_vec2) {496 + (112 - text_size_start.x) / 2 + s_right_side_offset_x, 292 + s_offset_y_characters + (40 + text_size_start.y) / 2}, CC_RED, 0);
 }
 
-static void draw_settings() {
-    draw_sprite(&m_button_sprite, 256, 16 + s_offset_y_settings, 368, 328, CC_LIGHT_RED);
-
-    t_vec2 text_size_sound = measure_text_size_ttf("Sound", &s_ui_font_l);
-    draw_text_ttf("Sound", &s_ui_font_l, (t_vec2) {256 + (368 - text_size_sound.x) / 2, 48 + s_offset_y_settings}, CC_BLACK, 0);
-
-    draw_text_ttf("Master", &s_ui_font_s, (t_vec2) { 272, 80 + s_offset_y_settings}, CC_BLACK, 0);
-    s_rect_master_volume_slider = (t_rect) { 340, 70 + s_offset_y_settings, 200, m_slider_background_sprite.texture.size.y };
-    draw_sprite_t(&m_slider_background_slim_sprite, s_rect_master_volume_slider, CC_BLACK);
-    draw_ui_button(&m_master_volume_slider_knob_button, 340 + (((float)volume_master / 100) * 200) - m_slider_knob_big_slim_sprite.texture.size.x / 2, s_rect_master_volume_slider.y + (m_slider_background_sprite.texture.size.y - m_slider_knob_big_slim_sprite.texture.size.y) / 2, m_slider_knob_big_slim_sprite.texture.size.x, m_slider_knob_big_slim_sprite.texture.size.y);
-
-    if (!m_master_volume_slider_knob_button.is_mouse_over && is_point_in_rect(input_state.mouse_state.position, s_rect_master_volume_slider)) {
-
-        if (is_mouse_button_pressed(MOUSE_BUTTON_LEFT)) {
-
-            //normalized value
-            float clicked_at = (input_state.mouse_state.position.x - s_rect_master_volume_slider.x) / s_rect_master_volume_slider.width;
-            volume_master = 100 * clicked_at;
-
-            m_master_volume_slider_knob_button.was_clicked = true;
-            m_master_volume_slider_knob_button.mouse_clicked_at = (t_vec2) { m_master_volume_slider_knob_button.sprite->texture.size.x / 2, m_master_volume_slider_knob_button.sprite->texture.size.y / 2};
-        }
-
-        t_rect slider_knob_small_rect = (t_rect) 
-            { input_state.mouse_state.position.x - m_slider_knob_small_slim_sprite.texture.size.x / 2, 
-            s_rect_master_volume_slider.y + s_offset_y_settings, 
-            m_slider_knob_small_slim_sprite.texture.size.x, 
-            m_slider_knob_small_slim_sprite.texture.size.y };
-
-        draw_sprite_t(&m_slider_knob_small_slim_sprite, slider_knob_small_rect, CC_BLACK);
-    }
-    char value_str[4];
-    sprintf(value_str, "%d", volume_master);
-    draw_text_ttf(value_str, &s_ui_font_s, (t_vec2) { 368 + 176 + 16, 80 + s_offset_y_settings}, CC_BLACK, 0);
-
-    draw_text_ttf("Music", &s_ui_font_s, (t_vec2) {256 + 16, 112 + s_offset_y_settings}, CC_BLACK, 0);
-    s_rect_music_volume_slider = (t_rect) {  256 + 184 - 100,  48 + 48 + 6 + s_offset_y_settings, 200, m_slider_background_sprite.texture.size.y };
-    draw_sprite_t(&m_slider_background_slim_sprite, s_rect_music_volume_slider, CC_BLACK);
-
-    draw_ui_button(&m_music_volume_slider_knob_button, 340 + (((float)volume_music / 100) * 200) - m_slider_knob_big_slim_sprite.texture.size.x / 2, s_rect_music_volume_slider.y + (m_slider_background_sprite.texture.size.y - m_slider_knob_big_slim_sprite.texture.size.y) / 2, m_slider_knob_big_slim_sprite.texture.size.x, m_slider_knob_big_slim_sprite.texture.size.y);
-
-    if (!m_music_volume_slider_knob_button.is_mouse_over && is_point_in_rect(input_state.mouse_state.position, s_rect_music_volume_slider)) {
-
-        if (is_mouse_button_pressed(MOUSE_BUTTON_LEFT)) {
-
-            //normalized value
-            float clicked_at = (input_state.mouse_state.position.x - s_rect_music_volume_slider.x) / s_rect_music_volume_slider.width;
-            volume_music = 100 * clicked_at;
-
-            m_music_volume_slider_knob_button.was_clicked = true;
-            m_music_volume_slider_knob_button.mouse_clicked_at = (t_vec2) { m_music_volume_slider_knob_button.sprite->texture.size.x / 2, m_music_volume_slider_knob_button.sprite->texture.size.y / 2};
-        }
-
-        t_rect slider_knob_small_rect = (t_rect) 
-            { input_state.mouse_state.position.x - m_slider_knob_small_slim_sprite.texture.size.x / 2, 
-            s_rect_music_volume_slider.y + s_offset_y_settings, 
-            m_slider_knob_small_slim_sprite.texture.size.x, 
-            m_slider_knob_small_slim_sprite.texture.size.y };
-
-        draw_sprite_t(&m_slider_knob_small_slim_sprite, slider_knob_small_rect, CC_BLACK);
-    }
-    char volume_music_str[4];
-    sprintf(volume_music_str, "%d", volume_music);
-    draw_text_ttf(volume_music_str, &s_ui_font_s, (t_vec2) { 368 + 176 + 16, 112 + s_offset_y_settings }, CC_BLACK, 0);
-
-    draw_text_ttf("Effects", &s_ui_font_s, (t_vec2) {256 + 16, 48 + 48 + 24 + 24 + s_offset_y_settings}, CC_BLACK, 0);
-    draw_sprite(&m_slider_background_slim_sprite, 256 + 184 - 100, 48 + 48 + 24 + 14 + s_offset_y_settings, 200, m_slider_background_sprite.texture.size.y, CC_BLACK);
-    draw_text_ttf("100", &s_ui_font_s, (t_vec2) { 368 + 176 + 16, 48 + 48 + 24 + 24 + s_offset_y_settings}, CC_BLACK, 0);
-
-}
-
-static void draw_about() {
-    draw_sprite(&m_button_sprite, 256, 16 + s_offset_y_about, 368, 328, CC_LIGHT_RED);
-
-    t_begin_scissor(256 + 16, 32 + s_offset_y_about, 368 - 48, 328 - 32);
-        draw_text_ttf("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Dictum sit amet justo donec. Faucibus nisl tincidunt eget nullam non. Egestas tellus rutrum tellus pellentesque eu tincidunt. Donec enim diam vulputate ut pharetra sit amet aliquam id. Quis viverra nibh cras pulvinar mattis nunc sed blandit. Posuere sollicitudin aliquam ultrices sagittis orci a scelerisque purus. In ornare quam viverra orci. Congue quisque egestas diam in arcu. Tempus urna et pharetra pharetra massa. Dolor magna eget est lorem ipsum dolor. Ut etiam sit amet nisl purus in mollis nunc sed. Cras fermentum odio eu feugiat pretium nibh ipsum consequat nisl. Consectetur purus ut faucibus pulvinar elementum. Elementum eu facilisis sed odio morbi.", &s_ui_font_s, (t_vec2) {256 + 16 , 16 + 32 + s_offset_y_about - scroll_area_offset_v}, CC_BLACK, 368 - 48);
-    t_end_scissor();
-
-    t_rect slider_rect = RECT_ZERO;
-    slider_rect.x = 597;
-    slider_rect.y = 32 + s_offset_y_about;
-    slider_rect.width = m_slider_background_sprite_v.texture.size.x;
-    slider_rect.height = 296;
-
-    // BIG KNOB
-    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-    glClear(GL_STENCIL_BUFFER_BIT);
-    glStencilFunc(GL_ALWAYS, 1, 0xFF);
-    glStencilMask(0xFF);
-    draw_ui_button(&m_slider_knob_button_v, slider_knob_rect_v.x, slider_knob_rect_v.y + s_offset_y_about, slider_knob_rect_v.width, slider_knob_rect_v.height);
-
-    glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-    if (!m_slider_knob_button_v.is_mouse_over && is_point_in_rect(input_state.mouse_state.position, slider_rect)) {
-
-        if (is_mouse_button_pressed(MOUSE_BUTTON_LEFT)) {
-            slider_knob_rect_v.y = input_state.mouse_state.position.y - slider_knob_rect_v.height / 2;
-            m_slider_knob_button_v.was_clicked = true;
-            m_slider_knob_button_v.mouse_clicked_at = (t_vec2) { m_slider_knob_button_v.sprite->texture.size.x / 2, m_slider_knob_button_v.sprite->texture.size.y / 2};
-        }
-
-        t_rect slider_knob_small_rect = (t_rect) { slider_rect.x, input_state.mouse_state.position.y - m_slider_knob_small_sprite_v.texture.size.y / 2 + s_offset_y_about, m_slider_knob_small_sprite_v.texture.size.x, m_slider_knob_small_sprite_v.texture.size.y };
-
-        //limits
-        if (slider_knob_small_rect.y < slider_rect.y)
-            slider_knob_small_rect.y = slider_rect.y;
-        else if (slider_knob_small_rect.y > slider_rect.y + slider_rect.height- slider_knob_small_rect.height)
-            slider_knob_small_rect.y = slider_rect.y + slider_rect.height - slider_knob_small_rect.height;
-
-        draw_sprite_t(&m_slider_knob_small_sprite_v, slider_knob_small_rect, CC_BLACK);
-    }
-
-    glStencilMask(0x00);
-    // SLIDER
-    draw_sprite_t(&m_slider_background_sprite_v, slider_rect, CC_BLACK);
-    glStencilMask(0xFF);
-    glStencilFunc(GL_ALWAYS, 1, 0xFF);
-}
-
 void load_title_screen() {
+
+    load_section_about();
+    load_section_settings();
 
     s_ui_font_l = load_ttf_font("./res/fonts/Eczar-Regular.ttf", 42);
     s_ui_font_m = load_ttf_font("./res/fonts/Eczar-Regular.ttf", 37);
@@ -674,43 +484,6 @@ void load_title_screen() {
     }
 
     scroll_area_width = m_characters_list->size * 128 + (m_characters_list->size - 1) * 16;
-
-    // ABOUT
-    create_sprite("./res/textures/slider_background_v.png", &m_slider_background_sprite_v);
-    create_sprite("./res/textures/slider_knob_small_v.png", &m_slider_knob_small_sprite_v);
-    create_sprite("./res/textures/slider_knob_big_v.png", &m_slider_knob_big_sprite_v);
-
-    m_slider_knob_button_v = create_ui_button(&m_slider_knob_big_sprite_v);
-    m_slider_knob_button_v.color_default = CC_BLACK;
-    m_slider_knob_button_v.color_mouseover = CC_DARK_RED;
-    m_slider_knob_button_v.color_clicked = CC_DARK_RED;
-    m_slider_knob_button_v.on_pressed = on_slider_knob_button_v_pressed;
-
-    //  slider_rect.x = 256 + 368 - 32 + 5;
-    //  slider_rect.y = 32 + s_offset_y_about;
-    slider_knob_rect_v = (t_rect){ 595, 32, m_slider_knob_big_sprite_v.texture.size.x, m_slider_knob_big_sprite_v.texture.size.y };
-
-    create_sprite("./res/textures/slider_background_slim.png", &m_slider_background_slim_sprite);
-    create_sprite("./res/textures/slider_knob_small_slim.png", &m_slider_knob_small_slim_sprite);
-    create_sprite("./res/textures/slider_knob_big_slim.png", &m_slider_knob_big_slim_sprite);
-
-    m_master_volume_slider_knob_button = create_ui_button(&m_slider_knob_big_slim_sprite);
-    m_master_volume_slider_knob_button.color_default = CC_BLACK;
-    m_master_volume_slider_knob_button.color_mouseover = CC_DARK_RED;
-    m_master_volume_slider_knob_button.color_clicked = CC_BLACK;
-    m_master_volume_slider_knob_button.on_pressed = on_master_volume_slider_knob_button_pressed;
-
-    m_music_volume_slider_knob_button = create_ui_button(&m_slider_knob_big_slim_sprite);
-    m_music_volume_slider_knob_button.color_default = CC_BLACK;
-    m_music_volume_slider_knob_button.color_mouseover = CC_DARK_RED;
-    m_music_volume_slider_knob_button.color_clicked = CC_BLACK;
-    m_music_volume_slider_knob_button.on_pressed = on_music_volume_slider_knob_button_pressed;
-
-    m_effects_volume_slider_knob_button = create_ui_button(&m_slider_knob_big_slim_sprite);
-    m_effects_volume_slider_knob_button.color_default = CC_BLACK;
-    m_effects_volume_slider_knob_button.color_mouseover = CC_DARK_RED;
-    m_effects_volume_slider_knob_button.color_clicked = CC_BLACK;
-    m_effects_volume_slider_knob_button.on_pressed = on_effects_volume_slider_knob_button_pressed;
 
     init_fire_particles(50);
 }
@@ -829,10 +602,12 @@ void draw_title_screen() {
         draw_characters();
     }
     if (m_draw_settings) {
-        draw_settings();
+        // draw_settings();
+        draw_section_settings(s_right_side_offset_x, s_offset_y_settings);
     }
     if (m_draw_about) {
-        draw_about();
+        //draw_about();
+        draw_section_about(s_right_side_offset_x, s_offset_y_about);
     }
 
     if (s_show_loading_bar) {

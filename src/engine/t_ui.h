@@ -1,4 +1,6 @@
 
+#pragma once
+
 #include "tailored.h"
 #include "t_sprite.h"
 
@@ -49,6 +51,14 @@ typedef struct t_ui_dropdown {
     void (*on_option_selected)(int);
 
 } t_ui_dropdown;
+
+typedef struct t_ui_padding {
+
+    float left;
+    float right;
+    float top;
+    float bottom;
+} t_ui_padding;
 
 t_ui_button create_ui_button(t_sprite* sprite);
 void draw_ui_button(t_ui_button* button, int x, int y, int width, int height);
