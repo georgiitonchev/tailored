@@ -111,6 +111,9 @@ void load_section_saves() {
     create_sprite("./res/textures/panel-transparent-center-030.png", &s_sprite_button);
     s_sprite_button.slice_borders = (t_vec4){ 16, 16, 16, 16 };
 
+    create_sprite("./res/textures/panel-transparent-center-029.png", &s_sprite_button_selected);
+    s_sprite_button_selected.slice_borders = (t_vec4){ 16, 16, 16, 16 };
+
     create_sprite("./res/textures/panel-transparent-center-030.png", &s_sprite_section_background);
     s_sprite_section_background.slice_borders = (t_vec4){ 16, 16, 16, 16 };
 
@@ -129,7 +132,7 @@ void load_section_saves() {
     s_button_new.color_mouseover = CC_DARK_RED;
     s_button_new.color_clicked = CC_RED;
     s_button_new.color_disabled = CC_DARK_RED;
-    //m_begin_button.on_released = on_button_start_cicked;
+    s_button_new.on_released = s_on_button_new_clicked;
     // s_button_new.on_mouse_enter = on_button_mouse_enter;
 
     s_button_delete = create_ui_button(&s_sprite_button);
