@@ -31,31 +31,31 @@ typedef struct t_particle {
 
 } t_particle;
 
-static t_list* particles_list;
+static t_list* s_list_particles;
 
-static unsigned int particles_shader;
-static unsigned int particle_quad_vao;
+static GLuint s_shader_particles;
+static GLuint s_quad_vao_particles;
+static GLuint s_vertex_buffer_object;
 
-static t_vec2 window_size; 
+static t_vec2 s_window_size; 
 
 static ma_sound s_fire_crackles_sound;
 static bool s_should_update;
 
 static void init_quad() {
-    unsigned int vertex_buffer_object;
 
     float vertices[] = {
         0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
 
         0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f};
 
-    glGenVertexArrays(1, &particle_quad_vao);
-    glGenBuffers(1, &vertex_buffer_object);
+    glGenVertexArrays(1, &s_quad_vao_particles);
+    glGenBuffers(1, &s_vertex_buffer_object);
 
-    glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_object);
+    glBindBuffer(GL_ARRAY_BUFFER, s_vertex_buffer_object);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    glBindVertexArray(particle_quad_vao);
+    glBindVertexArray(s_quad_vao_particles);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -74,13 +74,13 @@ static void init_particle(t_particle* particle) {
 
     particle->color_green_add = random_float(0.0f, 2.5f);
 
-    particle->rect = (t_rect) { random_float(-window_size.x / 3, window_size.x / 2), window_size.y, size, size };
+    particle->rect = (t_rect) { random_float(-s_window_size.x / 3, s_window_size.x / 2), s_window_size.y, size, size };
 }
 
 void draw_particle(t_particle* particle) { 
 
     mat4 mat4_projection;
-    glm_ortho(0, window_size.x, window_size.y, 0, 0.0, 1.0, mat4_projection);
+    glm_ortho(0, s_window_size.x, s_window_size.y, 0, 0.0, 1.0, mat4_projection);
 
     mat4 mat4_model;
     glm_mat4_identity(mat4_model);
@@ -88,15 +88,15 @@ void draw_particle(t_particle* particle) {
                 (vec3){particle->rect.x, particle->rect.y, -0.1f});
     glm_scale(mat4_model, (vec3){particle->rect.width, particle->rect.height, 1.0f});
 
-    glUniformMatrix4fv(glGetUniformLocation(particles_shader, "u_mat4_projection"),
+    glUniformMatrix4fv(glGetUniformLocation(s_shader_particles, "u_mat4_projection"),
                         1, GL_FALSE, (float *)mat4_projection);
 
-    glUniformMatrix4fv(glGetUniformLocation(particles_shader, "u_mat4_model"), 1,
+    glUniformMatrix4fv(glGetUniformLocation(s_shader_particles, "u_mat4_model"), 1,
                         GL_FALSE, (float *)mat4_model);
 
-    glUniform1f(glGetUniformLocation(particles_shader, "u_green_add"), particle->color_green_add);
+    glUniform1f(glGetUniformLocation(s_shader_particles, "u_green_add"), particle->color_green_add);
 
-    glBindVertexArray(particle_quad_vao);
+    glBindVertexArray(s_quad_vao_particles);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindVertexArray(0);
 }
@@ -111,29 +111,39 @@ void init_fire_particles(unsigned int count_particles_max) {
         ma_sound_set_looping(&s_fire_crackles_sound, MA_TRUE);
     }
     
-    window_size = t_window_size();
+    s_window_size = t_window_size();
 
     init_quad();
 
-    particles_list = create_list(sizeof(t_particle));
-    particles_shader = t_create_shader_program("./res/shaders/fire_particle_shader.vs", "./res/shaders/fire_particle_shader.fs");
+    s_list_particles = create_list(sizeof(t_particle));
+    s_shader_particles = t_create_shader_program("./res/shaders/fire_particle_shader.vs", "./res/shaders/fire_particle_shader.fs");
 
     for (unsigned int i = 0; i < count_particles_max; i++) {
 
         t_particle* particle = (t_particle*)malloc(sizeof(t_particle));
         init_particle(particle);
-        add_to_list(particles_list, particle);
+        add_to_list(s_list_particles, particle);
     }
+}
+
+void uninit_fire_particles() {
+
+    t_uninit_sound(&s_fire_crackles_sound);
+    destroy_list(s_list_particles);
+
+    t_destroy_shader_program(s_shader_particles);
+    glDeleteBuffers(1, &s_vertex_buffer_object);
+    glDeleteVertexArrays(1, &s_quad_vao_particles);
 }
 
 void draw_fire_particles() { 
     
-    glUseProgram(particles_shader);
+    glUseProgram(s_shader_particles);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR);  
 
-    for (int i = 0; i < particles_list->size; i ++) { 
+    for (unsigned int i = 0; i < s_list_particles->size; i ++) { 
 
-        t_particle* particle = (t_particle*)element_at_list(particles_list, i);
+        t_particle* particle = (t_particle*)element_at_list(s_list_particles, i);
         
         if (s_should_update && particle->life_current <= 0) { 
            init_particle(particle);
@@ -158,10 +168,11 @@ void draw_fire_particles() {
 }
 
 void set_updating(bool value) {
-    printf("set updateing");
     s_should_update = value;
 
-    if(!value) { 
+    if (!value) { 
         t_fade_out_sound(&s_fire_crackles_sound, 1);
+    } else {
+        t_fade_in_sound(&s_fire_crackles_sound, 1);
     }
 }

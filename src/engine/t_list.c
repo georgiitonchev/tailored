@@ -106,6 +106,16 @@ void add_to_list(t_list* list, const void* element) {
     list->size++;
 }
 
+void remove_from_list(t_list* list, unsigned int index_of_element) {
+
+    if (index_of_element < list->size - 1) { 
+        memcpy((char*)list->elements + (index_of_element * list->element_size), 
+            (char*)list->elements + ((index_of_element + 1) * list->element_size), list->element_size * (list->size - (index_of_element + 1)));
+    }
+
+    list->size--;
+}
+
 void* element_at_list(t_list* list, unsigned int index) {
 
     if (!list) {

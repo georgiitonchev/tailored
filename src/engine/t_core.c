@@ -17,7 +17,7 @@ const char *t_read_file(const char *path, long* file_size) {
 
   if (file_pointer == NULL) {
     perror(path);
-    exit(EXIT_FAILURE);
+    return NULL;
   }
 
   fseek(file_pointer, 0, SEEK_END);
@@ -35,6 +35,27 @@ const char *t_read_file(const char *path, long* file_size) {
   fclose(file_pointer);
 
   return text_buffer;
+}
+
+t_result t_write_file(const char* path, const char* file_data) {
+  FILE *file = fopen(path, "wt");
+  if (file != NULL)
+  {
+      int count = fprintf(file, "%s", file_data);
+
+      if (count < 0) {
+        fclose(file);
+        printf("ERROR: Could not write to file: %s.\n", path);
+        return T_ERROR;
+      }
+
+      fclose(file);
+      return T_SUCCESS;
+  }
+  else {
+      printf("ERROR: Could not create file: %s.\n", path);
+      return T_ERROR;
+  }
 }
 
 static GLuint compile_shader(const char* shader_path, unsigned int shader_type) {
@@ -101,6 +122,10 @@ GLuint t_create_shader_program(const char *vertex_shader_path, const char *fragm
   glDeleteShader(vertex_shader);
   glDeleteShader(fragment_shader);
   return shader_program;
+}
+
+void t_destroy_shader_program(unsigned int shader_program) {
+  glDeleteProgram(shader_program);
 }
 
 t_texture_data t_load_texture_data(const char* path) {

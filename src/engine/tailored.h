@@ -3,10 +3,9 @@
 
 #include <stdbool.h>
 
-// SCTRUCTURE DEFINITIONS
 typedef enum t_result {
-  t_success = 0,
-  t_error = 1
+  T_SUCCESS = 0,
+  T_ERROR = 1
 } t_result;
 
 typedef struct t_vec2 {
@@ -99,9 +98,11 @@ typedef struct t_input_state {
 
 // FILE FUNCTIONS
 const char *t_read_file(const char *path, long* file_size);
+t_result t_write_file(const char* path, const char* file_data);
 
 // SHADER FUNCTIONS
 unsigned int t_create_shader_program(const char *vertex_shader_path, const char *fragment_shader_path);
+void t_destroy_shader_program(unsigned int shader_program);
 
 // COLOR FUNCTIONS
 void t_clear_color(t_color color);
@@ -121,14 +122,15 @@ int t_begin(int window_width, int window_height, const char* title);
 bool t_loop();
 void t_loop_end();
 void t_end();
-
 void t_draw_scene();
 
 // AUDIO 
 #include "./extern/miniaudio.h"
 void t_play_audio(const char* path);
 ma_result t_init_sound(const char* path, ma_sound* sound);
+void t_uninit_sound(ma_sound* sound);
 void t_fade_out_sound(ma_sound* sound, int time);
+void t_fade_in_sound(ma_sound* sound, int time);
 void t_start_sound(ma_sound* sound);
 void t_set_master_volume(float value);
 

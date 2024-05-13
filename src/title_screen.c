@@ -21,17 +21,11 @@
 #include "fire_particles.h"
 
 #include "./screens/title/screen_title.h"
-
-#define CC_LIGHT_RED (t_color) { 242, 97, 63, 255 }
-#define CC_RED (t_color) { 155, 57, 34, 255 }
-#define CC_DARK_RED (t_color) { 72, 30, 20, 255 }
-#define CC_BLACK (t_color) { 12, 12, 12, 255 }
-#define CC_LIGH_BLUE (t_color) { 109, 197, 209, 255 }
+#include "game.h"
 
 // EXTERN
 extern const int SCREEN_WIDTH_DEFAULT;
 extern const int SCREEN_HEIGHT_DEFAULT;
-extern t_input_state input_state;
 
 extern bool m_should_change_screen;
 extern t_screen m_should_change_screen_to;
@@ -50,8 +44,6 @@ static t_ui_button m_settings_button;
 static t_ui_button m_about_button;
 
 static t_font s_ui_font_l;
-static t_font s_ui_font_m;
-static t_font s_ui_font_s;
 
 static bool m_draw_characters;
 static bool m_draw_settings;
@@ -91,8 +83,10 @@ static void on_button_mouse_enter() {
 
 static bool s_show_loading_bar = false;
 
-static void on_button_start_cicked(t_ui_button* button) { 
-    //set_updating(false);
+static void on_button_start_cicked(t_ui_button* button) {
+    UNUSED(button);
+
+    set_updating(false);
     s_ease_out_left_side = true;
     s_ease_out_right_side = true;
     s_show_loading_bar = true;
@@ -191,12 +185,12 @@ static void on_about_button_clicked() {
 void load_title_screen() {
 
     load_section_saves();
+    set_on_save_file_loaded(on_button_start_cicked);
+
     load_section_settings();
     load_section_about();
 
     s_ui_font_l = load_ttf_font("./res/fonts/Eczar-Regular.ttf", 42);
-    s_ui_font_m = load_ttf_font("./res/fonts/Eczar-Regular.ttf", 37);
-    s_ui_font_s = load_ttf_font("./res/fonts/Eczar-Regular.ttf", 32);
 
     create_sprite("./res/textures/loading_bar.png", &s_sprite_loading_bar);
     create_sprite("./res/textures/imps_fairies_logo.png", &m_logo_sprite);
@@ -226,10 +220,26 @@ void load_title_screen() {
     m_about_button.on_mouse_enter = on_button_mouse_enter;
 
     init_fire_particles(50);
+
+    // RESET
+    s_ease_out_timer_left_side = 0;
+    s_ease_out_left_side = false;
+
+    s_ease_out_timer_right_side = 0;
+    s_ease_out_right_side = false;
+
+    s_left_side_offset_x = 0;
+    s_right_side_offset_x = 0;
+
+    m_draw_characters = false;
+    m_draw_about = false;
+    m_draw_settings = false;
+
+    s_timer_loading = 0;
 }
 
 void unload_title_screen() {
-
+    uninit_fire_particles();
 }
 
 void update_title_screen() {
@@ -349,7 +359,6 @@ void draw_title_screen() {
     }
 
     if (s_show_loading_bar) {
-
         draw_sprite(&s_sprite_loading_bar, 
             (t_window_size().x - s_sprite_loading_bar.texture.size.x) / 2, 
             (t_window_size().y - s_sprite_loading_bar.texture.size.y) / 2,
@@ -367,10 +376,11 @@ void draw_title_screen() {
 
         if (progress > 1) {
             s_show_loading_bar = false;
-            set_updating(false);
+
+            m_should_change_screen = true;
+            m_should_change_screen_to = GAME;
         }
     }
 
     clear_ui();
-
 }

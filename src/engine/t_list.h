@@ -20,4 +20,5 @@ typedef struct t_list {
 t_list* create_list(unsigned int element_size);
 void destroy_list(t_list* list);
 void add_to_list(t_list* list, const void* element);
+void remove_from_list(t_list* list, unsigned int index_of_element);
 void* element_at_list(t_list* list, unsigned int index);

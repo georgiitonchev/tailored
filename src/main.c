@@ -22,7 +22,7 @@ int main() {
 
     t_result result = t_begin(640, 360, "Imps & Fairies");
 
-    if (result != t_success) {
+    if (result != T_SUCCESS) {
         exit(EXIT_FAILURE);
     }
 

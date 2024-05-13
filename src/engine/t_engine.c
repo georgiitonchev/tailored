@@ -155,8 +155,16 @@ ma_result t_init_sound(const char* path, ma_sound* sound) {
   return result;
 }
 
+void t_uninit_sound(ma_sound* sound) { 
+  ma_sound_uninit(sound);
+}
+
 void t_fade_out_sound(ma_sound* sound, int time) {
   ma_sound_set_fade_in_milliseconds(sound, -1, 0, time * 1000);
+}
+
+void t_fade_in_sound(ma_sound* sound, int time) {
+  ma_sound_set_fade_in_milliseconds(sound, 0, 1, time * 1000);
 }
 
 void t_set_master_volume(float value) { 
