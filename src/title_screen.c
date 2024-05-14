@@ -26,7 +26,6 @@
 // EXTERN
 extern const int SCREEN_WIDTH_DEFAULT;
 extern const int SCREEN_HEIGHT_DEFAULT;
-
 extern bool m_should_change_screen;
 extern t_screen m_should_change_screen_to;
 
@@ -50,6 +49,8 @@ static bool m_draw_about;
 
 static float s_ease_out_timer_left_side = 0;
 static float s_ease_out_left_side = false;
+
+static float s_ease_in_left_side = false;
 
 static float s_ease_out_timer_right_side = 0;
 static float s_ease_out_right_side = false;
@@ -182,6 +183,8 @@ static void on_about_button_clicked() {
 }
 
 void load_title_screen() {
+
+    s_ease_in_left_side = true;
 
     load_section_saves();
     set_on_save_file_loaded(on_button_start_cicked);
@@ -336,6 +339,16 @@ void draw_title_screen() {
             s_ease_out_timer_about = 0;
             s_ease_out_about = false;
             m_draw_about = false;
+        }
+    }
+
+    if (s_ease_in_left_side) {
+
+        float progress = t_ease_out_quint(&s_ease_out_timer_left_side, &s_left_side_offset_x, -256, 0, .5f);
+
+        if (progress >= 1) {
+            s_ease_out_timer_left_side = 0;
+            s_ease_in_left_side = false;
         }
     }
 

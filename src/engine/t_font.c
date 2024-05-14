@@ -105,14 +105,6 @@ t_vec4 get_character(char character) {
   return slice;
 }
 
-static void draw_texture_slice(t_texture texture, t_vec4 texture_slice, t_vec2 position, t_vec2 size, t_color color) {
-
- 
-  
-
-
-}
-
 t_font load_ttf_font(const char* path, unsigned int font_size) {
   
   t_font font = { 0 };
@@ -169,12 +161,6 @@ void init_font_renderer() {
 
 void terminate_font_renderer() {
     t_free_texture(&font_texture);
-}
-
-void draw_text(const char* text, t_vec2 position, int size , t_color color) {
-  for (int i = 0; i < (int) strlen(text); i++) {
-      draw_texture_slice(font_texture, get_character(text[i]), (t_vec2){ position.x + i * size, position.y }, (t_vec2){ size, size }, color);
-  }
 }
 
 t_vec2 measure_text_size(const char* text, int size) {

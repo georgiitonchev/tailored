@@ -15,7 +15,7 @@ typedef struct t_ui_button {
     void (*on_released)(struct t_ui_button*);
     void (*on_mouse_enter)();
     void (*on_mouse_exit)();
-    void (*on_pressed)();
+    void (*on_pressed)(struct t_ui_button*);
 
     bool is_mouse_over;
     bool was_clicked;

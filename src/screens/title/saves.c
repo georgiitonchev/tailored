@@ -19,6 +19,9 @@
 #include <stdlib.h>
 #include <time.h>
 
+// EXTERN
+extern char* g_save_file;
+
 static const char* save_files_data_path = "saves/save_files_data.tsfs";
 
 typedef struct save_file_ui_data {
@@ -84,6 +87,9 @@ static void s_on_save_file_clicked(t_ui_button* button) {
 static void s_on_save_file_loaded(t_ui_button* button) {
     UNUSED(button);
 
+    save_file_ui_data* sfui_data = (save_file_ui_data*)s_selected_save->user_data;
+
+    g_save_file = sfui_data->save_file_name;
     s_on_loaded(s_selected_save);
 }
 
@@ -129,7 +135,7 @@ static void s_on_button_new_clicked() {
     cJSON_AddStringToObject(json, "created_at", time_string);
 
     const char* json_string = cJSON_Print(json);
-    char file_name[100];
+    char* file_name = malloc(100 * sizeof(char));
 
     sprintf(file_name, "saves/%s.tsf", file_name_string);
     
@@ -144,7 +150,7 @@ static void s_on_button_new_clicked() {
         character_button->color_clicked = CC_RED;
 
         save_file_ui_data* sfui_data = (save_file_ui_data*)malloc(sizeof(save_file_ui_data));
-        sfui_data->save_file_name = time_string;
+        sfui_data->save_file_name = file_name;
         sfui_data->fade_in_y = 0;
         sfui_data->fade_in_timer = 0;
         sfui_data->index = s_list_saves->size;
@@ -225,7 +231,7 @@ void load_section_saves() {
             character_button->color_clicked = CC_RED;
 
             save_file_ui_data* sfui_data = (save_file_ui_data*)malloc(sizeof(save_file_ui_data));
-            sfui_data->save_file_name = sf_created_at->valuestring;
+            sfui_data->save_file_name = json_array_item->valuestring;
             sfui_data->fade_in_y = 0;
             sfui_data->fade_in_timer = 0;
             sfui_data->index = i;

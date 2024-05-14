@@ -10,10 +10,12 @@
 
 #include "./engine/extern/stb_truetype.h"
 
-t_screen m_current_screen = TITLE;
+static t_screen m_current_screen = SPLASH;
 
+// EXTERNS
 bool m_should_change_screen = false;
 t_screen m_should_change_screen_to;
+char* g_save_file; 
 
 void on_free_button_released() {
 }
@@ -27,7 +29,13 @@ int main() {
     }
 
     t_set_cursor("./res/textures/pointer_b.png", 8, 6);
-    load_title_screen();
+    
+    switch (m_current_screen)
+    {
+        case SPLASH: load_splash_screen(); break;
+        case TITLE: load_title_screen(); break;
+        case GAME: load_game_screen(); break;
+    }
 
     while(t_loop()) {
 
