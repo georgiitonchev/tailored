@@ -9,7 +9,7 @@
 
 #include <stdlib.h>
 
-static float random_float(float from, float to) { 
+static float random_float(float from, float to) {
     return from + ((float)rand() / RAND_MAX) * (to - from);
 }
 
@@ -37,7 +37,7 @@ static GLuint s_shader_particles;
 static GLuint s_quad_vao_particles;
 static GLuint s_vertex_buffer_object;
 
-static t_vec2 s_window_size; 
+static t_vec2 s_window_size;
 
 static ma_sound s_fire_crackles_sound;
 static bool s_should_update;
@@ -70,7 +70,7 @@ static void init_quad() {
 }
 
 static void init_particle(t_particle* particle) {
-    
+
     particle->life_initial = random_float(2, 10);
     particle->life_current = particle->life_initial;
     particle->timer = 0;
@@ -93,7 +93,7 @@ void init_fire_particles(unsigned int count_particles_max) {
         t_start_sound(&s_fire_crackles_sound);
         ma_sound_set_looping(&s_fire_crackles_sound, MA_TRUE);
     }
-    
+
     s_window_size = t_window_size();
 
     init_quad();
@@ -124,16 +124,16 @@ void uninit_fire_particles() {
     glDeleteVertexArrays(1, &s_quad_vao_particles);
 }
 
-void draw_fire_particles() { 
-    
-    glUseProgram(s_shader_particles);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR);  
+void draw_fire_particles() {
 
-    for (unsigned int i = 0; i < s_list_particles->size; i ++) { 
+    glUseProgram(s_shader_particles);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR);
+
+    for (unsigned int i = 0; i < s_list_particles->size; i ++) {
 
         t_particle* particle = (t_particle*)element_at_list(s_list_particles, i);
-        
-        if (s_should_update && particle->life_current <= 0) { 
+
+        if (s_should_update && particle->life_current <= 0) {
            init_particle(particle);
         }
 
@@ -147,19 +147,19 @@ void draw_fire_particles() {
                             1, GL_FALSE, (float *)s_mat4_projection);
 
         char mat4_model_key[20];
-        sprintf_s(mat4_model_key, 20, "u_mat4_models[%d]", i);
+        sprintf(mat4_model_key, "u_mat4_models[%d]", i);
 
         glUniformMatrix4fv(glGetUniformLocation(s_shader_particles, mat4_model_key), 1,
                             GL_FALSE, (float *)mat4_model);
 
         char green_add_key[20];
-        sprintf_s(green_add_key, 20, "u_green_add[%d]", i);
+        sprintf(green_add_key, "u_green_add[%d]", i);
         glUniform1f(glGetUniformLocation(s_shader_particles, green_add_key), particle->color_green_add);
 
         if (particle->life_current > 0) {
             particle->life_current -= t_delta_time();
             particle->rect.x += random_float(-10, 500) * t_delta_time() * (particle->rect.width * 0.2f);
-            particle->rect.y -= random_float(-10, 450) * t_delta_time() * (particle->rect.height * 0.2f); 
+            particle->rect.y -= random_float(-10, 450) * t_delta_time() * (particle->rect.height * 0.2f);
 
             float size = 0;
             t_ease_out_quint(&particle->timer, &size, particle->size_initial, 0, particle->life_initial);
@@ -173,13 +173,13 @@ void draw_fire_particles() {
     glDrawArraysInstanced(GL_TRIANGLES, 0, 6, s_list_particles->size);
     glBindVertexArray(0);
 
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);  
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void set_updating(bool value) {
     s_should_update = value;
 
-    if (!value) { 
+    if (!value) {
         t_fade_out_sound(&s_fire_crackles_sound, 1);
     } else {
         t_fade_in_sound(&s_fire_crackles_sound, 1);

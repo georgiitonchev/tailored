@@ -106,7 +106,7 @@ t_vec4 get_character(char character) {
 }
 
 t_font load_ttf_font(const char* path, unsigned int font_size) {
-  
+
   t_font font = { 0 };
   font.characters = malloc(96 * sizeof(t_font_character));
 
@@ -249,25 +249,25 @@ void draw_text_ttf(const char* text, t_font* font, t_vec2 position, t_color colo
                         (vec3){position.x, position.y, 0});
 
           glm_scale(mat4_model, (vec3){size.x, size.y, 1.0f});
-          
+
           char model_key[30];
-          sprintf_s(model_key, 30, "u_mat4_models[%d]", index);
+          sprintf(model_key, "u_mat4_models[%d]", index);
           glUniformMatrix4fv(glGetUniformLocation(font_shader, model_key), 1,
                               GL_FALSE, (float *)mat4_model);
 
           char slice_key[30];
-          sprintf_s(slice_key, 30, "u_texture_slices[%d]", index);
+          sprintf(slice_key, "u_texture_slices[%d]", index);
           glUniform4fv(glGetUniformLocation(font_shader, slice_key), 1,
                         (vec4){texture_slice.x, texture_slice.y,
                                 texture_slice.z, texture_slice.w});
 
-  
+
           pos_x += font->characters[character].advance;
           current_width += font->characters[character].advance;
 
           index ++;
 
-          if (index == 128) { 
+          if (index == 128) {
             glDrawArraysInstanced(GL_TRIANGLES, 0, 6, index - 1);
             index = 0;
           }
@@ -278,7 +278,7 @@ void draw_text_ttf(const char* text, t_font* font, t_vec2 position, t_color colo
         current_word_width = 0;
         current_word_length = 0;
       }
-      
+
       else if (character == 0) {
         pos_x += font->characters[0].advance;
       }
