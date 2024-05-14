@@ -23,7 +23,6 @@ static void on_button_mouse_enter() {
 }
 
 static void on_quit_button_clicked() {
-    printf("quit clicked\n");
     m_should_change_screen = true;
     m_should_change_screen_to = TITLE;
 }

@@ -42,7 +42,8 @@ static const char* s_text_about =
 
 static void s_on_slider_knob_button_pressed() { 
 
-    float value = (mouse_position().y - s_rect_slider.y) / s_rect_slider.height;
+    float value = (mouse_position().y - (s_rect_slider.y + s_button_slider_knob.sprite->texture.size.y / 2)) 
+        / (s_rect_slider.height - s_button_slider_knob.sprite->texture.size.y);
 
     if (value < 0)
         value = 0;
@@ -84,16 +85,12 @@ void draw_section_about(const float p_offset_x, const float p_offset_y) {
     glClear(GL_STENCIL_BUFFER_BIT);
     glStencilFunc(GL_ALWAYS, 1, 0xFF);
     glStencilMask(0xFF);
-    draw_ui_button(&s_button_slider_knob, 595, 32 + p_offset_y + s_value_scrolled * s_rect_slider.height, s_button_slider_knob.sprite->texture.size.x, s_button_slider_knob.sprite->texture.size.y);
+    draw_ui_button(&s_button_slider_knob, 595, 32 + p_offset_y + s_value_scrolled * (s_rect_slider.height - s_button_slider_knob.sprite->texture.size.y), s_button_slider_knob.sprite->texture.size.x, s_button_slider_knob.sprite->texture.size.y);
     
     glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
     if (!s_button_slider_knob.is_mouse_over && is_point_in_rect(mouse_position(), s_rect_slider)) {
 
         if (is_mouse_button_pressed(MOUSE_BUTTON_LEFT)) {
-            
-            float value = (mouse_position().y - s_rect_slider.y) / s_rect_slider.height;
-            s_value_scrolled = value;
-
             s_button_slider_knob.was_clicked = true;
             s_button_slider_knob.mouse_clicked_at = (t_vec2) { s_button_slider_knob.sprite->texture.size.x / 2, s_button_slider_knob.sprite->texture.size.y / 2};
         }
@@ -117,4 +114,10 @@ void draw_section_about(const float p_offset_x, const float p_offset_y) {
 
 void unload_section_about() {
 
+    delete_sprite(&s_sprite_section_background);
+    delete_sprite(&s_sprite_slider_background);
+    delete_sprite(&s_sprite_small_knob);
+    delete_sprite(&s_sprite_big_knob);
+
+    delete_ttf_font(&s_font_ui_s);
 }

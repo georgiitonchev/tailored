@@ -208,9 +208,6 @@ t_texture t_load_texture(const char *texture_path) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-  //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-  //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
@@ -218,13 +215,11 @@ t_texture t_load_texture(const char *texture_path) {
                texture_format, GL_UNSIGNED_BYTE, texture_data.data);
 
 
-  //glGenerateMipmap(GL_TEXTURE_2D);
-
   glBindTexture(GL_TEXTURE_2D, 0);
 
   stbi_image_free(texture_data.data);
 
-  t_texture texture;// = malloc(sizeof(t_texture));
+  t_texture texture;
       texture.id = texture_id;
       texture.size.x = texture_data.width;
       texture.size.y = texture_data.height;

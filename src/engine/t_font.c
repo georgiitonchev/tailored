@@ -16,6 +16,8 @@ static unsigned int font_quad_vao;
 static unsigned int font_shader;
 static t_texture font_texture;
 
+static mat4 s_mat4_projection;
+
 static float bake_font_bitmap(stbtt_fontinfo *font_info,
                                 float pixel_height,                     // height of font in pixels
                                 unsigned char *pixels, int pw, int ph,  // bitmap to be filled in
@@ -104,36 +106,11 @@ t_vec4 get_character(char character) {
 }
 
 static void draw_texture_slice(t_texture texture, t_vec4 texture_slice, t_vec2 position, t_vec2 size, t_color color) {
-  glUseProgram(font_shader);
 
-  mat4 mat4_projection;
-  glm_ortho(0, 640, 360, 0, 0.0, 1.0, mat4_projection);
+ 
+  
 
-  mat4 mat4_model;
-  glm_mat4_identity(mat4_model);
-  glm_translate(mat4_model,
-                (vec3){position.x, position.y, 0});
-  glm_scale(mat4_model, (vec3){size.x, size.y, 1.0f});
 
-  glUniformMatrix4fv(glGetUniformLocation(font_shader, "u_mat4_projection"),
-                      1, GL_FALSE, (float *)mat4_projection);
-
-  glUniformMatrix4fv(glGetUniformLocation(font_shader, "u_mat4_model"), 1,
-                      GL_FALSE, (float *)mat4_model);
-
-  glUniform4fv(glGetUniformLocation(font_shader, "u_color"), 1,
-                (vec4){color.r / 255.0f, color.g / 255.0f, color.b / 255.0f, color.a / 255.0f});
-
-  glUniform4fv(glGetUniformLocation(font_shader, "u_texture_slice"), 1,
-                (vec4){texture_slice.x, texture_slice.y,
-                        texture_slice.z, texture_slice.w});
-
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, texture.id);
-
-  glBindVertexArray(font_quad_vao);
-  glDrawArrays(GL_TRIANGLES, 0, 6);
-  glBindVertexArray(0);
 }
 
 t_font load_ttf_font(const char* path, unsigned int font_size) {
@@ -176,9 +153,16 @@ t_font load_ttf_font(const char* path, unsigned int font_size) {
   return font;
 }
 
+void delete_ttf_font(t_font* font) {
+  free(font->characters);
+  t_free_texture(&font->bitmap);
+}
+
 void init_font_renderer() {
     init_quad();
     init_shader();
+
+    glm_ortho(0, 640, 360, 0, 0.0, 1.0, s_mat4_projection);
 
     font_texture = t_load_texture("./res/textures/font.png");
 }
@@ -216,6 +200,18 @@ t_vec2 measure_text_size_ttf(const char* text, t_font* font) {
 
 void draw_text_ttf(const char* text, t_font* font, t_vec2 position, t_color color, int max_width) {
 
+  glUseProgram(font_shader);
+
+  glUniformMatrix4fv(glGetUniformLocation(font_shader, "u_mat4_projection"),
+                      1, GL_FALSE, (float *)s_mat4_projection);
+
+  glUniform4fv(glGetUniformLocation(font_shader, "u_color"), 1,
+                      (vec4){color.r / 255.0f, color.g / 255.0f, color.b / 255.0f, color.a / 255.0f});
+
+  glBindVertexArray(font_quad_vao);
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, font->bitmap.id);
+
   int text_length = (int) strlen(text);
   int pos_x = position.x;
   int pos_y = position.y;
@@ -225,6 +221,8 @@ void draw_text_ttf(const char* text, t_font* font, t_vec2 position, t_color colo
   int current_word_width = 0;
   int current_word_index = 0;
   int current_word_length = 0;
+
+  int index = 0;
 
   for (int i = 0; i < text_length; i++) {
 
@@ -250,24 +248,59 @@ void draw_text_ttf(const char* text, t_font* font, t_vec2 position, t_color colo
         for (int j = current_word_index; j < current_word_index + current_word_length + 1; j++) {
 
           character = text[j] - 32;
-          t_vec4 char_rect;
-          char_rect.x = font->characters[character].x;
-          char_rect.y = font->characters[character].y;
-          char_rect.z = font->characters[character].width;
-          char_rect.w = font->characters[character].height;
+          t_vec4 texture_slice;
+          texture_slice.x = font->characters[character].x;
+          texture_slice.y = font->characters[character].y;
+          texture_slice.z = font->characters[character].width;
+          texture_slice.w = font->characters[character].height;
 
-          draw_texture_slice(font->bitmap, char_rect, (t_vec2){ pos_x + font->characters[character].bearing_x, pos_y + font->characters[character].yoff }, (t_vec2){ char_rect.z, char_rect.w }, color);
+          t_vec2 position = (t_vec2){ pos_x + font->characters[character].bearing_x, pos_y + font->characters[character].yoff };
+          t_vec2 size = (t_vec2){ texture_slice.z, texture_slice.w };
+
+          mat4 mat4_model;
+          glm_mat4_identity(mat4_model);
+          glm_translate(mat4_model,
+                        (vec3){position.x, position.y, 0});
+
+          glm_scale(mat4_model, (vec3){size.x, size.y, 1.0f});
+          
+          char model_key[30];
+          sprintf_s(model_key, 30, "u_mat4_models[%d]", index);
+          glUniformMatrix4fv(glGetUniformLocation(font_shader, model_key), 1,
+                              GL_FALSE, (float *)mat4_model);
+
+          char slice_key[30];
+          sprintf_s(slice_key, 30, "u_texture_slices[%d]", index);
+          glUniform4fv(glGetUniformLocation(font_shader, slice_key), 1,
+                        (vec4){texture_slice.x, texture_slice.y,
+                                texture_slice.z, texture_slice.w});
+
+  
           pos_x += font->characters[character].advance;
           current_width += font->characters[character].advance;
+
+          index ++;
+
+          if (index == 128) { 
+            glDrawArraysInstanced(GL_TRIANGLES, 0, 6, index);
+            index = 0;
+          }
+
         }
 
         current_word_index = i + 1;
         current_word_width = 0;
         current_word_length = 0;
       }
+      
       else if (character == 0) { 
         pos_x += font->characters[0].advance;
       }
     }
   }
+  
+  glDrawArraysInstanced(GL_TRIANGLES, 0, 6, index);
+
+  glBindVertexArray(0);
+  glUseProgram(0);
 }

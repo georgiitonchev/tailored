@@ -372,7 +372,18 @@ void draw_section_saves(const float p_offset_x, const float p_offset_y) {
 }
 
 void unload_section_saves() {
+    destroy_list(s_list_saves);
 
+    delete_ttf_font(&s_font_ui_xs);
+    delete_ttf_font(&s_font_ui_s);
+    delete_ttf_font(&s_font_ui_m);
+
+    delete_sprite(&s_sprite_button);
+    delete_sprite(&s_sprite_button_selected);
+    delete_sprite(&s_sprite_section_background);
+    delete_sprite(&s_sprite_slider_background);
+    delete_sprite(&s_sprite_small_knob);
+    delete_sprite(&s_sprite_big_knob);
 }
 
 void set_on_save_file_loaded(void (*on_loaded)(struct t_ui_button*)) {

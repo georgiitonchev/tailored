@@ -234,5 +234,12 @@ void draw_section_settings(const float p_offset_x, const float p_offset_y) {
 }
 
 void unload_section_settings() {
+    
+    delete_ttf_font(&s_font_ui_s);
+    delete_ttf_font(&s_font_ui_l);
 
+    delete_sprite(&s_sprite_section_background);
+    delete_sprite(&s_sprite_slider_background);
+    delete_sprite(&s_sprite_small_knob);
+    delete_sprite(&s_sprite_big_knob);
 }

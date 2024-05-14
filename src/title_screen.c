@@ -34,7 +34,6 @@ extern t_screen m_should_change_screen_to;
 static t_sprite m_logo_sprite;
 static t_sprite m_button_sprite;
 static t_sprite m_button_sprite_selected;
-
 static t_sprite s_sprite_loading_bar;
 
 // UI
@@ -239,7 +238,19 @@ void load_title_screen() {
 }
 
 void unload_title_screen() {
+    
     uninit_fire_particles();
+
+    unload_section_saves();
+    unload_section_settings();
+    unload_section_about();
+
+    delete_sprite(&m_logo_sprite);
+    delete_sprite(&m_button_sprite);
+    delete_sprite(&m_button_sprite_selected);
+    delete_sprite(&s_sprite_loading_bar);
+
+    delete_ttf_font(&s_ui_font_l);
 }
 
 void update_title_screen() {
