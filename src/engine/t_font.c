@@ -231,16 +231,16 @@ void draw_text_ttf(const char* text, t_font* font, t_vec2 position, t_color colo
           pos_y += font->line_height;
         }
 
-        for (int j = current_word_index; j < current_word_index + current_word_length + 1; j++) {
+        for (int j = current_word_index; j < current_word_index + current_word_length; j++) {
 
-          character = text[j] - 32;
+          int w_character = text[j] - 32;
           t_vec4 texture_slice;
-          texture_slice.x = font->characters[character].x;
-          texture_slice.y = font->characters[character].y;
-          texture_slice.z = font->characters[character].width;
-          texture_slice.w = font->characters[character].height;
+          texture_slice.x = font->characters[w_character].x;
+          texture_slice.y = font->characters[w_character].y;
+          texture_slice.z = font->characters[w_character].width;
+          texture_slice.w = font->characters[w_character].height;
 
-          t_vec2 position = (t_vec2){ pos_x + font->characters[character].bearing_x, pos_y + font->characters[character].yoff };
+          t_vec2 position = (t_vec2){ pos_x + font->characters[w_character].bearing_x, pos_y + font->characters[w_character].yoff };
           t_vec2 size = (t_vec2){ texture_slice.z, texture_slice.w };
 
           mat4 mat4_model;
@@ -262,16 +262,15 @@ void draw_text_ttf(const char* text, t_font* font, t_vec2 position, t_color colo
                                 texture_slice.z, texture_slice.w});
 
   
-          pos_x += font->characters[character].advance;
-          current_width += font->characters[character].advance;
+          pos_x += font->characters[w_character].advance;
+          current_width += font->characters[w_character].advance;
 
           index ++;
 
           if (index == 128) { 
-            glDrawArraysInstanced(GL_TRIANGLES, 0, 6, index - 1);
+            glDrawArraysInstanced(GL_TRIANGLES, 0, 6, index);
             index = 0;
           }
-
         }
 
         current_word_index = i + 1;
@@ -279,13 +278,13 @@ void draw_text_ttf(const char* text, t_font* font, t_vec2 position, t_color colo
         current_word_length = 0;
       }
       
-      else if (character == 0) {
+      if (character == 0) {
         pos_x += font->characters[0].advance;
       }
     }
   }
 
-  glDrawArraysInstanced(GL_TRIANGLES, 0, 6, index - 1);
+  glDrawArraysInstanced(GL_TRIANGLES, 0, 6, index);
 
   glBindVertexArray(0);
   glUseProgram(0);
