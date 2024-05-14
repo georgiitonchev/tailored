@@ -282,7 +282,7 @@ void draw_text_ttf(const char* text, t_font* font, t_vec2 position, t_color colo
           index ++;
 
           if (index == 128) { 
-            glDrawArraysInstanced(GL_TRIANGLES, 0, 6, index);
+            glDrawArraysInstanced(GL_TRIANGLES, 0, 6, index - 1);
             index = 0;
           }
 
@@ -293,13 +293,13 @@ void draw_text_ttf(const char* text, t_font* font, t_vec2 position, t_color colo
         current_word_length = 0;
       }
       
-      else if (character == 0) { 
+      else if (character == 0) {
         pos_x += font->characters[0].advance;
       }
     }
   }
-  
-  glDrawArraysInstanced(GL_TRIANGLES, 0, 6, index);
+
+  glDrawArraysInstanced(GL_TRIANGLES, 0, 6, index - 1);
 
   glBindVertexArray(0);
   glUseProgram(0);

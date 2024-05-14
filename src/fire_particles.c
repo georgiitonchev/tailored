@@ -97,7 +97,6 @@ void init_fire_particles(unsigned int count_particles_max) {
     s_window_size = t_window_size();
 
     init_quad();
-
     glm_ortho(0, s_window_size.x, s_window_size.y, 0, 0.0, 1.0, s_mat4_projection);
 
     s_list_particles = create_list(sizeof(t_particle));
@@ -107,6 +106,10 @@ void init_fire_particles(unsigned int count_particles_max) {
 
         t_particle* particle = (t_particle*)malloc(sizeof(t_particle));
         init_particle(particle);
+
+        particle->rect.x = s_window_size.x;
+        particle->life_current /= 2;
+
         add_to_list(s_list_particles, particle);
     }
 }
