@@ -2,9 +2,12 @@
 #include "./engine/t_sprite.h"
 #include "./engine/t_ui.h"
 
-#include "stdio.h"
-#include "stdbool.h"
-#include "stdlib.h"
+#include <stdio.h>
+#include <stdbool.h>
+#include <stdlib.h>
+
+#include <threads.h>
+#include <stdatomic.h>
 
 #include "./engine/tailored.h"
 #include "./engine/t_list.h"
@@ -75,13 +78,59 @@ static float s_offset_y_about = 0;
 static float s_left_side_offset_x = 0;
 static float s_right_side_offset_x = 0;
 
-// BUTTON CALLBACKS
+static float s_timer_load_initial = 0;
+static bool s_show_loading_bar = false;
+static atomic_int s_loading_progress = 0;
+static atomic_bool s_loading_finished = false;
+static thrd_t s_thread;
+
+static const char* resource_paths[] = 
+    {   
+        "./res/textures/imps_fairies_logo.png", 
+        "./res/textures/panel-transparent-center-030.png", 
+        "./res/textures/panel-transparent-center-029.png",
+        "./res/textures/large_1.jpg",
+        "./res/textures/large_1.jpg",
+        "./res/textures/large_1.jpg",
+        "./res/textures/large_1.jpg",
+        "./res/textures/large_1.jpg",
+        "./res/textures/large_1.jpg",
+        "./res/textures/large_1.jpg",
+        "./res/textures/large_1.jpg",
+        "./res/textures/large_1.jpg",
+    };
+
+
+typedef struct load_resources {
+
+    const char** resource_paths;
+    unsigned int count;
+
+    t_texture_data* data;
+} load_resources;
+
+static load_resources resources;
+
+// pass in paths, return data, load sprites
+static int s_load_resources(void* args) {
+
+    load_resources* resources = (load_resources*) args;
+    t_texture_data* texture_data = malloc(resources->count * sizeof(t_texture_data));
+
+    for (unsigned int i = 0; i < resources->count; i++) { 
+        printf("Loading resource: %s\n" , resources->resource_paths[i]);
+        texture_data[i] = t_load_texture_data(resources->resource_paths[i]);
+        atomic_store_explicit(&s_loading_progress, (int)(((float)i / resources->count) * 100), memory_order_relaxed);
+    }
+
+    resources->data = texture_data;
+    atomic_store_explicit(&s_loading_finished, true, memory_order_relaxed);
+    return 0;
+}
 
 static void on_button_mouse_enter() {
      //t_play_audio("./res/audio/click_003.wav");
 }
-
-static bool s_show_loading_bar = false;
 
 static void on_button_start_cicked(t_ui_button* button) {
     UNUSED(button);
@@ -184,6 +233,7 @@ static void on_about_button_clicked() {
 
 void load_title_screen() {
 
+    s_timer_load_initial = 0;
     s_ease_in_left_side = true;
 
     load_section_saves();
@@ -193,33 +243,16 @@ void load_title_screen() {
     load_section_about();
 
     s_ui_font_l = load_ttf_font("./res/fonts/Eczar-Regular.ttf", 42);
-
+    
     create_sprite("./res/textures/loading_bar.png", &s_sprite_loading_bar);
-    create_sprite("./res/textures/imps_fairies_logo.png", &m_logo_sprite);
 
-    create_sprite("./res/textures/panel-transparent-center-030.png", &m_button_sprite);
-    m_button_sprite.slice_borders = (t_vec4){ 16, 16, 16, 16 };
+    resources.resource_paths = resource_paths;
+    resources.count = 12;
 
-    create_sprite("./res/textures/panel-transparent-center-029.png", &m_button_sprite_selected);
-    m_button_sprite_selected.slice_borders = (t_vec4){ 16, 16, 16, 16 };
-
-    m_characters_button = create_ui_button(&m_button_sprite);
-    m_characters_button.color_default = CC_LIGHT_RED;
-    m_characters_button.color_disabled = CC_RED;
-    m_characters_button.on_released = on_characters_button_clicked;
-    m_characters_button.on_mouse_enter = on_button_mouse_enter;
-
-    m_settings_button = create_ui_button(&m_button_sprite);
-    m_settings_button.color_default = CC_LIGHT_RED;
-    m_settings_button.color_disabled = CC_RED;
-    m_settings_button.on_released = on_settings_button_clicked;
-    m_settings_button.on_mouse_enter = on_button_mouse_enter;
-
-    m_about_button = create_ui_button(&m_button_sprite);
-    m_about_button.color_default = CC_LIGHT_RED;
-    m_about_button.color_disabled = CC_RED;
-    m_about_button.on_released = on_about_button_clicked;
-    m_about_button.on_mouse_enter = on_button_mouse_enter;
+    int result = thrd_create(&s_thread, s_load_resources, &resources);
+    if (result != thrd_success) {
+        printf("thrd_create failed, error: %d\n", result);
+    }
 
     init_fire_particles(50);
 
@@ -260,9 +293,89 @@ void update_title_screen() {
 
 }
 
+static bool s_loaded = false;
+
 void draw_title_screen() {
 
     t_clear_color(CC_BLACK);
+    
+    if (!s_loaded && atomic_load_explicit(&s_loading_finished, memory_order_relaxed)) {
+        s_loaded = true;
+        int result = thrd_join(s_thread, NULL);
+        if (result != thrd_success) {
+            printf("thrd_join failed, error: %d\n", result);
+        } else {
+
+            t_texture texture_logo = t_load_texture_from_data(&resources.data[0]);
+            create_sprite_t(&texture_logo, &m_logo_sprite);
+
+            t_texture texture_button = t_load_texture_from_data(&resources.data[1]);
+            create_sprite_t(&texture_button, &m_button_sprite);
+            m_button_sprite.slice_borders = (t_vec4){ 16, 16, 16, 16 };
+
+            t_texture texture_button_selected = t_load_texture_from_data(&resources.data[2]);
+            create_sprite_t(&texture_button_selected, &m_button_sprite_selected);
+            m_button_sprite_selected.slice_borders = (t_vec4){ 16, 16, 16, 16 };
+
+            m_characters_button = create_ui_button(&m_button_sprite);
+            m_characters_button.color_default = CC_LIGHT_RED;
+            m_characters_button.color_disabled = CC_RED;
+            m_characters_button.on_released = on_characters_button_clicked;
+            m_characters_button.on_mouse_enter = on_button_mouse_enter;
+
+            m_settings_button = create_ui_button(&m_button_sprite);
+            m_settings_button.color_default = CC_LIGHT_RED;
+            m_settings_button.color_disabled = CC_RED;
+            m_settings_button.on_released = on_settings_button_clicked;
+            m_settings_button.on_mouse_enter = on_button_mouse_enter;
+
+            m_about_button = create_ui_button(&m_button_sprite);
+            m_about_button.color_default = CC_LIGHT_RED;
+            m_about_button.color_disabled = CC_RED;
+            m_about_button.on_released = on_about_button_clicked;
+            m_about_button.on_mouse_enter = on_button_mouse_enter;
+        }
+    } else if (!s_loaded) {    
+        draw_sprite(&s_sprite_loading_bar, 
+            (t_window_size().x - s_sprite_loading_bar.texture.size.x) / 2, 
+            (t_window_size().y - s_sprite_loading_bar.texture.size.y) / 2,
+            s_sprite_loading_bar.texture.size.x,
+            s_sprite_loading_bar.texture.size.y, CC_RED);
+        
+        draw_rect(
+            (t_window_size().x - s_sprite_loading_bar.texture.size.x) / 2, 
+            t_window_size().y / 2 - s_sprite_loading_bar.texture.size.y / 4,
+            s_sprite_loading_bar.texture.size.x * ((float)atomic_load_explicit(&s_loading_progress, memory_order_relaxed) / 100),
+            s_sprite_loading_bar.texture.size.y / 2, CC_RED);
+
+        return;
+    }
+
+    if (s_timer_load_initial < .5f)
+    {
+        s_timer_load_initial += t_delta_time();
+        return;
+    }
+
+    if (s_ease_in_left_side) {
+
+        float progress = t_ease_out_quint(&s_ease_out_timer_left_side, &s_left_side_offset_x, -256, 0, .5f);
+
+        if (progress >= 1) {
+            s_ease_out_timer_left_side = 0;
+            s_ease_in_left_side = false;
+        }
+    }
+
+    if (s_ease_out_left_side) {
+
+        float progress = t_ease_out_quint(&s_ease_out_timer_left_side, &s_left_side_offset_x, 0, -256, .5f);
+
+        if (progress >= 1) {
+            s_ease_out_timer_left_side = 0;
+            s_ease_out_left_side = false;
+        }
+    }
 
     draw_sprite(&m_logo_sprite, 0 + s_left_side_offset_x, 0, m_logo_sprite.texture.size.x, m_logo_sprite.texture.size.y, CC_LIGHT_RED);
 
@@ -278,9 +391,6 @@ void draw_title_screen() {
 
     t_vec2 text_size_settings = measure_text_size_ttf("Settings", &s_ui_font_l);
     draw_text_ttf("Settings", &s_ui_font_l, (t_vec2) {64 + (128 - text_size_settings.x) / 2 + s_left_side_offset_x, 204 + (48 + text_size_settings.y) / 2}, CC_BLACK, 0);
-
-    t_vec2 text_size_about = measure_text_size_ttf("About", &s_ui_font_l);
-    draw_text_ttf("About", &s_ui_font_l, (t_vec2) {64 + (128 - text_size_about.x) / 2 + s_left_side_offset_x, 268 + (48 + text_size_about.y) / 2}, CC_BLACK, 0);
 
     if (s_ease_in_characters) {
         float progress = t_ease_out_quint(&s_ease_out_timer_characters, &s_offset_y_characters, 360, 0, .5f);
@@ -342,26 +452,7 @@ void draw_title_screen() {
         }
     }
 
-    if (s_ease_in_left_side) {
-
-        float progress = t_ease_out_quint(&s_ease_out_timer_left_side, &s_left_side_offset_x, -256, 0, .5f);
-
-        if (progress >= 1) {
-            s_ease_out_timer_left_side = 0;
-            s_ease_in_left_side = false;
-        }
-    }
-
-    if (s_ease_out_left_side) {
-
-        float progress = t_ease_out_quint(&s_ease_out_timer_left_side, &s_left_side_offset_x, 0, -256, .5f);
-
-        if (progress >= 1) {
-            s_ease_out_timer_left_side = 0;
-            s_ease_out_left_side = false;
-        }
-    }
-
+   
     if (s_ease_out_right_side) {
 
         float progress = t_ease_out_quint(&s_ease_out_timer_right_side, &s_right_side_offset_x, 0, 384, .5f);
@@ -371,6 +462,10 @@ void draw_title_screen() {
             s_ease_out_right_side = false;
         }
     }
+
+
+    t_vec2 text_size_about = measure_text_size_ttf("About", &s_ui_font_l);
+    draw_text_ttf("About", &s_ui_font_l, (t_vec2) {64 + (128 - text_size_about.x) / 2 + s_left_side_offset_x, 268 + (48 + text_size_about.y) / 2}, CC_BLACK, 0);
 
     if (m_draw_characters) {
         draw_section_saves(s_right_side_offset_x, s_offset_y_characters);

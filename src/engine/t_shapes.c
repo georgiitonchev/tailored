@@ -87,6 +87,10 @@ bool is_rect_in_rect(t_rect this, t_rect that) {
            this.y >= that.y && this.y + this.height <= that.y + that.height;
 }
 
+bool is_rect_zero(t_rect rect) { 
+    return rect.x == 0 && rect.y == 0 && rect.width == 0 && rect.height == 0;
+}
+
 bool does_rect_overlap_rect(t_rect this, t_rect that) {
 
     if (this.x + this.width <= that.x || that.x + that.width <= this.x)

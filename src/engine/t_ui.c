@@ -13,6 +13,7 @@ extern t_rect clip_areas[2];
 // STATIC
 static int m_currently_over_ui = 0;
 static t_rect m_focused_rect;
+static t_rect s_ui_raycast_block = { 0 };
 
 t_ui_button create_ui_button(t_sprite* sprite) {
 
@@ -20,11 +21,19 @@ t_ui_button create_ui_button(t_sprite* sprite) {
 
     ui_button.user_data = NULL;
 
+    ui_button.font = NULL;
+    ui_button.text = NULL;
+
     ui_button.sprite = sprite;
     ui_button.color_default = WHITE;
     ui_button.color_mouseover = LIGHT_GRAY;
     ui_button.color_clicked = DARK_GRAY;
     ui_button.color_disabled = DARK_GRAY;
+
+    ui_button.color_text_default = BLACK;
+    ui_button.color_text_mouseover = DARK_GRAY;
+    ui_button.color_text_clicked = LIGHT_GRAY;
+    ui_button.color_text_disabled = DARK_GRAY;
 
     ui_button.is_mouse_over = false;
     ui_button.was_clicked = false;
@@ -40,6 +49,48 @@ t_ui_button create_ui_button(t_sprite* sprite) {
     return ui_button;
 }
 
+t_ui_button create_ui_button_s() {
+
+}
+
+t_ui_button create_ui_button_t(t_font* font, const char* text) { 
+
+    t_ui_button ui_button;
+
+    ui_button.user_data = NULL;
+
+    ui_button.font = font;
+    ui_button.text = text;
+
+    ui_button.sprite = NULL;
+    ui_button.color_default = WHITE;
+    ui_button.color_mouseover = LIGHT_GRAY;
+    ui_button.color_clicked = DARK_GRAY;
+    ui_button.color_disabled = DARK_GRAY;
+
+    ui_button.color_text_default = BLACK;
+    ui_button.color_text_mouseover = DARK_GRAY;
+    ui_button.color_text_clicked = LIGHT_GRAY;
+    ui_button.color_text_disabled = DARK_GRAY;
+
+    ui_button.is_mouse_over = false;
+    ui_button.was_clicked = false;
+    ui_button.is_selected = false;
+    ui_button.is_disabled = false;
+
+    ui_button.on_released = NULL;
+    ui_button.on_mouse_enter = NULL;
+    ui_button.on_mouse_exit = NULL;
+    ui_button.on_pressed = NULL;
+    ui_button.mouse_clicked_at = VEC2_ZERO;
+
+    return ui_button;
+}
+
+t_ui_button create_ui_button_st() {
+
+}
+
 void draw_ui_button(t_ui_button* button, int x, int y, int width, int height) {
 
     if (clip_areas[0].width + clip_areas[0].height > 0) {
@@ -48,11 +99,13 @@ void draw_ui_button(t_ui_button* button, int x, int y, int width, int height) {
     }
 
     t_color color = button->color_default;
+    t_color color_text = button->color_text_default;
 
     if (button->is_disabled) { 
         color = button->color_disabled;
+        color_text = button->color_text_disabled;
     }
-    else { 
+    else if (is_rect_zero(s_ui_raycast_block) || !is_point_in_rect(mouse_position(), s_ui_raycast_block) ){ 
         bool is_mouse_inside_clip_area =
             clip_areas[0].width + clip_areas[0].height > 0 ? 
             is_point_in_rect(input_state.mouse_state.position, clip_areas[0]) : true;
@@ -67,14 +120,17 @@ void draw_ui_button(t_ui_button* button, int x, int y, int width, int height) {
             }
 
             color = button->color_mouseover;
+            color_text = button->color_text_mouseover;
 
             if (!button->was_clicked && is_mouse_button_pressed(MOUSE_BUTTON_LEFT)) {
                 button->was_clicked = true;
                 button->mouse_clicked_at = t_vec2_sub(input_state.mouse_state.position, (t_vec2){ x, y });
             }
 
-            if (button->was_clicked)
+            if (button->was_clicked) {
                 color = button->color_clicked;
+                color_text = button->color_text_clicked;
+            }
 
             if (is_mouse_button_released(MOUSE_BUTTON_LEFT))
                 if (button->was_clicked && button->on_released)
@@ -94,11 +150,21 @@ void draw_ui_button(t_ui_button* button, int x, int y, int width, int height) {
             button->on_pressed(button);
         }
 
-        if (button->is_selected)
+        if (button->is_selected) {
             color = button->color_clicked;
+            color_text = button->color_text_clicked;
+        }
     }
 
-    draw_sprite(button->sprite, x, y, width, height, color);
+    if (button->sprite != NULL) {
+        draw_sprite(button->sprite, x, y, width, height, color);
+    }
+
+    if (button->text != NULL && button->font != NULL) {
+
+        t_vec2 text_size = measure_text_size_ttf(button->text, button->font);
+        draw_text_ttf(button->text, button->font, (t_vec2) { x + (width - text_size.x) / 2, y + (height + text_size.y ) / 2}, color_text, 0);
+    }
 }
 
 t_ui_dropdown create_ui_dropdown(t_sprite* sprite, t_rect rect) {
@@ -197,6 +263,17 @@ void draw_ui_dropdown(t_ui_dropdown* dropdown) {
     //     (Vector2) { dropdown->rect.x + dropdown->rect.width - 16 - (dropdown->rect.height / 3) / 2,  dropdown->rect.y + dropdown->rect.height / 2 - (dropdown->rect.height / 3) / 2 + (dropdown->rect.height / 3)},
     //     (Vector2) { dropdown->rect.x + dropdown->rect.width - 16, dropdown->rect.y + dropdown->rect.height / 2 - (dropdown->rect.height / 3) / 2 }, 
     //     WHITE);
+}
+
+void set_ui_raycast_block(int x, int y, int width, int height) {
+    s_ui_raycast_block.x = x;
+    s_ui_raycast_block.y = y;
+    s_ui_raycast_block.width = width;
+    s_ui_raycast_block.height = height;
+}
+
+void set_ui_raycast_block_r(t_rect rect) {
+    set_ui_raycast_block(rect.x, rect.y, rect.width, rect.height);
 }
 
 void clear_ui() {

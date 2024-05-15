@@ -57,7 +57,7 @@ static t_ui_button s_button_load;
 static t_list* s_list_saves;
 static float s_scroll_area_offset;
 static float s_scroll_area_width;
-static t_ui_button* s_selected_save;
+static t_ui_button* s_selected_save = NULL;
 static t_rect s_rect_slider;
 static void (*s_on_loaded)(struct t_ui_button*);
 
@@ -390,6 +390,9 @@ void unload_section_saves() {
     delete_sprite(&s_sprite_slider_background);
     delete_sprite(&s_sprite_small_knob);
     delete_sprite(&s_sprite_big_knob);
+
+    s_selected_save = NULL;
+    s_scroll_area_offset = 0;
 }
 
 void set_on_save_file_loaded(void (*on_loaded)(struct t_ui_button*)) {

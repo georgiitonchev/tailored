@@ -4,6 +4,7 @@
 #include "./engine/t_font.h"
 #include "./engine/t_sprite.h"
 #include "./engine/t_input.h"
+#include "./engine/t_shapes.h"
 #include "./engine/t_ui.h"
 
 #include "game.h"
@@ -29,20 +30,42 @@ static t_sprite m_button_sprite;
 static t_ui_button s_button_quit;
 static t_ui_button s_button_save;
 
+static t_ui_button s_button_quit_yes;
+static t_ui_button s_button_quit_no;
+
 static t_ui_button s_button_position;
 
 // STATE
 static t_vec2 s_saved_position;
 static cJSON* s_json_data;
 
+static bool s_has_saved = true;
+static bool s_prompt_save = false;
+
 static void s_on_button_position_pressed(t_ui_button* button) {
     s_saved_position = t_vec2_sub(mouse_position(), button->mouse_clicked_at);
+    s_has_saved = false;
+}
+
+static void s_on_button_quit_yes_clicked() {
+
+    m_should_change_screen = true;
+    m_should_change_screen_to = TITLE;
+    s_prompt_save = false;
+}
+
+static void s_on_button_quit_no_clicked() {
+    s_prompt_save = false;
 }
 
 static void s_on_button_quit_clicked() {
 
-    m_should_change_screen = true;
-    m_should_change_screen_to = TITLE;
+    if (s_has_saved) { 
+        m_should_change_screen = true;
+        m_should_change_screen_to = TITLE;
+    } else {
+        s_prompt_save = true;
+    }
 }
 
 static void s_on_button_save_clicked() {
@@ -67,6 +90,8 @@ static void s_on_button_save_clicked() {
     } else {
         printf("Save file updated successfuly - %s.\n", g_save_file);
     }
+
+    s_has_saved = true;
 }
 
 static void s_load_save_file() { 
@@ -99,6 +124,8 @@ static void s_load_save_file() {
 
 void load_game_screen() {
 
+    s_has_saved = true;
+    s_prompt_save = false;
     s_saved_position = VEC2_ZERO;
 
     s_ui_font_m = load_ttf_font("./res/fonts/Eczar-Regular.ttf", 34);
@@ -120,6 +147,12 @@ void load_game_screen() {
     s_button_position.color_default = CC_LIGHT_RED;
     s_button_position.color_disabled = CC_RED;
     s_button_position.on_pressed = s_on_button_position_pressed;
+
+    s_button_quit_yes = create_ui_button_t(&s_ui_font_m, "Yes");
+    s_button_quit_yes.on_released = s_on_button_quit_yes_clicked;
+
+    s_button_quit_no = create_ui_button_t(&s_ui_font_m, "No");
+    s_button_quit_no.on_released = s_on_button_quit_no_clicked;
 
     s_load_save_file();
 }
@@ -147,5 +180,33 @@ void draw_game_screen() {
     draw_ui_button(&s_button_save, 16, 56, 96, 32);
     t_vec2 size_text_save = measure_text_size_ttf("Save", &s_ui_font_m);
     draw_text_ttf("Save", &s_ui_font_m, (t_vec2) { 16 + (96 - size_text_save.x) / 2, 56 + (32 + size_text_save.y) / 2}, CC_BLACK, 0);
+
+
+    if (s_prompt_save) {
+        t_color modal_background_color = CC_BLACK;
+        modal_background_color.a /= 2;
+
+        set_ui_raycast_block_r(RECT_ZERO);
+
+        draw_rect(0, 0, t_window_size().x, t_window_size().y, modal_background_color);
+        draw_sprite(&m_button_sprite, (t_window_size().x - 256) / 2, (t_window_size().y - 128) / 2, 256, 128, CC_LIGHT_RED);
+
+        t_vec2 size_text = measure_text_size_ttf("Exit without saving?", &s_ui_font_m);
+        draw_text_ttf("Exit without saving?", &s_ui_font_m, (t_vec2){(t_window_size().x - size_text.x) / 2, (t_window_size().y + size_text.y) / 2 - size_text.y}, CC_BLACK, 0);
+
+        t_vec2 size_text_no = measure_text_size_ttf("No", &s_ui_font_m);
+        draw_ui_button(&s_button_quit_no, 
+            (t_window_size().x - size_text.x) / 2 + 32, (t_window_size().y - 128) / 2 + 128 - 48, size_text_no.x, size_text_no.y);
+
+        t_vec2 size_text_yes = measure_text_size_ttf("Yes", &s_ui_font_m);
+        draw_ui_button(&s_button_quit_yes,
+            (t_window_size().x - size_text.x) / 2 + size_text.x - size_text_yes.x - 32, (t_window_size().y - 128) / 2 + 128 - 48, size_text_yes.x, size_text_yes.y);
+
+        set_ui_raycast_block(0, 0, t_window_size().x, t_window_size().y);
+    }
+
+    if (!s_prompt_save)
+        set_ui_raycast_block_r(RECT_ZERO);
+
     clear_ui();
 }

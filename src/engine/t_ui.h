@@ -3,6 +3,7 @@
 
 #include "tailored.h"
 #include "t_sprite.h"
+#include "t_font.h"
 
 typedef struct t_ui_button {
     t_sprite* sprite;
@@ -11,6 +12,13 @@ typedef struct t_ui_button {
     t_color color_mouseover;
     t_color color_clicked;
     t_color color_disabled;
+
+    t_font* font;
+    const char* text;
+    t_color color_text_default;
+    t_color color_text_mouseover;
+    t_color color_text_clicked;
+    t_color color_text_disabled;
 
     void (*on_released)(struct t_ui_button*);
     void (*on_mouse_enter)();
@@ -61,9 +69,14 @@ typedef struct t_ui_padding {
 } t_ui_padding;
 
 t_ui_button create_ui_button(t_sprite* sprite);
+t_ui_button create_ui_button_t(t_font* font, const char* text);
+
 void draw_ui_button(t_ui_button* button, int x, int y, int width, int height);
 
 t_ui_dropdown create_ui_dropdown(t_sprite* sprite, t_rect rect);
 void draw_ui_dropdown(t_ui_dropdown* dropdown);
+
+void set_ui_raycast_block(int x, int y, int width, int height);
+void set_ui_raycast_block_r(t_rect rect);
 
 void clear_ui();
