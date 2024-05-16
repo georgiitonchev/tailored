@@ -6,9 +6,6 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#include <threads.h>
-#include <stdatomic.h>
-
 #include "./engine/tailored.h"
 #include "./engine/t_list.h"
 #include "./engine/t_shapes.h"
@@ -38,7 +35,6 @@ static t_sprite s_sprite_button;
 static t_sprite s_sprite_button_selected;
 static t_sprite s_sprite_loading_bar;
 
-// UI
 //  BUTTONS
 static t_ui_button m_characters_button;
 static t_ui_button m_settings_button;
@@ -203,7 +199,7 @@ int load_title_screen(void* args) {
     return 0;
 }
 
-void init_title_screen() { 
+void init_title_screen() {
 
     s_ui_font_l = load_ttf_font("./res/fonts/Eczar-Regular.ttf", 42);
 
@@ -356,7 +352,7 @@ void draw_title_screen() {
         }
     }
 
-   
+
     if (s_ease_out_right_side) {
 
         float progress = t_ease_out_quint(&s_ease_out_timer_right_side, &s_right_side_offset_x, 0, 384, .5f);
@@ -382,17 +378,17 @@ void draw_title_screen() {
     }
 
     if (s_show_loading_bar) {
-        draw_sprite(&s_sprite_loading_bar, 
-            (t_window_size().x - s_sprite_loading_bar.texture_data.width) / 2, 
+        draw_sprite(&s_sprite_loading_bar,
+            (t_window_size().x - s_sprite_loading_bar.texture_data.width) / 2,
             (t_window_size().y - s_sprite_loading_bar.texture_data.height) / 2,
             s_sprite_loading_bar.texture_data.width,
             s_sprite_loading_bar.texture_data.height, CC_RED);
-        
+
         float loading_bar_width = 0;
         float progress = t_ease_out_quint(&s_timer_loading, &loading_bar_width, 0, s_sprite_loading_bar.texture_data.width, 3.0f);
 
         draw_rect(
-            (t_window_size().x - s_sprite_loading_bar.texture_data.width) / 2, 
+            (t_window_size().x - s_sprite_loading_bar.texture_data.width) / 2,
             t_window_size().y / 2 - s_sprite_loading_bar.texture_data.height / 4,
             loading_bar_width,
             s_sprite_loading_bar.texture_data.height / 2, CC_RED);

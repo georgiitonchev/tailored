@@ -12,11 +12,22 @@
 
 #include "./engine/extern/stb_truetype.h"
 
-#include <threads.h>
 #include <stdatomic.h>
 
 static bool s_loading = false;
-static thrd_t s_loading_thread;
+
+#ifdef _WIN32
+    #include <threads.h>
+    static thrd_t s_thread;
+        #define CREATE_THREAD(thread, func) thrd_create(thread, func, NULL)
+        #define JOIN_THREAD(thread) thrd_join(thread)
+#else
+    #include <pthread.h>
+    static pthread_t s_thread;
+        #define CREATE_THREAD(thread, func) pthread_create(thread, NULL, func, NULL)
+        #define JOIN_THREAD(thread) pthread_join(thread, NULL)
+#endif
+
 static atomic_int s_loading_progress = 0;
 static atomic_bool s_loading_finished = false;
 
@@ -77,14 +88,14 @@ int main() {
                 case NONE: break;
             }
 
-            if (load_screen != NULL) { 
+            if (load_screen != NULL) {
 
                 s_loading = true;
                 s_loading_finished = false;
                 s_loading_progress = 0;
 
-                int result = thrd_create(&s_loading_thread, load_screen, NULL);
-                if (result != thrd_success) { 
+                int result = CREATE_THREAD(&s_thread, load_screen);
+                if (result != 0) {
                     printf("thrd_create failed, error: %d\n", result);
                 } else {
                     printf("Loading screen started.\n");
@@ -96,11 +107,11 @@ int main() {
 
         if (s_loading) {
 
-            if (atomic_load_explicit(&s_loading_finished, memory_order_relaxed)) { 
+            if (atomic_load_explicit(&s_loading_finished, memory_order_relaxed)) {
                 s_loading = false;
 
-                int result = thrd_join(s_loading_thread, NULL);
-                if (result != thrd_success) {
+                int result = JOIN_THREAD(s_thread);
+                if (result != 0) {
                     printf("thrd_join failed, error: %d\n", result);
                 } else {
                     printf("Loading screen finished.\n");
@@ -117,21 +128,21 @@ int main() {
             }
             else {
                 t_clear_color(CC_BLACK);
-                draw_sprite(&s_sprite_loading_bar, 
-                    (t_window_size().x - s_sprite_loading_bar.texture_data.width) / 2, 
+                draw_sprite(&s_sprite_loading_bar,
+                    (t_window_size().x - s_sprite_loading_bar.texture_data.width) / 2,
                     (t_window_size().y - s_sprite_loading_bar.texture_data.height) / 2,
                     s_sprite_loading_bar.texture_data.width,
                     s_sprite_loading_bar.texture_data.height, CC_RED);
-                
+
                 draw_rect(
-                    (t_window_size().x - s_sprite_loading_bar.texture_data.width) / 2, 
+                    (t_window_size().x - s_sprite_loading_bar.texture_data.width) / 2,
                     t_window_size().y / 2 - s_sprite_loading_bar.texture_data.height / 4,
                     s_sprite_loading_bar.texture_data.width * ((float)atomic_load_explicit(&s_loading_progress, memory_order_relaxed) / 10),
                     s_sprite_loading_bar.texture_data.height / 2, CC_RED);
             }
         }
 
-        if (!s_loading) { 
+        if (!s_loading) {
             switch (m_current_screen)
             {
                 case SPLASH: draw_splash_screen(); break;
@@ -140,7 +151,7 @@ int main() {
                 case NONE: break;
             }
         }
-       
+
         t_draw_scene();
         t_loop_end();
     }
