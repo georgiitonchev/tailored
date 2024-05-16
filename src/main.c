@@ -28,6 +28,8 @@ static bool s_loading = false;
         #define JOIN_THREAD(thread) pthread_join(thread, NULL)
 #endif
 
+static float s_loading_buffer = 0;
+
 static atomic_int s_loading_progress = 0;
 static atomic_bool s_loading_finished = false;
 
@@ -93,7 +95,7 @@ int main() {
                 s_loading = true;
                 s_loading_finished = false;
                 s_loading_progress = 0;
-
+                s_loading_buffer = 0;
                 int result = CREATE_THREAD(&s_thread, load_screen);
                 if (result != 0) {
                     printf("thrd_create failed, error: %d\n", result);
@@ -106,7 +108,7 @@ int main() {
         }
 
         if (s_loading) {
-
+            s_loading_buffer += t_delta_time();
             if (atomic_load_explicit(&s_loading_finished, memory_order_relaxed)) {
                 s_loading = false;
 
@@ -126,7 +128,7 @@ int main() {
                     printf("Initializing screen finished.\n");
                 }
             }
-            else {
+            else if (s_loading_buffer > .15f){
                 t_clear_color(CC_BLACK);
                 draw_sprite(&s_sprite_loading_bar,
                     (t_window_size().x - s_sprite_loading_bar.texture_data.width) / 2,
