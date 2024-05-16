@@ -19,6 +19,7 @@
 extern char* g_save_file; 
 
 // FONTS
+static t_font s_font_ui_s;
 static t_font s_font_ui_m;
 
 // SPRITES
@@ -26,8 +27,9 @@ static t_sprite s_sprite_button;
 static t_sprite s_sprite_spritesheet_idle;
 
 // UI
-static t_ui_button s_button_quit;
 static t_ui_button s_button_save;
+static t_ui_button s_button_reset;
+static t_ui_button s_button_quit;
 
 static t_ui_button s_button_quit_yes;
 static t_ui_button s_button_quit_no;
@@ -41,9 +43,12 @@ static cJSON* s_json_data;
 static bool s_has_saved = true;
 static bool s_prompt_save = false;
 
+static bool s_drawing_categories = true;
+static bool s_drawing_options = false;
+
 static void s_on_button_position_pressed(t_ui_button* button) {
-    s_saved_position = t_vec2_sub(mouse_position(), button->mouse_clicked_at);
-    s_has_saved = false;
+    s_drawing_categories = !s_drawing_categories;
+    s_drawing_options = !s_drawing_options;
 }
 
 static void s_on_button_quit_yes_clicked() {
@@ -91,6 +96,10 @@ static void s_on_button_save_clicked() {
     s_has_saved = true;
 }
 
+static void s_on_button_reset_clicked() {
+
+}
+
 static void s_load_save_file() { 
 
     long file_size;
@@ -134,6 +143,7 @@ int load_game_screen(void* args) {
 
 void init_game_screen() {
 
+    s_font_ui_s = load_ttf_font("./res/fonts/Eczar-Regular.ttf", 32);
     s_font_ui_m = load_ttf_font("./res/fonts/Eczar-Regular.ttf", 34);
 
     s_has_saved = true;
@@ -153,6 +163,11 @@ void init_game_screen() {
     s_button_save.color_disabled = CC_RED;
     s_button_save.on_released = s_on_button_save_clicked;
 
+    s_button_reset = create_ui_button(&s_sprite_button);
+    s_button_reset.color_default = CC_LIGHT_RED;
+    s_button_reset.color_disabled = CC_RED;
+    s_button_reset.on_released = s_on_button_reset_clicked;
+
     s_button_quit_yes = create_ui_button_t(&s_font_ui_m, "Yes");
     s_button_quit_yes.on_released = s_on_button_quit_yes_clicked;
 
@@ -165,7 +180,7 @@ void init_game_screen() {
 
     s_button_position = create_ui_button(&s_sprite_spritesheet_idle);
     s_button_position.color_default = WHITE;
-    s_button_position.on_pressed = s_on_button_position_pressed;
+    s_button_position.on_released = s_on_button_position_pressed;
 }
 
 void unload_game_screen() {
@@ -175,12 +190,74 @@ void unload_game_screen() {
     cJSON_Delete(s_json_data);
 }
 
+static void s_draw_categories() {
+
+    const char* categories[] = {"Horns", "Hair", "Body", "Eyes", "Nails", "Wings", "Ears", "Mouth", "Tail"};
+    unsigned int category_index = 0;
+
+    for (int x = 0; x < 3; x++) { 
+        for (int y = 0; y < 3; y++) {
+
+            const float pos_x = 376 + 16 + x * (64 + 12);
+            const float pos_y = 16 + 16 + y * (64 + 45);
+
+            t_color color = CC_BLACK;
+            color.a /= 2;
+
+            draw_rect(pos_x, pos_y, 64, 64, color);
+
+            t_vec2 text_size = measure_text_size_ttf(categories[category_index], &s_font_ui_s);
+            draw_text_ttf(categories[category_index], &s_font_ui_s, (t_vec2)
+                { pos_x + (64 - text_size.x) / 2,
+                  pos_y + 64 + text_size.y + 6 }, CC_BLACK, 0);
+
+            category_index++;
+        }
+    }
+}
+
+static void s_draw_options() { 
+
+    t_vec2 size_category_text = measure_text_size_ttf("Horns", &s_font_ui_m);
+    draw_text_ttf("Horns", &s_font_ui_m, (t_vec2) { 376 + (248 - size_category_text.x) / 2, 16 + size_category_text.y + 12}, CC_BLACK, 0);
+
+    t_vec2 size_style_text = measure_text_size_ttf("Style", &s_font_ui_s);
+    draw_text_ttf("Style", &s_font_ui_s, (t_vec2) { 376 + (248 - size_style_text.x) / 2, 52 + size_style_text.y }, CC_BLACK, 0);
+
+    for (int x = 0; x < 4; x++) { 
+        for (int y = 0; y < 3; y++) {
+
+            const float pos_x = 376 + 42 + x * (32 + 12);
+            const float pos_y = 78 + y * (32 + 12);
+
+            t_color color = CC_BLACK;
+            color.a /= 2;
+            draw_rect(pos_x, pos_y, 32, 32, color);
+        }
+    }
+
+    t_vec2 size_color_text = measure_text_size_ttf("Color", &s_font_ui_s);
+    draw_text_ttf("Color", &s_font_ui_s, (t_vec2) { 376 + (248 - size_color_text.x) / 2, 216 + size_color_text.y }, CC_BLACK, 0);
+
+    for (int x = 0; x < 11; x++) { 
+        for (int y = 0; y < 4; y++) {
+
+            const float pos_x = 376 + 42 + x * (12 + 3);
+            const float pos_y = 239 + y * (12 + 3);
+
+            t_color color = CC_BLACK;
+            color.a /= 2;
+            draw_rect(pos_x, pos_y, 12, 12, color);
+        }
+    }
+}
+
 static float s_timer_animation = 0;
 static int s_index_animation = 1;
 
 void draw_game_screen() {
-    t_clear_color(CC_LIGH_BLUE);
-    draw_ui_button(&s_button_position, s_saved_position.x, s_saved_position.y, 200, 360);
+    t_clear_color(CC_BLACK);
+    draw_ui_button(&s_button_position, 144, 0, 200, 360);
 
     s_timer_animation += t_delta_time();
     if (s_timer_animation >= .1f) {
@@ -195,14 +272,27 @@ void draw_game_screen() {
         s_sprite_spritesheet_idle.texture_slice.y = (s_index_animation / 4) * 360;
     }
 
-    draw_ui_button(&s_button_quit, 16, 16, 96, 32);
-    t_vec2 size_text_quit = measure_text_size_ttf("Quit", &s_font_ui_m);
-    draw_text_ttf("Quit", &s_font_ui_m, (t_vec2) { 16 + (96 - size_text_quit.x) / 2, 16 + (32 + size_text_quit.y) / 2}, CC_BLACK, 0);
-
-    draw_ui_button(&s_button_save, 16, 56, 96, 32);
+    draw_ui_button(&s_button_save, 16, 16, 96, 32);
     t_vec2 size_text_save = measure_text_size_ttf("Save", &s_font_ui_m);
-    draw_text_ttf("Save", &s_font_ui_m, (t_vec2) { 16 + (96 - size_text_save.x) / 2, 56 + (32 + size_text_save.y) / 2}, CC_BLACK, 0);
+    draw_text_ttf("Save", &s_font_ui_m, (t_vec2) { 16 + (96 - size_text_save.x) / 2, 16 + (32 + size_text_save.y) / 2}, CC_BLACK, 0);
 
+    draw_ui_button(&s_button_reset, 16, 56, 96, 32);
+    t_vec2 size_text_reset = measure_text_size_ttf("Reset", &s_font_ui_m);
+    draw_text_ttf("Reset", &s_font_ui_m, (t_vec2) { 16 + (96 - size_text_reset.x) / 2,  56 + (32 + size_text_reset.y) / 2}, CC_BLACK, 0);
+
+    draw_ui_button(&s_button_quit, 16, t_window_size().y - 32 - 16, 96, 32);
+    t_vec2 size_text_quit = measure_text_size_ttf("Back", &s_font_ui_m);
+    draw_text_ttf("Back", &s_font_ui_m, (t_vec2) { 16 + (96 - size_text_quit.x) / 2, t_window_size().y - 32 - 16 + (32 + size_text_quit.y) / 2}, CC_BLACK, 0);
+
+    draw_sprite(&s_sprite_button, 376, 16, 248, 328, CC_LIGHT_RED);
+
+    // Categories
+    if (s_drawing_categories)
+        s_draw_categories();
+
+    // Options
+    if (s_drawing_options)
+        s_draw_options();
 
     if (s_prompt_save) {
         t_color modal_background_color = CC_BLACK;
