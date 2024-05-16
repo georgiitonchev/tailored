@@ -64,19 +64,17 @@ typedef struct t_transform {
   t_vec3 scale;
 } t_transform;
 
-typedef struct t_texture {
-  unsigned int id;
-  t_vec2 size;
-  unsigned int channels;
-} t_texture;
-
 typedef struct t_texture_data {
-  unsigned char* data;
+  unsigned char* bytes;
   unsigned int width;
   unsigned int height;
   unsigned int channels;
 
 } t_texture_data;
+
+typedef struct t_texture {
+  unsigned int id;
+} t_texture;
 
 typedef struct t_input_state {
 

@@ -182,7 +182,7 @@ void t_set_cursor(const char* path, int xhot, int yhot) {
   GLFWimage image;
   image.width = texture_data.width;
   image.height = texture_data.height;
-  image.pixels = texture_data.data;
+  image.pixels = texture_data.bytes;
 
   GLFWcursor* cursor = glfwCreateCursor(&image, xhot, yhot);
   glfwSetCursor(s_window, cursor);

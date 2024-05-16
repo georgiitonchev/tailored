@@ -92,6 +92,38 @@ static void init_shader() {
                                         "./res/shaders/font_shader.fs");
 }
 
+static t_texture s_load_texture(const t_texture_data* texture_data) {
+
+  GLenum texture_format = 0;
+  if (texture_data->channels == 1)
+    texture_format = GL_RED;
+  else if (texture_data->channels == 3)
+    texture_format = GL_RGB;
+  else if (texture_data->channels == 4)
+    texture_format = GL_RGBA;
+
+  unsigned int texture_id;
+  
+  glGenTextures(1, &texture_id);
+  glBindTexture(GL_TEXTURE_2D, texture_id);
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+  glTexImage2D(GL_TEXTURE_2D, 0, texture_format, texture_data->width, texture_data->height, 0,
+              texture_format, GL_UNSIGNED_BYTE, texture_data->bytes);
+
+  glBindTexture(GL_TEXTURE_2D, 0);
+
+  t_texture texture;
+  texture.id = texture_id;
+
+  return texture;
+}
+
 t_vec4 get_character(char character) {
   int columns = 16;
 
@@ -119,12 +151,9 @@ t_font load_ttf_font(const char* path, unsigned int font_size) {
   font_info.userdata = NULL;
 
   if (!stbtt_InitFont(&font_info, file_data, 0))
-  {
     printf("Eror initializing font. \n");
-  }
 
   float scale = bake_font_bitmap(&font_info, font_size, bitmap_data, 512, 512, 32, 96, font.characters);
-  //free(file_data);
 
   int font_ascent = 0;
   int font_descent = 0;
@@ -134,14 +163,14 @@ t_font load_ttf_font(const char* path, unsigned int font_size) {
 
   t_texture_data texture_data;
   texture_data.channels = 1;
-  texture_data.data = bitmap_data;
+  texture_data.bytes = bitmap_data;
   texture_data.width = 512;
   texture_data.height = 512;
 
-  font.bitmap = t_load_texture_from_data(&texture_data);
+  font.bitmap = s_load_texture(&texture_data);
   font.line_height = (font_ascent - font_descent + line_gap) * scale; //ascent - *descent + *lineGap
 
-  free(file_data);
+  free((void*) file_data);
   return font;
 }
 

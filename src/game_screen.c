@@ -16,15 +16,14 @@
 #include "cJSON.h"
 
 // EXTERNS
-extern bool m_should_change_screen;
-extern t_screen m_should_change_screen_to;
 extern char* g_save_file; 
 
 // FONTS
-static t_font s_ui_font_m;
+static t_font s_font_ui_m;
 
 // SPRITES
-static t_sprite m_button_sprite;
+static t_sprite s_sprite_button;
+static t_sprite s_sprite_spritesheet_idle;
 
 // UI
 static t_ui_button s_button_quit;
@@ -49,8 +48,7 @@ static void s_on_button_position_pressed(t_ui_button* button) {
 
 static void s_on_button_quit_yes_clicked() {
 
-    m_should_change_screen = true;
-    m_should_change_screen_to = TITLE;
+    set_screen(TITLE);
     s_prompt_save = false;
 }
 
@@ -61,8 +59,7 @@ static void s_on_button_quit_no_clicked() {
 static void s_on_button_quit_clicked() {
 
     if (s_has_saved) { 
-        m_should_change_screen = true;
-        m_should_change_screen_to = TITLE;
+        set_screen(TITLE);
     } else {
         s_prompt_save = true;
     }
@@ -83,7 +80,7 @@ static void s_on_button_save_clicked() {
     const char* json_string = cJSON_Print(s_json_data);
     t_result write_file_result = t_write_file(g_save_file, json_string);
 
-    free(json_string);
+    free((char *)json_string);
 
     if (write_file_result != T_SUCCESS) { 
         printf("ERROR: Could not update save file - %s.\n", g_save_file);
@@ -122,64 +119,89 @@ static void s_load_save_file() {
     s_saved_position.y = cJSON_GetObjectItem(json_object_position, "y")->valuedouble;
 }
 
-void load_game_screen() {
+int load_game_screen(void* args) {
+    UNUSED(args);
+
+    t_load_texture_data_s(&s_sprite_button, "./res/textures/panel-transparent-center-030.png");
+    t_load_texture_data_s(&s_sprite_spritesheet_idle, "./res/textures/spritesheet_imp_idle.png");
+
+    s_load_save_file();
+
+    set_loading_progress(1);
+    set_loading_finished();
+    return 0;
+}
+
+void init_game_screen() {
+
+    s_font_ui_m = load_ttf_font("./res/fonts/Eczar-Regular.ttf", 34);
 
     s_has_saved = true;
     s_prompt_save = false;
     s_saved_position = VEC2_ZERO;
 
-    s_ui_font_m = load_ttf_font("./res/fonts/Eczar-Regular.ttf", 34);
+    t_init_sprite(&s_sprite_button);
+    s_sprite_button.slice_borders = (t_vec4){ 16, 16, 16, 16 };
 
-    create_sprite("./res/textures/panel-transparent-center-030.png", &m_button_sprite);
-    m_button_sprite.slice_borders = (t_vec4){ 16, 16, 16, 16 };
-
-    s_button_quit = create_ui_button(&m_button_sprite);
+    s_button_quit = create_ui_button(&s_sprite_button);
     s_button_quit.color_default = CC_LIGHT_RED;
     s_button_quit.color_disabled = CC_RED;
     s_button_quit.on_released = s_on_button_quit_clicked;
 
-    s_button_save = create_ui_button(&m_button_sprite);
+    s_button_save = create_ui_button(&s_sprite_button);
     s_button_save.color_default = CC_LIGHT_RED;
     s_button_save.color_disabled = CC_RED;
     s_button_save.on_released = s_on_button_save_clicked;
 
-    s_button_position = create_ui_button(&m_button_sprite);
-    s_button_position.color_default = CC_LIGHT_RED;
-    s_button_position.color_disabled = CC_RED;
-    s_button_position.on_pressed = s_on_button_position_pressed;
-
-    s_button_quit_yes = create_ui_button_t(&s_ui_font_m, "Yes");
+    s_button_quit_yes = create_ui_button_t(&s_font_ui_m, "Yes");
     s_button_quit_yes.on_released = s_on_button_quit_yes_clicked;
 
-    s_button_quit_no = create_ui_button_t(&s_ui_font_m, "No");
+    s_button_quit_no = create_ui_button_t(&s_font_ui_m, "No");
     s_button_quit_no.on_released = s_on_button_quit_no_clicked;
 
-    s_load_save_file();
+    // 200 x 350
+    t_init_sprite(&s_sprite_spritesheet_idle);
+    s_sprite_spritesheet_idle.texture_slice = (t_vec4) { 0, 0, 200, 360};
+
+    s_button_position = create_ui_button(&s_sprite_spritesheet_idle);
+    s_button_position.color_default = WHITE;
+    s_button_position.on_pressed = s_on_button_position_pressed;
 }
 
 void unload_game_screen() {
-
-    delete_sprite(&m_button_sprite);
-    delete_ttf_font(&s_ui_font_m);
+    t_deinit_sprite(&s_sprite_button);
+    delete_ttf_font(&s_font_ui_m);
 
     cJSON_Delete(s_json_data);
 }
 
-void update_game_screen() {
-
-}
+static float s_timer_animation = 0;
+static int s_index_animation = 1;
 
 void draw_game_screen() {
-    t_clear_color(CC_BLACK);
-    draw_ui_button(&s_button_position, s_saved_position.x, s_saved_position.y, 100, 100);
+    t_clear_color(CC_LIGH_BLUE);
+    draw_ui_button(&s_button_position, s_saved_position.x, s_saved_position.y, 200, 360);
+
+    s_timer_animation += t_delta_time();
+    if (s_timer_animation >= .1f) {
+
+        s_index_animation ++;
+        s_timer_animation = 0;
+
+        if (s_index_animation == 13)
+         s_index_animation = 0;
+
+        s_sprite_spritesheet_idle.texture_slice.x = (s_index_animation % 4) * 200;
+        s_sprite_spritesheet_idle.texture_slice.y = (s_index_animation / 4) * 360;
+    }
 
     draw_ui_button(&s_button_quit, 16, 16, 96, 32);
-    t_vec2 size_text_quit = measure_text_size_ttf("Quit", &s_ui_font_m);
-    draw_text_ttf("Quit", &s_ui_font_m, (t_vec2) { 16 + (96 - size_text_quit.x) / 2, 16 + (32 + size_text_quit.y) / 2}, CC_BLACK, 0);
+    t_vec2 size_text_quit = measure_text_size_ttf("Quit", &s_font_ui_m);
+    draw_text_ttf("Quit", &s_font_ui_m, (t_vec2) { 16 + (96 - size_text_quit.x) / 2, 16 + (32 + size_text_quit.y) / 2}, CC_BLACK, 0);
 
     draw_ui_button(&s_button_save, 16, 56, 96, 32);
-    t_vec2 size_text_save = measure_text_size_ttf("Save", &s_ui_font_m);
-    draw_text_ttf("Save", &s_ui_font_m, (t_vec2) { 16 + (96 - size_text_save.x) / 2, 56 + (32 + size_text_save.y) / 2}, CC_BLACK, 0);
+    t_vec2 size_text_save = measure_text_size_ttf("Save", &s_font_ui_m);
+    draw_text_ttf("Save", &s_font_ui_m, (t_vec2) { 16 + (96 - size_text_save.x) / 2, 56 + (32 + size_text_save.y) / 2}, CC_BLACK, 0);
 
 
     if (s_prompt_save) {
@@ -189,16 +211,16 @@ void draw_game_screen() {
         set_ui_raycast_block_r(RECT_ZERO);
 
         draw_rect(0, 0, t_window_size().x, t_window_size().y, modal_background_color);
-        draw_sprite(&m_button_sprite, (t_window_size().x - 256) / 2, (t_window_size().y - 128) / 2, 256, 128, CC_LIGHT_RED);
+        draw_sprite(&s_sprite_button, (t_window_size().x - 256) / 2, (t_window_size().y - 128) / 2, 256, 128, CC_LIGHT_RED);
 
-        t_vec2 size_text = measure_text_size_ttf("Exit without saving?", &s_ui_font_m);
-        draw_text_ttf("Exit without saving?", &s_ui_font_m, (t_vec2){(t_window_size().x - size_text.x) / 2, (t_window_size().y + size_text.y) / 2 - size_text.y}, CC_BLACK, 0);
+        t_vec2 size_text = measure_text_size_ttf("Exit without saving?", &s_font_ui_m);
+        draw_text_ttf("Exit without saving?", &s_font_ui_m, (t_vec2){(t_window_size().x - size_text.x) / 2, (t_window_size().y + size_text.y) / 2 - size_text.y}, CC_BLACK, 0);
 
-        t_vec2 size_text_no = measure_text_size_ttf("No", &s_ui_font_m);
+        t_vec2 size_text_no = measure_text_size_ttf("No", &s_font_ui_m);
         draw_ui_button(&s_button_quit_no, 
             (t_window_size().x - size_text.x) / 2 + 32, (t_window_size().y - 128) / 2 + 128 - 48, size_text_no.x, size_text_no.y);
 
-        t_vec2 size_text_yes = measure_text_size_ttf("Yes", &s_ui_font_m);
+        t_vec2 size_text_yes = measure_text_size_ttf("Yes", &s_font_ui_m);
         draw_ui_button(&s_button_quit_yes,
             (t_window_size().x - size_text.x) / 2 + size_text.x - size_text_yes.x - 32, (t_window_size().y - 128) / 2 + 128 - 48, size_text_yes.x, size_text_yes.y);
 

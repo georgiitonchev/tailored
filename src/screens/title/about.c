@@ -42,8 +42,8 @@ static const char* s_text_about =
 
 static void s_on_slider_knob_button_pressed() { 
 
-    float value = (mouse_position().y - (s_rect_slider.y + s_button_slider_knob.sprite->texture.size.y / 2)) 
-        / (s_rect_slider.height - s_button_slider_knob.sprite->texture.size.y);
+    float value = (mouse_position().y - (s_rect_slider.y + s_button_slider_knob.sprite->texture_data.height / 2)) 
+        / (s_rect_slider.height - s_button_slider_knob.sprite->texture_data.height);
 
     if (value < 0)
         value = 0;
@@ -55,14 +55,22 @@ static void s_on_slider_knob_button_pressed() {
 
 void load_section_about() {
 
+    t_load_texture_data_s(&s_sprite_section_background, "./res/textures/panel-transparent-center-030.png");
+    t_load_texture_data_s(&s_sprite_slider_background, "./res/textures/slider_background_v.png");
+    t_load_texture_data_s(&s_sprite_small_knob, "./res/textures/slider_knob_small_v.png");
+    t_load_texture_data_s(&s_sprite_big_knob, "./res/textures/slider_knob_big_v.png");
+}
+
+void init_section_about() {
+
     s_font_ui_s = load_ttf_font("./res/fonts/Eczar-Regular.ttf", 32);
 
-    create_sprite("./res/textures/panel-transparent-center-030.png", &s_sprite_section_background);
+    t_init_sprite(&s_sprite_section_background);
     s_sprite_section_background.slice_borders = (t_vec4){ 16, 16, 16, 16 };
 
-    create_sprite("./res/textures/slider_background_v.png", &s_sprite_slider_background);
-    create_sprite("./res/textures/slider_knob_small_v.png", &s_sprite_small_knob);
-    create_sprite("./res/textures/slider_knob_big_v.png", &s_sprite_big_knob);
+    t_init_sprite(&s_sprite_slider_background);
+    t_init_sprite(&s_sprite_small_knob);
+    t_init_sprite(&s_sprite_big_knob);
 
     s_button_slider_knob = create_ui_button(&s_sprite_big_knob);
     s_button_slider_knob.color_default = CC_BLACK;
@@ -79,23 +87,23 @@ void draw_section_about(const float p_offset_x, const float p_offset_y) {
 
     t_end_scissor();
 
-    s_rect_slider = (t_rect) { 597, 32 + p_offset_y, s_sprite_slider_background.texture.size.x, 296};
+    s_rect_slider = (t_rect) { 597, 32 + p_offset_y, s_sprite_slider_background.texture_data.width, 296};
 
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
     glClear(GL_STENCIL_BUFFER_BIT);
     glStencilFunc(GL_ALWAYS, 1, 0xFF);
     glStencilMask(0xFF);
-    draw_ui_button(&s_button_slider_knob, 595, 32 + p_offset_y + s_value_scrolled * (s_rect_slider.height - s_button_slider_knob.sprite->texture.size.y), s_button_slider_knob.sprite->texture.size.x, s_button_slider_knob.sprite->texture.size.y);
+    draw_ui_button(&s_button_slider_knob, 595, 32 + p_offset_y + s_value_scrolled * (s_rect_slider.height - s_button_slider_knob.sprite->texture_data.height), s_button_slider_knob.sprite->texture_data.width, s_button_slider_knob.sprite->texture_data.height);
     
     glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
     if (!s_button_slider_knob.is_mouse_over && is_point_in_rect(mouse_position(), s_rect_slider)) {
 
         if (is_mouse_button_pressed(MOUSE_BUTTON_LEFT)) {
             s_button_slider_knob.was_clicked = true;
-            s_button_slider_knob.mouse_clicked_at = (t_vec2) { s_button_slider_knob.sprite->texture.size.x / 2, s_button_slider_knob.sprite->texture.size.y / 2};
+            s_button_slider_knob.mouse_clicked_at = (t_vec2) { s_button_slider_knob.sprite->texture_data.width / 2, s_button_slider_knob.sprite->texture_data.height / 2};
         }
 
-        t_rect rect_small_knob = (t_rect) { s_rect_slider.x, mouse_position().y - s_sprite_small_knob.texture.size.y / 2 + p_offset_y, s_sprite_small_knob.texture.size.x, s_sprite_small_knob.texture.size.y };
+        t_rect rect_small_knob = (t_rect) { s_rect_slider.x, mouse_position().y - s_sprite_small_knob.texture_data.height / 2 + p_offset_y, s_sprite_small_knob.texture_data.width, s_sprite_small_knob.texture_data.height };
 
         if (rect_small_knob.y < s_rect_slider.y)
             rect_small_knob.y = s_rect_slider.y;
@@ -114,10 +122,10 @@ void draw_section_about(const float p_offset_x, const float p_offset_y) {
 
 void unload_section_about() {
 
-    delete_sprite(&s_sprite_section_background);
-    delete_sprite(&s_sprite_slider_background);
-    delete_sprite(&s_sprite_small_knob);
-    delete_sprite(&s_sprite_big_knob);
+    t_deinit_sprite(&s_sprite_section_background);
+    t_deinit_sprite(&s_sprite_slider_background);
+    t_deinit_sprite(&s_sprite_small_knob);
+    t_deinit_sprite(&s_sprite_big_knob);
 
     delete_ttf_font(&s_font_ui_s);
 }

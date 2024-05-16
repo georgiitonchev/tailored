@@ -11,3 +11,4 @@
 
 #define CC_UI_PADDING (t_ui_padding) { 16, 16, 16, 16 }
 #define CC_UI_SECTION_RECT (t_vec4) { 256, CC_UI_PADDING.top, 368, 328 }
+

@@ -94,6 +94,7 @@ static void s_on_save_file_loaded(t_ui_button* button) {
 }
 
 static void s_on_button_delete_clicked(t_ui_button* button) { 
+    UNUSED(button);
 
     long file_size;
     const char* save_files_data = t_read_file(save_files_data_path, &file_size);
@@ -181,8 +182,8 @@ static void s_on_button_new_clicked() {
 
 static void s_on_slider_knob_button_pressed() { 
 
-    float value = (mouse_position().x - (s_rect_slider.x + s_button_slider_knob.sprite->texture.size.x / 2)) 
-        / (s_rect_slider.width - s_button_slider_knob.sprite->texture.size.x);
+    float value = (mouse_position().x - (s_rect_slider.x + s_button_slider_knob.sprite->texture_data.width / 2)) 
+        / (s_rect_slider.width - s_button_slider_knob.sprite->texture_data.width);
 
     if (value < 0)
         value = 0;
@@ -193,6 +194,65 @@ static void s_on_slider_knob_button_pressed() {
 }
 
 void load_section_saves() {
+    // Load textures
+    t_load_texture_data_s(&s_sprite_button, "./res/textures/panel-transparent-center-030.png");
+    t_load_texture_data_s(&s_sprite_button_selected, "./res/textures/panel-transparent-center-029.png");
+    t_load_texture_data_s(&s_sprite_section_background, "./res/textures/panel-transparent-center-030.png");
+    t_load_texture_data_s(&s_sprite_slider_background, "./res/textures/slider_background.png");
+    t_load_texture_data_s(&s_sprite_small_knob, "./res/textures/slider_knob_small.png");
+    t_load_texture_data_s(&s_sprite_big_knob, "./res/textures/slider_knob_big.png");
+}
+
+void init_section_saves() {
+
+    t_init_sprite(&s_sprite_button);
+    s_sprite_button.slice_borders = (t_vec4){ 16, 16, 16, 16 };
+
+    t_init_sprite(&s_sprite_button_selected);
+    s_sprite_button_selected.slice_borders = (t_vec4){ 16, 16, 16, 16 };
+
+    t_init_sprite(&s_sprite_section_background);
+    s_sprite_section_background.slice_borders = (t_vec4){ 16, 16, 16, 16 };
+
+    t_init_sprite(&s_sprite_slider_background);
+    t_init_sprite(&s_sprite_small_knob);
+    t_init_sprite(&s_sprite_big_knob);
+    
+    s_font_ui_s = load_ttf_font("./res/fonts/Eczar-Regular.ttf", 32);
+    s_font_ui_xs = load_ttf_font("./res/fonts/Eczar-Regular.ttf", 27);
+    s_font_ui_m = load_ttf_font("./res/fonts/Eczar-Regular.ttf", 37);
+
+    s_button_slider_knob = create_ui_button(&s_sprite_big_knob);
+    s_button_slider_knob.color_default = CC_BLACK;
+    s_button_slider_knob.color_mouseover = CC_DARK_RED;
+    s_button_slider_knob.color_clicked = CC_DARK_RED;
+    s_button_slider_knob.on_pressed = s_on_slider_knob_button_pressed;
+
+    s_button_new = create_ui_button(&s_sprite_button);
+    s_button_new.color_default = CC_BLACK;
+    s_button_new.color_mouseover = CC_DARK_RED;
+    s_button_new.color_clicked = CC_RED;
+    s_button_new.color_disabled = CC_DARK_RED;
+    s_button_new.on_released = s_on_button_new_clicked;
+    // s_button_new.on_mouse_enter = on_button_mouse_enter;
+
+    s_button_delete = create_ui_button(&s_sprite_button);
+    s_button_delete.color_default = CC_BLACK;
+    s_button_delete.color_mouseover = CC_DARK_RED;
+    s_button_delete.color_clicked = CC_RED;
+    s_button_delete.color_disabled = CC_DARK_RED;
+    s_button_delete.is_disabled = true;
+    s_button_delete.on_released = s_on_button_delete_clicked;
+    // s_button_delete.on_mouse_enter = on_button_mouse_enter;
+
+    s_button_load = create_ui_button(&s_sprite_button);
+    s_button_load.color_default = CC_BLACK;
+    s_button_load.color_mouseover = CC_DARK_RED;
+    s_button_load.color_clicked = CC_RED;
+    s_button_load.color_disabled = CC_DARK_RED;
+    s_button_load.is_disabled = true;
+    // s_button_load.on_mouse_enter = on_button_mouse_enter;
+    s_button_load.on_released = s_on_save_file_loaded;
 
     s_list_saves = create_list(sizeof(t_ui_button));
 
@@ -244,56 +304,6 @@ void load_section_saves() {
 
         s_scroll_area_width = s_list_saves->size * (128 + 16) - 16;
     }
-
-    s_font_ui_s = load_ttf_font("./res/fonts/Eczar-Regular.ttf", 32);
-    s_font_ui_xs = load_ttf_font("./res/fonts/Eczar-Regular.ttf", 27);
-    s_font_ui_m = load_ttf_font("./res/fonts/Eczar-Regular.ttf", 37);
-
-    create_sprite("./res/textures/panel-transparent-center-030.png", &s_sprite_button);
-    s_sprite_button.slice_borders = (t_vec4){ 16, 16, 16, 16 };
-
-    create_sprite("./res/textures/panel-transparent-center-029.png", &s_sprite_button_selected);
-    s_sprite_button_selected.slice_borders = (t_vec4){ 16, 16, 16, 16 };
-
-    create_sprite("./res/textures/panel-transparent-center-030.png", &s_sprite_section_background);
-    s_sprite_section_background.slice_borders = (t_vec4){ 16, 16, 16, 16 };
-
-    create_sprite("./res/textures/slider_background.png", &s_sprite_slider_background);
-    create_sprite("./res/textures/slider_knob_small.png", &s_sprite_small_knob);
-    create_sprite("./res/textures/slider_knob_big.png", &s_sprite_big_knob);
-
-    s_button_slider_knob = create_ui_button(&s_sprite_big_knob);
-    s_button_slider_knob.color_default = CC_BLACK;
-    s_button_slider_knob.color_mouseover = CC_DARK_RED;
-    s_button_slider_knob.color_clicked = CC_DARK_RED;
-    s_button_slider_knob.on_pressed = s_on_slider_knob_button_pressed;
-
-    s_button_new = create_ui_button(&s_sprite_button);
-    s_button_new.color_default = CC_BLACK;
-    s_button_new.color_mouseover = CC_DARK_RED;
-    s_button_new.color_clicked = CC_RED;
-    s_button_new.color_disabled = CC_DARK_RED;
-    s_button_new.on_released = s_on_button_new_clicked;
-    // s_button_new.on_mouse_enter = on_button_mouse_enter;
-
-    s_button_delete = create_ui_button(&s_sprite_button);
-    s_button_delete.color_default = CC_BLACK;
-    s_button_delete.color_mouseover = CC_DARK_RED;
-    s_button_delete.color_clicked = CC_RED;
-    s_button_delete.color_disabled = CC_DARK_RED;
-    s_button_delete.is_disabled = true;
-    s_button_delete.on_released = s_on_button_delete_clicked;
-    // s_button_delete.on_mouse_enter = on_button_mouse_enter;
-
-    s_button_load = create_ui_button(&s_sprite_button);
-    s_button_load.color_default = CC_BLACK;
-    s_button_load.color_mouseover = CC_DARK_RED;
-    s_button_load.color_clicked = CC_RED;
-    s_button_load.color_disabled = CC_DARK_RED;
-    s_button_load.is_disabled = true;
-    // s_button_load.on_mouse_enter = on_button_mouse_enter;
-    s_button_load.on_released = s_on_save_file_loaded;
-
 }
 
 void draw_section_saves(const float p_offset_x, const float p_offset_y) {
@@ -320,7 +330,7 @@ void draw_section_saves(const float p_offset_x, const float p_offset_y) {
     }
     t_end_scissor();
 
-    s_rect_slider = (t_rect) { 272 + p_offset_x, 328 - 64 + p_offset_y, 336, s_sprite_slider_background.texture.size.y };
+    s_rect_slider = (t_rect) { 272 + p_offset_x, 328 - 64 + p_offset_y, 336, s_sprite_slider_background.texture_data.height };
 
     // BIG KNOB
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
@@ -329,17 +339,17 @@ void draw_section_saves(const float p_offset_x, const float p_offset_y) {
     glStencilMask(0xFF);
 
     if (s_list_saves->size > 0)
-        draw_ui_button(&s_button_slider_knob, 272 + p_offset_x + s_scroll_area_offset * (s_rect_slider.width - s_button_slider_knob.sprite->texture.size.x), 328 - 66 + p_offset_y, s_sprite_big_knob.texture.size.x, s_sprite_big_knob.texture.size.y);
+        draw_ui_button(&s_button_slider_knob, 272 + p_offset_x + s_scroll_area_offset * (s_rect_slider.width - s_button_slider_knob.sprite->texture_data.width), 328 - 66 + p_offset_y, s_sprite_big_knob.texture_data.width, s_sprite_big_knob.texture_data.height);
 
     glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
     if (s_list_saves->size > 0 && !s_button_slider_knob.is_mouse_over && is_point_in_rect(mouse_position(), s_rect_slider)) {
 
         if (is_mouse_button_pressed(MOUSE_BUTTON_LEFT)) {
             s_button_slider_knob.was_clicked = true;
-            s_button_slider_knob.mouse_clicked_at = (t_vec2) { s_button_slider_knob.sprite->texture.size.x / 2, s_button_slider_knob.sprite->texture.size.y / 2};
+            s_button_slider_knob.mouse_clicked_at = (t_vec2) { s_button_slider_knob.sprite->texture_data.width / 2, s_button_slider_knob.sprite->texture_data.height / 2};
         }
 
-        t_rect rect_small_knob = (t_rect) { mouse_position().x - s_sprite_small_knob.texture.size.x / 2 + p_offset_x, s_rect_slider.y + p_offset_y, s_sprite_small_knob.texture.size.x, s_sprite_small_knob.texture.size.y };
+        t_rect rect_small_knob = (t_rect) { mouse_position().x - s_sprite_small_knob.texture_data.width / 2 + p_offset_x, s_rect_slider.y + p_offset_y, s_sprite_small_knob.texture_data.width, s_sprite_small_knob.texture_data.height };
 
         //limits
         if (rect_small_knob.x < s_rect_slider.x)
@@ -384,12 +394,12 @@ void unload_section_saves() {
     delete_ttf_font(&s_font_ui_s);
     delete_ttf_font(&s_font_ui_m);
 
-    delete_sprite(&s_sprite_button);
-    delete_sprite(&s_sprite_button_selected);
-    delete_sprite(&s_sprite_section_background);
-    delete_sprite(&s_sprite_slider_background);
-    delete_sprite(&s_sprite_small_knob);
-    delete_sprite(&s_sprite_big_knob);
+    t_deinit_sprite(&s_sprite_button);
+    t_deinit_sprite(&s_sprite_button_selected);
+    t_deinit_sprite(&s_sprite_section_background);
+    t_deinit_sprite(&s_sprite_slider_background);
+    t_deinit_sprite(&s_sprite_small_knob);
+    t_deinit_sprite(&s_sprite_big_knob);
 
     s_selected_save = NULL;
     s_scroll_area_offset = 0;

@@ -12,7 +12,6 @@ extern t_rect clip_areas[2];
 
 // STATIC
 static int m_currently_over_ui = 0;
-static t_rect m_focused_rect;
 static t_rect s_ui_raycast_block = { 0 };
 
 t_ui_button create_ui_button(t_sprite* sprite) {
@@ -49,9 +48,6 @@ t_ui_button create_ui_button(t_sprite* sprite) {
     return ui_button;
 }
 
-t_ui_button create_ui_button_s() {
-
-}
 
 t_ui_button create_ui_button_t(t_font* font, const char* text) { 
 
@@ -85,10 +81,6 @@ t_ui_button create_ui_button_t(t_font* font, const char* text) {
     ui_button.mouse_clicked_at = VEC2_ZERO;
 
     return ui_button;
-}
-
-t_ui_button create_ui_button_st() {
-
 }
 
 void draw_ui_button(t_ui_button* button, int x, int y, int width, int height) {

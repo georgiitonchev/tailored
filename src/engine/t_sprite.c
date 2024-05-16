@@ -93,20 +93,6 @@ void draw_sprite_t(t_sprite *sprite, t_rect rect, t_color color) {
       rect.x, rect.y, rect.width, rect.height, color);
 }
 
-void create_sprite_t(t_texture* texture, t_sprite* sprite) {
-  sprite->texture = *texture;
-  sprite->scale = (t_vec2){ 1, 1 };
-  sprite->texture_slice = (t_vec4){ 0, 0, sprite->texture.size.x, sprite->texture.size.y };
-  sprite->slice_borders = (t_vec4){ 0, 0, 0, 0 };
-}
-
-void create_sprite(const char* path, t_sprite* sprite) {
-  sprite->texture = t_load_texture(path);
-  sprite->scale = (t_vec2){ 1, 1 };
-  sprite->texture_slice = (t_vec4){ 0, 0, sprite->texture.size.x, sprite->texture.size.y };
-  sprite->slice_borders = (t_vec4){ 0, 0, 0, 0 };
-
-}
 void delete_sprite(t_sprite* sprite)
 {
     t_free_texture(&sprite->texture);
@@ -131,4 +117,29 @@ void t_end_scissor() {
 
   clip_areas[0] = RECT_ZERO;
   glDisable(GL_SCISSOR_TEST);
+}
+
+void t_load_texture_data_s(t_sprite* sprite, const char* texture_path) {
+
+  t_texture_data texture_data = t_load_texture_data(texture_path);
+  sprite->texture_data = texture_data;
+}
+
+void t_load_texture_s(t_sprite* sprite) {
+  
+  t_texture texture = t_load_texture_from_data(&sprite->texture_data);
+  sprite->texture = texture;
+}
+
+void t_init_sprite(t_sprite* sprite) { 
+
+  t_load_texture_s(sprite);
+
+  sprite->scale = (t_vec2){ 1, 1 };
+  sprite->texture_slice = (t_vec4){ 0, 0, sprite->texture_data.width, sprite->texture_data.height };
+  sprite->slice_borders = (t_vec4){ 0, 0, 0, 0 };
+}
+
+void t_deinit_sprite(t_sprite* sprite) {
+  t_free_texture(&sprite->texture);
 }

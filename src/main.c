@@ -5,74 +5,142 @@
 #include "./engine/t_sprite.h"
 #include "./engine/t_font.h"
 #include "./engine/t_ui.h"
+#include "./engine/t_shapes.h"
 
 #include "screens.h"
+#include "game.h"
 
 #include "./engine/extern/stb_truetype.h"
 
-static t_screen m_current_screen = SPLASH;
+#include <threads.h>
+#include <stdatomic.h>
 
-// EXTERNS
-bool m_should_change_screen = false;
-t_screen m_should_change_screen_to;
-char* g_save_file; 
+static bool s_loading = false;
+static thrd_t s_loading_thread;
+static atomic_int s_loading_progress = 0;
+static atomic_bool s_loading_finished = false;
 
-void on_free_button_released() {
+static t_screen m_current_screen = NONE;
+static bool s_should_change_screen = false;
+static t_screen s_should_change_screen_to;
+
+static t_sprite s_sprite_loading_bar;
+
+char* g_save_file;
+
+void set_loading_progress(float progress) {
+    atomic_store_explicit(&s_loading_progress, (int)(progress * 10), memory_order_relaxed);
+}
+void set_loading_finished() {
+    atomic_store_explicit(&s_loading_finished, true, memory_order_relaxed);
+}
+
+void set_screen(t_screen screen) {
+    s_should_change_screen = true;
+    s_should_change_screen_to = screen;
 }
 
 int main() {
 
-    t_result result = t_begin(640, 360, "Imps & Fairies");
+    t_result result = t_begin(640, 360, "Tailored");
 
     if (result != T_SUCCESS) {
         exit(EXIT_FAILURE);
     }
 
     t_set_cursor("./res/textures/pointer_b.png", 8, 6);
-    
-    switch (m_current_screen)
-    {
-        case SPLASH: load_splash_screen(); break;
-        case TITLE: load_title_screen(); break;
-        case GAME: load_game_screen(); break;
-    }
+    t_load_texture_data_s(&s_sprite_loading_bar, "./res/textures/loading_bar.png");
+    t_init_sprite(&s_sprite_loading_bar);
+
+    set_screen(SPLASH);
 
     while(t_loop()) {
 
-        switch (m_current_screen)
+        if (s_should_change_screen)
         {
-            case SPLASH: update_splash_screen(); break;
-            case TITLE: update_title_screen(); break;
-            case GAME: update_game_screen(); break;
-        }
+            s_should_change_screen = false;
 
-        if (m_should_change_screen)
-        {
-            m_should_change_screen = false;
             switch (m_current_screen)
             {
                 case SPLASH: unload_splash_screen(); break;
                 case TITLE: unload_title_screen(); break;
                 case GAME: unload_game_screen(); break;
+                case NONE: break;
             }
 
-            switch (m_should_change_screen_to)
+            int (*load_screen)(void*) = NULL;
+            switch (s_should_change_screen_to)
             {
-                case SPLASH: load_splash_screen(); break;
-                case TITLE: load_title_screen(); break;
-                case GAME: load_game_screen(); break;
+                case SPLASH: load_screen = &load_splash_screen; break;
+                case TITLE: load_screen = &load_title_screen; break;
+                case GAME: load_screen = &load_game_screen; break;
+                case NONE: break;
             }
 
-            m_current_screen = m_should_change_screen_to;
+            if (load_screen != NULL) { 
+
+                s_loading = true;
+                s_loading_finished = false;
+                s_loading_progress = 0;
+
+                int result = thrd_create(&s_loading_thread, load_screen, NULL);
+                if (result != thrd_success) { 
+                    printf("thrd_create failed, error: %d\n", result);
+                } else {
+                    printf("Loading screen started.\n");
+                }
+            }
+
+            m_current_screen = s_should_change_screen_to;
         }
 
-        switch (m_current_screen)
-        {
-            case SPLASH: draw_splash_screen(); break;
-            case TITLE: draw_title_screen(); break;
-            case GAME: draw_game_screen(); break;
+        if (s_loading) {
+
+            if (atomic_load_explicit(&s_loading_finished, memory_order_relaxed)) { 
+                s_loading = false;
+
+                int result = thrd_join(s_loading_thread, NULL);
+                if (result != thrd_success) {
+                    printf("thrd_join failed, error: %d\n", result);
+                } else {
+                    printf("Loading screen finished.\n");
+                    printf("Initializing screen.\n");
+                    switch (m_current_screen)
+                    {
+                        case SPLASH: init_splash_screen(); break;
+                        case TITLE: init_title_screen(); break;
+                        case GAME: init_game_screen(); break;
+                        case NONE: break;
+                    }
+                    printf("Initializing screen finished.\n");
+                }
+            }
+            else {
+                t_clear_color(CC_BLACK);
+                draw_sprite(&s_sprite_loading_bar, 
+                    (t_window_size().x - s_sprite_loading_bar.texture_data.width) / 2, 
+                    (t_window_size().y - s_sprite_loading_bar.texture_data.height) / 2,
+                    s_sprite_loading_bar.texture_data.width,
+                    s_sprite_loading_bar.texture_data.height, CC_RED);
+                
+                draw_rect(
+                    (t_window_size().x - s_sprite_loading_bar.texture_data.width) / 2, 
+                    t_window_size().y / 2 - s_sprite_loading_bar.texture_data.height / 4,
+                    s_sprite_loading_bar.texture_data.width * ((float)atomic_load_explicit(&s_loading_progress, memory_order_relaxed) / 10),
+                    s_sprite_loading_bar.texture_data.height / 2, CC_RED);
+            }
         }
 
+        if (!s_loading) { 
+            switch (m_current_screen)
+            {
+                case SPLASH: draw_splash_screen(); break;
+                case TITLE: draw_title_screen(); break;
+                case GAME: draw_game_screen(); break;
+                case NONE: break;
+            }
+        }
+       
         t_draw_scene();
         t_loop_end();
     }
