@@ -20,7 +20,7 @@ static bool s_loading = false;
     #include <threads.h>
     static thrd_t s_thread;
         #define CREATE_THREAD(thread, func) thrd_create(thread, func, NULL)
-        #define JOIN_THREAD(thread) thrd_join(thread)
+        #define JOIN_THREAD(thread) thrd_join(thread, NULL)
 #else
     #include <pthread.h>
     static pthread_t s_thread;
