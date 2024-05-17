@@ -19,6 +19,3 @@ void t_deinit_sprite(t_sprite* sprite);
 
 void t_draw_sprite(t_sprite* sprite, float x, float y, float width, float height, t_color color);
 void t_draw_sprite_r(t_sprite *sprite, t_rect rect, t_color color);
-
-void t_begin_scissor(int x, int y, int width, int height);
-void t_end_scissor();

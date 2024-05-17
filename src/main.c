@@ -35,6 +35,10 @@ static t_screen s_should_change_screen_to;
 
 static t_sprite s_sprite_loading_bar;
 
+static t_font s_font;
+static float s_fps_update = 0;
+static int s_current_fps;
+
 char* g_save_file;
 
 void set_loading_progress(float progress) {
@@ -60,6 +64,7 @@ int main() {
     t_set_cursor("./res/textures/pointer_b.png", 8, 6);
     t_load_texture_data_s(&s_sprite_loading_bar, "./res/textures/loading_bar.png");
     t_init_sprite(&s_sprite_loading_bar);
+    s_font = load_ttf_font("./res/fonts/Roboto-Regular.ttf", 18);
 
     set_screen(SPLASH);
 
@@ -149,6 +154,16 @@ int main() {
                 case NONE: break;
             }
         }
+
+        s_fps_update += t_delta_time();
+        if (s_fps_update >= 1.0f) { 
+            s_current_fps = (int)(1.0f / t_delta_time());
+            s_fps_update = 0;
+        }
+        
+        char* text_fps[20];
+        sprintf(text_fps, "%d fps", s_current_fps);
+        draw_text_ttf(text_fps, &s_font, (t_vec2) { 12, t_window_size().y - 12 }, WHITE, 0);
 
         t_draw_scene();
         t_loop_end();

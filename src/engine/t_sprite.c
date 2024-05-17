@@ -11,8 +11,6 @@ extern t_input_state input_state;
 static unsigned int sprite_quad_vao;
 static unsigned int sprite_shader;
 
-t_rect clip_areas[2];
-
 static void init_shader() {
   sprite_shader = t_create_shader_program("./res/shaders/sprite_shader.vs",
                                         "./res/shaders/sprite_shader.fs");
@@ -44,12 +42,15 @@ static void init_quad() {
 void t_init_sprite_renderer() {
   init_shader();
   init_quad();
-
-  clip_areas[0] = RECT_ZERO;
-  clip_areas[1] = RECT_ZERO;
 }
 
 void t_draw_sprite(t_sprite* sprite, float x, float y, float width, float height, t_color color) {
+
+  if (t_clip_area().width + t_clip_area().height > 0) {
+        if (!does_rect_overlap_rect((t_rect){x, y, width, height}, t_clip_area()))
+        return;
+  }
+
   glUseProgram(sprite_shader);
 
   mat4 mat4_projection;
@@ -91,27 +92,6 @@ void t_draw_sprite_r(t_sprite *sprite, t_rect rect, t_color color) {
     t_draw_sprite(
       sprite,
       rect.x, rect.y, rect.width, rect.height, color);
-}
-
-void t_begin_scissor(int x, int y, int width, int height) {
-
-  const t_vec2 window_size = t_window_size();
-  const t_vec2 framebuffer_size = t_framebuffer_size();
-
-  clip_areas[0] = (t_rect) { x, y, width, height };
-
-  glEnable(GL_SCISSOR_TEST);
-  glScissor(
-      (x / window_size.x) * framebuffer_size.x,
-      ((window_size.y - y - height) / window_size.y) * framebuffer_size.y,
-      (width / window_size.x) * framebuffer_size.x,
-      (height / window_size.y) * framebuffer_size.y);
-}
-
-void t_end_scissor() {
-
-  clip_areas[0] = RECT_ZERO;
-  glDisable(GL_SCISSOR_TEST);
 }
 
 void t_load_texture_data_s(t_sprite* sprite, const char* texture_path) {

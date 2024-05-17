@@ -3,7 +3,6 @@
 
 // EXTERN
 extern t_input_state input_state;
-extern t_rect clip_areas[2];
 
 // STATIC
 static int m_currently_over_ui = 0;
@@ -80,8 +79,8 @@ t_ui_button create_ui_button_t(t_font* font, const char* text) {
 
 void draw_ui_button(t_ui_button* button, int x, int y, int width, int height) {
 
-    if (clip_areas[0].width + clip_areas[0].height > 0) {
-        if (!does_rect_overlap_rect((t_rect){x, y, width, height}, clip_areas[0]))
+    if (t_clip_area().width + t_clip_area().height > 0) {
+        if (!does_rect_overlap_rect((t_rect){x, y, width, height}, t_clip_area()))
         return;
     }
 
@@ -94,8 +93,8 @@ void draw_ui_button(t_ui_button* button, int x, int y, int width, int height) {
     }
     else if (is_rect_zero(s_ui_raycast_block) || !is_point_in_rect(mouse_position(), s_ui_raycast_block) ){ 
         bool is_mouse_inside_clip_area =
-            clip_areas[0].width + clip_areas[0].height > 0 ? 
-            is_point_in_rect(input_state.mouse_state.position, clip_areas[0]) : true;
+            t_clip_area().width + t_clip_area().height > 0 ? 
+            is_point_in_rect(input_state.mouse_state.position, t_clip_area()) : true;
 
         if (is_mouse_inside_clip_area && is_point_in_rect(input_state.mouse_state.position, (t_rect){ x, y, width, height }))
         {

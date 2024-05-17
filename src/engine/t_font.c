@@ -258,6 +258,13 @@ void draw_text_ttf(const char* text, t_font* font, t_vec2 position, t_color colo
           current_width = 0;
           pos_x = position.x;
           pos_y += font->line_height;
+
+          if (t_clip_area().height > 0 && pos_y - font->line_height > t_clip_area().y + t_clip_area().height) {
+            glDrawArraysInstanced(GL_TRIANGLES, 0, 6, index);
+            glBindVertexArray(0);
+            glUseProgram(0);
+            return;
+          }
         }
 
         for (int j = current_word_index; j < current_word_index + current_word_length; j++) {

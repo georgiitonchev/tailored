@@ -40,6 +40,17 @@ static bool s_prompt_save = false;
 static bool s_drawing_categories = true;
 static bool s_drawing_options = false;
 
+static float s_ease_out_timer_left_side = 0;
+static float s_ease_out_left_side = false;
+static float s_ease_in_left_side = false;
+
+static float s_ease_out_timer_right_side = 0;
+static float s_ease_out_right_side = false;
+static float s_ease_in_right_side = false;
+
+static float s_left_side_offset_x = 0;
+static float s_right_side_offset_x = 0;
+
 static void s_on_button_position_pressed(t_ui_button* button) {
     s_drawing_categories = !s_drawing_categories;
     s_drawing_options = !s_drawing_options;
@@ -137,6 +148,9 @@ int load_game_screen(void* args) {
 
 void init_game_screen() {
 
+    s_ease_in_left_side = true;
+    s_ease_in_right_side = true;
+    
     s_font_ui_s = load_ttf_font("./res/fonts/Eczar-Regular.ttf", 32);
     s_font_ui_m = load_ttf_font("./res/fonts/Eczar-Regular.ttf", 34);
 
@@ -192,7 +206,7 @@ static void s_draw_categories() {
     for (int x = 0; x < 3; x++) { 
         for (int y = 0; y < 3; y++) {
 
-            const float pos_x = 376 + 16 + x * (64 + 12);
+            const float pos_x = 376 + 16 + x * (64 + 12) + s_right_side_offset_x;
             const float pos_y = 16 + 16 + y * (64 + 45);
 
             t_color color = CC_BLACK;
@@ -213,15 +227,15 @@ static void s_draw_categories() {
 static void s_draw_options() { 
 
     t_vec2 size_category_text = measure_text_size_ttf("Horns", &s_font_ui_m);
-    draw_text_ttf("Horns", &s_font_ui_m, (t_vec2) { 376 + (248 - size_category_text.x) / 2, 16 + size_category_text.y + 12}, CC_BLACK, 0);
+    draw_text_ttf("Horns", &s_font_ui_m, (t_vec2) { 376 + (248 - size_category_text.x) / 2 + s_right_side_offset_x, 16 + size_category_text.y + 12}, CC_BLACK, 0);
 
     t_vec2 size_style_text = measure_text_size_ttf("Style", &s_font_ui_s);
-    draw_text_ttf("Style", &s_font_ui_s, (t_vec2) { 376 + (248 - size_style_text.x) / 2, 52 + size_style_text.y }, CC_BLACK, 0);
+    draw_text_ttf("Style", &s_font_ui_s, (t_vec2) { 376 + (248 - size_style_text.x) / 2 + s_right_side_offset_x, 52 + size_style_text.y }, CC_BLACK, 0);
 
     for (int x = 0; x < 4; x++) { 
         for (int y = 0; y < 3; y++) {
 
-            const float pos_x = 376 + 42 + x * (32 + 12);
+            const float pos_x = 376 + 42 + x * (32 + 12) + s_right_side_offset_x;
             const float pos_y = 78 + y * (32 + 12);
 
             t_color color = CC_BLACK;
@@ -231,12 +245,12 @@ static void s_draw_options() {
     }
 
     t_vec2 size_color_text = measure_text_size_ttf("Color", &s_font_ui_s);
-    draw_text_ttf("Color", &s_font_ui_s, (t_vec2) { 376 + (248 - size_color_text.x) / 2, 216 + size_color_text.y }, CC_BLACK, 0);
+    draw_text_ttf("Color", &s_font_ui_s, (t_vec2) { 376 + (248 - size_color_text.x) / 2 + s_right_side_offset_x, 216 + size_color_text.y }, CC_BLACK, 0);
 
     for (int x = 0; x < 11; x++) { 
         for (int y = 0; y < 4; y++) {
 
-            const float pos_x = 376 + 42 + x * (12 + 3);
+            const float pos_x = 376 + 42 + x * (12 + 3) + s_right_side_offset_x;
             const float pos_y = 239 + y * (12 + 3);
 
             t_color color = CC_BLACK;
@@ -266,19 +280,60 @@ void draw_game_screen() {
         s_sprite_spritesheet_idle.texture_slice.y = (s_index_animation / 4) * 360;
     }
 
-    draw_ui_button(&s_button_save, 16, 16, 96, 32);
+    if (s_ease_in_left_side) {
+
+        float progress = t_ease_out_quint(&s_ease_out_timer_left_side, &s_left_side_offset_x, -256, 0, .5f);
+
+        if (progress >= 1) {
+            s_ease_out_timer_left_side = 0;
+            s_ease_in_left_side = false;
+        }
+    }
+
+    if (s_ease_out_left_side) {
+
+        float progress = t_ease_out_quint(&s_ease_out_timer_left_side, &s_left_side_offset_x, 0, -256, .5f);
+
+        if (progress >= 1) {
+            s_ease_out_timer_left_side = 0;
+            s_ease_out_left_side = false;
+        }
+    }
+
+    draw_ui_button(&s_button_save, 16 + s_left_side_offset_x, 16, 96, 32);
     t_vec2 size_text_save = measure_text_size_ttf("Save", &s_font_ui_m);
-    draw_text_ttf("Save", &s_font_ui_m, (t_vec2) { 16 + (96 - size_text_save.x) / 2, 16 + (32 + size_text_save.y) / 2}, CC_BLACK, 0);
+    draw_text_ttf("Save", &s_font_ui_m, (t_vec2) { 16 + (96 - size_text_save.x) / 2 + s_left_side_offset_x, 16 + (32 + size_text_save.y) / 2}, CC_BLACK, 0);
 
-    draw_ui_button(&s_button_reset, 16, 56, 96, 32);
+    draw_ui_button(&s_button_reset, 16 + s_left_side_offset_x, 56, 96, 32);
     t_vec2 size_text_reset = measure_text_size_ttf("Reset", &s_font_ui_m);
-    draw_text_ttf("Reset", &s_font_ui_m, (t_vec2) { 16 + (96 - size_text_reset.x) / 2,  56 + (32 + size_text_reset.y) / 2}, CC_BLACK, 0);
+    draw_text_ttf("Reset", &s_font_ui_m, (t_vec2) { 16 + (96 - size_text_reset.x) / 2 + s_left_side_offset_x,  56 + (32 + size_text_reset.y) / 2}, CC_BLACK, 0);
 
-    draw_ui_button(&s_button_quit, 16, t_window_size().y - 32 - 16, 96, 32);
+    draw_ui_button(&s_button_quit, 16 + s_left_side_offset_x, t_window_size().y - 32 - 16, 96, 32);
     t_vec2 size_text_quit = measure_text_size_ttf("Back", &s_font_ui_m);
-    draw_text_ttf("Back", &s_font_ui_m, (t_vec2) { 16 + (96 - size_text_quit.x) / 2, t_window_size().y - 32 - 16 + (32 + size_text_quit.y) / 2}, CC_BLACK, 0);
+    draw_text_ttf("Back", &s_font_ui_m, (t_vec2) { 16 + (96 - size_text_quit.x) / 2 + s_left_side_offset_x, t_window_size().y - 32 - 16 + (32 + size_text_quit.y) / 2}, CC_BLACK, 0);
 
-    t_draw_sprite(&s_sprite_button, 376, 16, 248, 328, CC_LIGHT_RED);
+
+    if (s_ease_in_right_side) {
+
+        float progress = t_ease_out_quint(&s_ease_out_timer_right_side, &s_right_side_offset_x, 256, 0, .5f);
+
+        if (progress >= 1) {
+            s_ease_out_timer_right_side = 0;
+            s_ease_in_right_side = false;
+        }
+    }
+
+    if (s_ease_out_right_side) {
+
+        float progress = t_ease_out_quint(&s_ease_out_timer_right_side, &s_right_side_offset_x, 0, 256, .5f);
+
+        if (progress >= 1) {
+            s_ease_out_timer_right_side = 0;
+            s_ease_out_right_side = false;
+        }
+    }
+
+    t_draw_sprite(&s_sprite_button, 376 + s_right_side_offset_x, 16, 248, 328, CC_LIGHT_RED);
 
     // Categories
     if (s_drawing_categories)

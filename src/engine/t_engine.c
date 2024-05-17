@@ -49,6 +49,33 @@ t_vec2 t_framebuffer_size() {
   return framebuffer_size;
 }
 
+static t_rect s_clip_area;
+
+void t_begin_scissor(int x, int y, int width, int height) {
+
+  const t_vec2 window_size = t_window_size();
+  const t_vec2 framebuffer_size = t_framebuffer_size();
+
+  s_clip_area = (t_rect) { x, y, width, height };
+
+  glEnable(GL_SCISSOR_TEST);
+  glScissor(
+      (x / window_size.x) * framebuffer_size.x,
+      ((window_size.y - y - height) / window_size.y) * framebuffer_size.y,
+      (width / window_size.x) * framebuffer_size.x,
+      (height / window_size.y) * framebuffer_size.y);
+}
+
+void t_end_scissor() {
+
+  s_clip_area = RECT_ZERO;
+  glDisable(GL_SCISSOR_TEST);
+}
+
+t_rect t_clip_area() {
+  return s_clip_area;
+}
+
 unsigned int create_framebuffer() {
 
   // generate framebuffer
@@ -272,6 +299,7 @@ int t_begin(int window_width, int window_height, const char* title) {
     glfwMakeContextCurrent(s_window);
     glfwSetCursorPosCallback(s_window, cursor_pos_callback);
     glfwSetMouseButtonCallback(s_window, mouse_button_callback);
+    glfwSwapInterval(0);
 
     printf("Initializing GLAD...\n");
 
@@ -312,6 +340,8 @@ int t_begin(int window_width, int window_height, const char* title) {
     t_init_font_renderer();
     t_init_shapes_renderer();
     // BEGIN AUDIO
+
+    s_clip_area = RECT_ZERO;
 
     printf("Initializing miniaudio...\n");
 

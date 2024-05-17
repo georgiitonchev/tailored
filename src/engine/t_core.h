@@ -104,6 +104,10 @@ void t_loop_end();
 void t_end();
 void t_draw_scene();
 
+void t_begin_scissor(int x, int y, int width, int height);
+void t_end_scissor();
+t_rect t_clip_area();
+
 // AUDIO 
 #include "./extern/miniaudio.h"
 void t_play_audio(const char* path);

@@ -1,7 +1,6 @@
 #include "screen_title.h"
 
 #include "../../engine/tailored.h"
-#include "../../../dep/include/glad/glad.h"
 #include "../../game.h"
 #include "../../cJSON.h"
 
