@@ -32,7 +32,7 @@ typedef struct t_font {
     
 } t_font;
 
-void init_font_renderer();
+void t_init_font_renderer();
 void terminate_font_renderer();
 
 t_font load_ttf_font(const char* path, unsigned int font_size);

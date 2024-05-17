@@ -308,9 +308,9 @@ int t_begin(int window_width, int window_height, const char* title) {
     printf("window_size: %d, %d\n", window_width, window_height);
     printf("framebuffer_size: %d, %d\n", width, height);
 
-    init_sprite_renderer();
-    init_font_renderer();
-    init_shapes_renderer();
+    t_init_sprite_renderer();
+    t_init_font_renderer();
+    t_init_shapes_renderer();
     // BEGIN AUDIO
 
     printf("Initializing miniaudio...\n");

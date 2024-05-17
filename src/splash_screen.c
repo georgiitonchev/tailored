@@ -1,6 +1,5 @@
 #include "screens.h"
 #include "./engine/tailored.h"
-#include "./engine/t_easings.h"
 
 #include "game.h"
 
@@ -25,13 +24,11 @@ int load_splash_screen(void* args) {
 }
 
 void init_splash_screen() {
-
      t_init_sprite(&s_sprite_splash_logo);
      s_window_size = t_window_size();
 }
 
 void unload_splash_screen() {
-
      t_deinit_sprite(&s_sprite_splash_logo);
 }
 
@@ -45,7 +42,7 @@ void draw_splash_screen() {
      if (s_splash_timer > 1)
           t_ease_in_back(&s_timer_splash_fade, &s_splash_fade, 0, 1, 2.5f);
 
-     draw_sprite(&s_sprite_splash_logo, (s_window_size.x - s_sprite_splash_logo.texture_data.width) / 2, (s_window_size.y - s_sprite_splash_logo.texture_data.height) / 2, 
+     t_draw_sprite(&s_sprite_splash_logo, (s_window_size.x - s_sprite_splash_logo.texture_data.width) / 2, (s_window_size.y - s_sprite_splash_logo.texture_data.height) / 2, 
           s_sprite_splash_logo.texture_data.width, s_sprite_splash_logo.texture_data.height, logo_color);
 
      if (s_splash_timer >= 4) {

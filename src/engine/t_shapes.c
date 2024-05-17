@@ -1,5 +1,4 @@
-#include "t_shapes.h"
-#include "t_sprite.h"
+#include "tailored.h"
 
 #include "../../dep/include/glad/glad.h"
 
@@ -38,7 +37,7 @@ static t_texture s_load_texture(const t_texture_data* texture_data) {
   return texture;
 }
 
-void init_shapes_renderer() {
+void t_init_shapes_renderer() {
 
     unsigned char white_pixel[] = { 255, 255, 255, 255 };
     t_texture_data texture_white_data = { .bytes = (unsigned char*) white_pixel, .width = 1, .height = 1, .channels = 3 };
@@ -102,9 +101,9 @@ bool does_rect_overlap_rect(t_rect this, t_rect that) {
 }
 
 void draw_rect(int x, int y, int width, int height, t_color color) {
-    draw_sprite(&s_white_rectangle_sprite, x, y, width, height, color);
+    t_draw_sprite(&s_white_rectangle_sprite, x, y, width, height, color);
 }
 
 void draw_rect_lines(int x, int y, int width, int height, t_color color) {
-    draw_sprite(&s_white_border_rectangle_sprite, x, y, width, height, color);
+    t_draw_sprite(&s_white_border_rectangle_sprite, x, y, width, height, color);
 }

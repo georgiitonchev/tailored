@@ -1,16 +1,8 @@
 #include "screen_title.h"
 
 #include "../../engine/tailored.h"
-#include "../../engine/t_input.h"
-#include "../../engine/t_sprite.h"
-#include "../../engine/t_ui.h"
-#include "../../engine/t_shapes.h"
-#include "../../engine/t_font.h"
-
 #include "../../../dep/include/glad/glad.h"
-
 #include "../../game.h"
-
 #include <stdio.h>
 
 // FONTS
@@ -112,7 +104,7 @@ void init_section_settings() {
 
 void draw_section_settings(const float p_offset_x, const float p_offset_y) {
 
-    draw_sprite(&s_sprite_section_background, 256, 16 + p_offset_y, 368, 328, CC_LIGHT_RED);
+    t_draw_sprite(&s_sprite_section_background, 256, 16 + p_offset_y, 368, 328, CC_LIGHT_RED);
 
     t_vec2 text_size_sound = measure_text_size_ttf("Sound", &s_font_ui_l);
     draw_text_ttf("Sound", &s_font_ui_l, (t_vec2) {256 + (368 - text_size_sound.x) / 2, 48 + p_offset_y}, CC_BLACK, 0);
@@ -146,12 +138,12 @@ void draw_section_settings(const float p_offset_x, const float p_offset_y) {
             s_sprite_small_knob.texture_data.width, 
             s_sprite_small_knob.texture_data.height };
 
-        draw_sprite_t(&s_sprite_small_knob, slider_knob_small_rect, CC_BLACK);
+        t_draw_sprite_r(&s_sprite_small_knob, slider_knob_small_rect, CC_BLACK);
     }
 
     glStencilMask(0x00);
     
-    draw_sprite_t(&s_sprite_slider_background, s_rect_master_volume_slider, CC_BLACK);
+    t_draw_sprite_r(&s_sprite_slider_background, s_rect_master_volume_slider, CC_BLACK);
     glStencilMask(0xFF);
     glStencilFunc(GL_ALWAYS, 1, 0xFF);
 
@@ -188,11 +180,11 @@ void draw_section_settings(const float p_offset_x, const float p_offset_y) {
             s_sprite_small_knob.texture_data.width, 
             s_sprite_small_knob.texture_data.height };
 
-        draw_sprite_t(&s_sprite_small_knob, slider_knob_small_rect, CC_BLACK);
+        t_draw_sprite_r(&s_sprite_small_knob, slider_knob_small_rect, CC_BLACK);
     }
 
     glStencilMask(0x00);
-    draw_sprite_t(&s_sprite_slider_background, s_rect_music_volume_slider, CC_BLACK);
+    t_draw_sprite_r(&s_sprite_slider_background, s_rect_music_volume_slider, CC_BLACK);
     glStencilMask(0xFF);
     glStencilFunc(GL_ALWAYS, 1, 0xFF);
 
@@ -228,11 +220,11 @@ void draw_section_settings(const float p_offset_x, const float p_offset_y) {
             s_sprite_small_knob.texture_data.width, 
             s_sprite_small_knob.texture_data.height };
 
-        draw_sprite_t(&s_sprite_small_knob, slider_knob_small_rect, CC_BLACK);
+        t_draw_sprite_r(&s_sprite_small_knob, slider_knob_small_rect, CC_BLACK);
     }
 
     glStencilMask(0x00);
-    draw_sprite_t(&s_sprite_slider_background, s_rect_effects_volume_slider, CC_BLACK);
+    t_draw_sprite_r(&s_sprite_slider_background, s_rect_effects_volume_slider, CC_BLACK);
     glStencilMask(0xFF);
     glStencilFunc(GL_ALWAYS, 1, 0xFF);
 

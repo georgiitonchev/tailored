@@ -1,5 +1,4 @@
 #include "tailored.h"
-#include "t_input.h"
 
 extern t_input_state input_state;
 

@@ -1,4 +1,4 @@
-#include "t_font.h"
+#include "tailored.h"
 
 #include <math.h>
 #include <string.h>
@@ -179,7 +179,7 @@ void delete_ttf_font(t_font* font) {
   t_free_texture(&font->bitmap);
 }
 
-void init_font_renderer() {
+void t_init_font_renderer() {
     init_quad();
     init_shader();
 

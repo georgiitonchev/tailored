@@ -1,18 +1,8 @@
 #include "screen_title.h"
 
 #include "../../engine/tailored.h"
-#include "../../engine/t_input.h"
-#include "../../engine/t_sprite.h"
-#include "../../engine/t_ui.h"
-#include "../../engine/t_shapes.h"
-#include "../../engine/t_font.h"
-#include "../../engine/t_list.h"
-#include "../../engine/t_easings.h"
-
 #include "../../../dep/include/glad/glad.h"
-
 #include "../../game.h"
-
 #include "../../cJSON.h"
 
 #include <stdio.h>
@@ -308,7 +298,7 @@ void init_section_saves() {
 
 void draw_section_saves(const float p_offset_x, const float p_offset_y) {
 
-    draw_sprite(&s_sprite_section_background, 256 + p_offset_x, 16 + p_offset_y, 368, 328, CC_LIGHT_RED);
+    t_draw_sprite(&s_sprite_section_background, 256 + p_offset_x, 16 + p_offset_y, 368, 328, CC_LIGHT_RED);
 
     // CHARACTER ELEMENTS
     t_begin_scissor(256 + 16 + p_offset_x, 16 + p_offset_y, 368 - 32, 223 + 16);
@@ -357,12 +347,12 @@ void draw_section_saves(const float p_offset_x, const float p_offset_y) {
         else if (rect_small_knob.x > s_rect_slider.x + s_rect_slider.width - rect_small_knob.width)
             rect_small_knob.x = s_rect_slider.x + s_rect_slider.width - rect_small_knob.width;
 
-        draw_sprite_t(&s_sprite_small_knob, rect_small_knob, CC_BLACK);
+        t_draw_sprite_r(&s_sprite_small_knob, rect_small_knob, CC_BLACK);
     }
 
     glStencilMask(0x00);
     // SLIDER
-    draw_sprite_t(&s_sprite_slider_background, s_rect_slider, CC_BLACK);
+    t_draw_sprite_r(&s_sprite_slider_background, s_rect_slider, CC_BLACK);
 
     glStencilMask(0xFF);
     glStencilFunc(GL_ALWAYS, 1, 0xFF);

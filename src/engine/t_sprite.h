@@ -11,14 +11,14 @@ typedef struct t_sprite {
 
 } t_sprite;
 
-void init_sprite_renderer();
+void t_init_sprite_renderer();
 
 void t_load_texture_data_s(t_sprite* sprite, const char* texture_path);
 void t_init_sprite(t_sprite* sprite);
 void t_deinit_sprite(t_sprite* sprite);
 
-void draw_sprite_t(t_sprite *sprite, t_rect rect, t_color color);
-void draw_sprite(t_sprite* sprite, float x, float y, float width, float height, t_color color);
+void t_draw_sprite(t_sprite* sprite, float x, float y, float width, float height, t_color color);
+void t_draw_sprite_r(t_sprite *sprite, t_rect rect, t_color color);
 
 void t_begin_scissor(int x, int y, int width, int height);
 void t_end_scissor();

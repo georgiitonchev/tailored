@@ -3,59 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../../dep/include/glad/glad.h"
-// STB
-#define STB_IMAGE_IMPLEMENTATION
-#include "../../dep/include/stb/stb_image.h"
-// MATH
-#include "../../dep/include/cglm/cglm.h"
-
-const char *t_read_file(const char *path, long* file_size) {
-  char *text_buffer;
-
-  FILE *file_pointer = fopen(path, "rb");
-
-  if (file_pointer == NULL) {
-    perror(path);
-    return NULL;
-  }
-
-  fseek(file_pointer, 0, SEEK_END);
-  *file_size = ftell(file_pointer);
-  rewind(file_pointer);
-
-  text_buffer = (char *)malloc((*file_size + 1) * sizeof(char));
-
-  fread(text_buffer, sizeof(char), *file_size, file_pointer);
-
-  text_buffer[*file_size] = '\0';
-
-  fclose(file_pointer);
-
-  return text_buffer;
-}
-
-t_result t_write_file(const char* path, const char* file_data) {
-  FILE *file = fopen(path, "wt");
-  if (file != NULL)
-  {
-      int count = fprintf(file, "%s", file_data);
-
-      if (count < 0) {
-        fclose(file);
-        printf("ERROR: Could not write to file: %s.\n", path);
-        return T_ERROR;
-      }
-
-      fclose(file);
-      return T_SUCCESS;
-  }
-  else {
-      printf("ERROR: Could not create file: %s.\n", path);
-      return T_ERROR;
-  }
-}
-
 static GLuint compile_shader(const char* shader_path, unsigned int shader_type) {
 
   long file_size;
@@ -124,73 +71,6 @@ GLuint t_create_shader_program(const char *vertex_shader_path, const char *fragm
 
 void t_destroy_shader_program(unsigned int shader_program) {
   glDeleteProgram(shader_program);
-}
-
-t_texture_data t_load_texture_data(const char* path) {
-  int width, height, channels;
-  unsigned char *bytes = stbi_load(path, &width, &height, &channels, 0);
-
-  if (bytes == NULL) {
-    printf("error loading texture: %s\n", path);
-  }
-
-  t_texture_data texture_data = {
-    .bytes = bytes,
-    .channels = channels,
-    .width = width,
-    .height = height
-  };
-
-  return texture_data;
-}
-
-static t_texture s_load_texture(const t_texture_data* texture_data) {
-
-  GLenum texture_format = 0;
-  if (texture_data->channels == 1)
-    texture_format = GL_RED;
-  else if (texture_data->channels == 3)
-    texture_format = GL_RGB;
-  else if (texture_data->channels == 4)
-    texture_format = GL_RGBA;
-
-  unsigned int texture_id;
-  
-  glGenTextures(1, &texture_id);
-  glBindTexture(GL_TEXTURE_2D, texture_id);
-
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-  glTexImage2D(GL_TEXTURE_2D, 0, texture_format, texture_data->width, texture_data->height, 0,
-              texture_format, GL_UNSIGNED_BYTE, texture_data->bytes);
-
-  glBindTexture(GL_TEXTURE_2D, 0);
-
-  stbi_image_free(texture_data->bytes);
-
-  t_texture texture;
-  texture.id = texture_id;
-
-  return texture;
-}
-
-t_texture t_load_texture_from_data(const t_texture_data* texture_data) {
-  return s_load_texture(texture_data);
-}
-
-t_texture t_load_texture(const char *texture_path) {
-
-  t_texture_data texture_data = t_load_texture_data(texture_path);
-  return s_load_texture(&texture_data);
-}
-
-void t_free_texture(t_texture* texture) 
-{
-    glDeleteTextures(1, &texture->id);
 }
 
 void t_clear_color(t_color color) {

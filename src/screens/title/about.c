@@ -1,14 +1,7 @@
 #include "screen_title.h"
 
 #include "../../engine/tailored.h"
-#include "../../engine/t_input.h"
-#include "../../engine/t_sprite.h"
-#include "../../engine/t_ui.h"
-#include "../../engine/t_shapes.h"
-#include "../../engine/t_font.h"
-
 #include "../../../dep/include/glad/glad.h"
-
 #include "../../game.h"
 
 // FONTS
@@ -81,7 +74,7 @@ void init_section_about() {
 
 void draw_section_about(const float p_offset_x, const float p_offset_y) {
 
-    draw_sprite(&s_sprite_section_background, CC_UI_SECTION_RECT.x + p_offset_x, CC_UI_SECTION_RECT.y + p_offset_y, CC_UI_SECTION_RECT.z, CC_UI_SECTION_RECT.w, CC_LIGHT_RED);
+    t_draw_sprite(&s_sprite_section_background, CC_UI_SECTION_RECT.x + p_offset_x, CC_UI_SECTION_RECT.y + p_offset_y, CC_UI_SECTION_RECT.z, CC_UI_SECTION_RECT.w, CC_LIGHT_RED);
     t_begin_scissor(CC_UI_SECTION_RECT.x + CC_UI_PADDING.left, CC_UI_SECTION_RECT.y + CC_UI_PADDING.top + p_offset_y, CC_UI_SECTION_RECT.z - 48, CC_UI_SECTION_RECT.w - 32);
         draw_text_ttf(s_text_about, &s_font_ui_s, (t_vec2) { 256 + 16 , 16 + 32 + p_offset_y - s_value_scrolled * 600 }, CC_BLACK, 368 - 48);
 
@@ -110,12 +103,12 @@ void draw_section_about(const float p_offset_x, const float p_offset_y) {
         else if (rect_small_knob.y > s_rect_slider.y + s_rect_slider.height- rect_small_knob.height)
             rect_small_knob.y = s_rect_slider.y + s_rect_slider.height - rect_small_knob.height;
 
-        draw_sprite_t(&s_sprite_small_knob, rect_small_knob, CC_BLACK);
+        t_draw_sprite_r(&s_sprite_small_knob, rect_small_knob, CC_BLACK);
     }
 
     glStencilMask(0x00);
 
-    draw_sprite_t(&s_sprite_slider_background, s_rect_slider, CC_BLACK);
+    t_draw_sprite_r(&s_sprite_slider_background, s_rect_slider, CC_BLACK);
     glStencilMask(0xFF);
     glStencilFunc(GL_ALWAYS, 1, 0xFF);
 }

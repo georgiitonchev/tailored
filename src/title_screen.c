@@ -1,19 +1,9 @@
 #include "screens.h"
-#include "./engine/t_sprite.h"
-#include "./engine/t_ui.h"
-
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
 
 #include "./engine/tailored.h"
-#include "./engine/t_list.h"
-#include "./engine/t_shapes.h"
-#include "./engine/t_input.h"
-#include "./engine/t_font.h"
-
-#include "./engine/t_easings.h"
-
 #include "../dep/include/glad/glad.h"
 
 #include "cJSON.h"
@@ -277,7 +267,7 @@ void draw_title_screen() {
         }
     }
 
-    draw_sprite(&s_sprite_logo, 0 + s_left_side_offset_x, 0, s_sprite_logo.texture_data.width, s_sprite_logo.texture_data.height, CC_LIGHT_RED);
+    t_draw_sprite(&s_sprite_logo, 0 + s_left_side_offset_x, 0, s_sprite_logo.texture_data.width, s_sprite_logo.texture_data.height, CC_LIGHT_RED);
 
     draw_fire_particles();
 
@@ -363,7 +353,6 @@ void draw_title_screen() {
         }
     }
 
-
     t_vec2 text_size_about = measure_text_size_ttf("About", &s_ui_font_l);
     draw_text_ttf("About", &s_ui_font_l, (t_vec2) {64 + (128 - text_size_about.x) / 2 + s_left_side_offset_x, 268 + (48 + text_size_about.y) / 2}, CC_BLACK, 0);
 
@@ -378,7 +367,7 @@ void draw_title_screen() {
     }
 
     if (s_show_loading_bar) {
-        draw_sprite(&s_sprite_loading_bar,
+        t_draw_sprite(&s_sprite_loading_bar,
             (t_window_size().x - s_sprite_loading_bar.texture_data.width) / 2,
             (t_window_size().y - s_sprite_loading_bar.texture_data.height) / 2,
             s_sprite_loading_bar.texture_data.width,

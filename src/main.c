@@ -2,10 +2,6 @@
 #include <stdio.h>
 
 #include "./engine/tailored.h"
-#include "./engine/t_sprite.h"
-#include "./engine/t_font.h"
-#include "./engine/t_ui.h"
-#include "./engine/t_shapes.h"
 
 #include "screens.h"
 #include "game.h"
@@ -130,7 +126,7 @@ int main() {
             }
             else if (s_loading_buffer > .15f){
                 t_clear_color(CC_BLACK);
-                draw_sprite(&s_sprite_loading_bar,
+                t_draw_sprite(&s_sprite_loading_bar,
                     (t_window_size().x - s_sprite_loading_bar.texture_data.width) / 2,
                     (t_window_size().y - s_sprite_loading_bar.texture_data.height) / 2,
                     s_sprite_loading_bar.texture_data.width,

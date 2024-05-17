@@ -1,12 +1,6 @@
 #include "screens.h"
 
 #include "./engine/tailored.h"
-#include "./engine/t_font.h"
-#include "./engine/t_sprite.h"
-#include "./engine/t_input.h"
-#include "./engine/t_shapes.h"
-#include "./engine/t_ui.h"
-
 #include "game.h"
 
 #include "stdio.h"
@@ -284,7 +278,7 @@ void draw_game_screen() {
     t_vec2 size_text_quit = measure_text_size_ttf("Back", &s_font_ui_m);
     draw_text_ttf("Back", &s_font_ui_m, (t_vec2) { 16 + (96 - size_text_quit.x) / 2, t_window_size().y - 32 - 16 + (32 + size_text_quit.y) / 2}, CC_BLACK, 0);
 
-    draw_sprite(&s_sprite_button, 376, 16, 248, 328, CC_LIGHT_RED);
+    t_draw_sprite(&s_sprite_button, 376, 16, 248, 328, CC_LIGHT_RED);
 
     // Categories
     if (s_drawing_categories)
@@ -301,7 +295,7 @@ void draw_game_screen() {
         set_ui_raycast_block_r(RECT_ZERO);
 
         draw_rect(0, 0, t_window_size().x, t_window_size().y, modal_background_color);
-        draw_sprite(&s_sprite_button, (t_window_size().x - 256) / 2, (t_window_size().y - 128) / 2, 256, 128, CC_LIGHT_RED);
+        t_draw_sprite(&s_sprite_button, (t_window_size().x - 256) / 2, (t_window_size().y - 128) / 2, 256, 128, CC_LIGHT_RED);
 
         t_vec2 size_text = measure_text_size_ttf("Exit without saving?", &s_font_ui_m);
         draw_text_ttf("Exit without saving?", &s_font_ui_m, (t_vec2){(t_window_size().x - size_text.x) / 2, (t_window_size().y + size_text.y) / 2 - size_text.y}, CC_BLACK, 0);

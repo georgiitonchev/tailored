@@ -1,5 +1,6 @@
 #pragma once
 
+#include "tailored.h"
 #include <stdbool.h>
 
 //mouse

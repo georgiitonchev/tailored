@@ -1,9 +1,4 @@
-#include "t_ui.h"
-#include "t_font.h"
-#include "t_input.h"
-#include "t_shapes.h"
-#include "t_sprite.h"
-
+#include "tailored.h"
 #include <stdio.h>
 
 // EXTERN
@@ -149,7 +144,7 @@ void draw_ui_button(t_ui_button* button, int x, int y, int width, int height) {
     }
 
     if (button->sprite != NULL) {
-        draw_sprite(button->sprite, x, y, width, height, color);
+        t_draw_sprite(button->sprite, x, y, width, height, color);
     }
 
     if (button->text != NULL && button->font != NULL) {

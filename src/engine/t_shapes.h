@@ -1,7 +1,7 @@
 #include "tailored.h"
 #include <stdbool.h>
 
-void init_shapes_renderer();
+void t_init_shapes_renderer();
 
 bool is_point_in_rect(t_vec2 point, t_rect rect);
 bool is_rect_in_rect(t_rect this, t_rect that);

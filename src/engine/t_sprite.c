@@ -1,4 +1,4 @@
-#include "t_sprite.h"
+#include "tailored.h"
 
 // GL loader
 #include "../../dep/include/glad/glad.h"
@@ -41,7 +41,7 @@ static void init_quad() {
   glBindVertexArray(0);
 }
 
-void init_sprite_renderer() {
+void t_init_sprite_renderer() {
   init_shader();
   init_quad();
 
@@ -49,7 +49,7 @@ void init_sprite_renderer() {
   clip_areas[1] = RECT_ZERO;
 }
 
-void draw_sprite(t_sprite* sprite, float x, float y, float width, float height, t_color color) {
+void t_draw_sprite(t_sprite* sprite, float x, float y, float width, float height, t_color color) {
   glUseProgram(sprite_shader);
 
   mat4 mat4_projection;
@@ -87,15 +87,10 @@ void draw_sprite(t_sprite* sprite, float x, float y, float width, float height, 
   glBindVertexArray(0);
 }
 
-void draw_sprite_t(t_sprite *sprite, t_rect rect, t_color color) {
-    draw_sprite(
+void t_draw_sprite_r(t_sprite *sprite, t_rect rect, t_color color) {
+    t_draw_sprite(
       sprite,
       rect.x, rect.y, rect.width, rect.height, color);
-}
-
-void delete_sprite(t_sprite* sprite)
-{
-    t_free_texture(&sprite->texture);
 }
 
 void t_begin_scissor(int x, int y, int width, int height) {

@@ -1,9 +1,5 @@
-
 #pragma once
-
 #include "tailored.h"
-#include "t_sprite.h"
-#include "t_font.h"
 
 typedef struct t_ui_button {
     t_sprite* sprite;
