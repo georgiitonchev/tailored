@@ -10,7 +10,7 @@
 #include "cJSON.h"
 
 // EXTERNS
-extern char* g_save_file; 
+extern char* g_save_file;
 
 // FONTS
 static t_font s_font_ui_s;
@@ -68,7 +68,7 @@ static void s_on_button_quit_no_clicked() {
 
 static void s_on_button_quit_clicked() {
 
-    if (s_has_saved) { 
+    if (s_has_saved) {
         set_screen(TITLE);
     } else {
         s_prompt_save = true;
@@ -92,7 +92,7 @@ static void s_on_button_save_clicked() {
 
     free((char *)json_string);
 
-    if (write_file_result != T_SUCCESS) { 
+    if (write_file_result != T_SUCCESS) {
         printf("ERROR: Could not update save file - %s.\n", g_save_file);
     } else {
         printf("Save file updated successfuly - %s.\n", g_save_file);
@@ -105,7 +105,7 @@ static void s_on_button_reset_clicked() {
 
 }
 
-static void s_load_save_file() { 
+static void s_load_save_file() {
 
     long file_size;
     const char* save_file_data = t_read_file(g_save_file, &file_size);
@@ -150,7 +150,7 @@ void init_game_screen() {
 
     s_ease_in_left_side = true;
     s_ease_in_right_side = true;
-    
+
     s_font_ui_s = load_ttf_font("./res/fonts/Eczar-Regular.ttf", 32);
     s_font_ui_m = load_ttf_font("./res/fonts/Eczar-Regular.ttf", 34);
 
@@ -182,7 +182,6 @@ void init_game_screen() {
     s_button_quit_no = create_ui_button_t(&s_font_ui_m, "No");
     s_button_quit_no.on_released = s_on_button_quit_no_clicked;
 
-    // 200 x 350
     t_init_sprite(&s_sprite_spritesheet_idle);
     s_sprite_spritesheet_idle.texture_slice = (t_vec4) { 0, 0, 200, 360};
 
@@ -203,7 +202,7 @@ static void s_draw_categories() {
     const char* categories[] = {"Horns", "Hair", "Body", "Eyes", "Nails", "Wings", "Ears", "Mouth", "Tail"};
     unsigned int category_index = 0;
 
-    for (int x = 0; x < 3; x++) { 
+    for (int x = 0; x < 3; x++) {
         for (int y = 0; y < 3; y++) {
 
             const float pos_x = 376 + 16 + x * (64 + 12) + s_right_side_offset_x;
@@ -224,7 +223,7 @@ static void s_draw_categories() {
     }
 }
 
-static void s_draw_options() { 
+static void s_draw_options() {
 
     t_vec2 size_category_text = measure_text_size_ttf("Horns", &s_font_ui_m);
     draw_text_ttf("Horns", &s_font_ui_m, (t_vec2) { 376 + (248 - size_category_text.x) / 2 + s_right_side_offset_x, 16 + size_category_text.y + 12}, CC_BLACK, 0);
@@ -232,7 +231,7 @@ static void s_draw_options() {
     t_vec2 size_style_text = measure_text_size_ttf("Style", &s_font_ui_s);
     draw_text_ttf("Style", &s_font_ui_s, (t_vec2) { 376 + (248 - size_style_text.x) / 2 + s_right_side_offset_x, 52 + size_style_text.y }, CC_BLACK, 0);
 
-    for (int x = 0; x < 4; x++) { 
+    for (int x = 0; x < 4; x++) {
         for (int y = 0; y < 3; y++) {
 
             const float pos_x = 376 + 42 + x * (32 + 12) + s_right_side_offset_x;
@@ -247,7 +246,7 @@ static void s_draw_options() {
     t_vec2 size_color_text = measure_text_size_ttf("Color", &s_font_ui_s);
     draw_text_ttf("Color", &s_font_ui_s, (t_vec2) { 376 + (248 - size_color_text.x) / 2 + s_right_side_offset_x, 216 + size_color_text.y }, CC_BLACK, 0);
 
-    for (int x = 0; x < 11; x++) { 
+    for (int x = 0; x < 11; x++) {
         for (int y = 0; y < 4; y++) {
 
             const float pos_x = 376 + 42 + x * (12 + 3) + s_right_side_offset_x;
@@ -356,7 +355,7 @@ void draw_game_screen() {
         draw_text_ttf("Exit without saving?", &s_font_ui_m, (t_vec2){(t_window_size().x - size_text.x) / 2, (t_window_size().y + size_text.y) / 2 - size_text.y}, CC_BLACK, 0);
 
         t_vec2 size_text_no = measure_text_size_ttf("No", &s_font_ui_m);
-        draw_ui_button(&s_button_quit_no, 
+        draw_ui_button(&s_button_quit_no,
             (t_window_size().x - size_text.x) / 2 + 32, (t_window_size().y - 128) / 2 + 128 - 48, size_text_no.x, size_text_no.y);
 
         t_vec2 size_text_yes = measure_text_size_ttf("Yes", &s_font_ui_m);

@@ -108,7 +108,7 @@ void t_begin_scissor(int x, int y, int width, int height);
 void t_end_scissor();
 t_rect t_clip_area();
 
-// AUDIO 
+// AUDIO
 #include "./extern/miniaudio.h"
 void t_play_audio(const char* path);
 ma_result t_init_sound(const char* path, ma_sound* sound);
@@ -121,6 +121,7 @@ void t_set_master_volume(float value);
 // CORE FUNCTIONS
 void t_set_cursor(const char* path, int xhot, int yhot);
 float t_delta_time();
+float t_get_time();
 t_vec2 t_window_size();
 t_vec2 t_framebuffer_size();
 

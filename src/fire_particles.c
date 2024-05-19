@@ -1,11 +1,84 @@
 #include "./engine/tailored.h"
 #include "./engine/extern/miniaudio.h"
 
-
 #include "../dep/include/glad/glad.h"
 #include "../dep/include/cglm/cglm.h"
+#include "engine/t_core.h"
+#include "engine/t_sprite.h"
+#include "engine/t_texture.h"
 
 #include <stdlib.h>
+#include <math.h>
+#include <unistd.h>
+
+/* Function to linearly interpolate between a0 and a1
+ * Weight w should be in the range [0.0, 1.0]
+ */
+float interpolate(float a0, float a1, float w) {
+     return (a1 - a0) * ((w * (w * 6.0 - 15.0) + 10.0) * w * w * w) + a0;
+}
+
+typedef struct {
+    float x, y;
+} vector2;
+
+/* Create pseudorandom direction vector
+ */
+vector2 randomGradient(int ix, int iy) {
+    // No precomputed gradients mean this works for any number of grid coordinates
+    const unsigned w = 8 * sizeof(unsigned);
+    const unsigned s = w / 2; // rotation width
+    unsigned a = ix, b = iy;
+    a *= 3284157443; b ^= a << s | a >> w-s;
+    b *= 1911520717; a ^= b << s | b >> w-s;
+    a *= 2048419325;
+    float random = a * (3.14159265 / ~(~0u >> 1)); // in [0, 2*Pi]
+    vector2 v;
+    v.x = cos(random);
+    v.y = sin(random);
+    return v;
+}
+
+// Computes the dot product of the distance and gradient vectors.
+float dotGridGradient(int ix, int iy, float x, float y) {
+    // Get gradient from integer coordinates
+    vector2 gradient = randomGradient(ix, iy);
+
+    // Compute the distance vector
+    float dx = x - (float)ix;
+    float dy = y - (float)iy;
+
+    // Compute the dot-product
+    return (dx*gradient.x + dy*gradient.y);
+}
+
+// Compute Perlin noise at coordinates x, y
+float perlin(float x, float y) {
+    // Determine grid cell coordinates
+    int x0 = (int)floor(x);
+    int x1 = x0 + 1;
+    int y0 = (int)floor(y);
+    int y1 = y0 + 1;
+
+    // Determine interpolation weights
+    // Could also use higher order polynomial/s-curve here
+    float sx = x - (float)x0;
+    float sy = y - (float)y0;
+
+    // Interpolate between grid point gradients
+    float n0, n1, ix0, ix1, value;
+
+    n0 = dotGridGradient(x0, y0, x, y);
+    n1 = dotGridGradient(x1, y0, x, y);
+    ix0 = interpolate(n0, n1, sx);
+
+    n0 = dotGridGradient(x0, y1, x, y);
+    n1 = dotGridGradient(x1, y1, x, y);
+    ix1 = interpolate(n0, n1, sx);
+
+    value = interpolate(ix0, ix1, sy);
+    return value * .5f + .5f; // Will return in range -1 to 1. To make it in range 0 to 1, multiply by 0.5 and add 0.5
+}
 
 static float random_float(float from, float to) {
     return from + ((float)rand() / RAND_MAX) * (to - from);
@@ -82,6 +155,40 @@ static void init_particle(t_particle* particle) {
     particle->rect = (t_rect) { random_float(-s_window_size.x / 3, s_window_size.x / 2), s_window_size.y, size, size };
 }
 
+static t_texture s_load_texture(const t_texture_data* texture_data) {
+
+  GLenum texture_format = 0;
+  if (texture_data->channels == 1)
+    texture_format = GL_RED;
+  else if (texture_data->channels == 3)
+    texture_format = GL_RGB;
+  else if (texture_data->channels == 4)
+    texture_format = GL_RGBA;
+
+  unsigned int texture_id;
+
+  glGenTextures(1, &texture_id);
+  glBindTexture(GL_TEXTURE_2D, texture_id);
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+  glTexImage2D(GL_TEXTURE_2D, 0, texture_format, texture_data->width, texture_data->height, 0,
+              texture_format, GL_UNSIGNED_BYTE, texture_data->bytes);
+
+  glBindTexture(GL_TEXTURE_2D, 0);
+
+  t_texture texture;
+  texture.id = texture_id;
+
+  return texture;
+}
+
+static t_sprite s_sprite_perlin;
+
 void init_fire_particles(unsigned int count_particles_max) {
 
     s_should_update = true;
@@ -110,6 +217,37 @@ void init_fire_particles(unsigned int count_particles_max) {
 
         add_to_list(s_list_particles, particle);
     }
+
+    const float perlinx_tex_w = 256;
+    const float perlinx_tex_h = 256;
+
+    unsigned char pixels[256][256][4];
+
+    float x_org = 0;
+    float y_org = 0;
+    float scale = 5;
+
+    for (int y = 0; y < perlinx_tex_h; y++) {
+        for (int x = 0; x < perlinx_tex_w; x++) {
+            float x_coord = x_org + (float)x / perlinx_tex_w * scale;
+            float y_coord = y_org + (float)y / perlinx_tex_h * scale;
+
+            float sample = perlin(x_coord, y_coord);
+            pixels[x][y][0] = 255 * sample;
+            pixels[x][y][1] = 255 * sample;
+            pixels[x][y][2] = 255 * sample;
+            pixels[x][y][3] = 255;
+        }
+    }
+
+    t_texture_data texture_data = { .bytes = (unsigned char*) pixels, .width = 256, .height = 256, .channels = 4 };
+    t_texture texture = s_load_texture(&texture_data);
+
+    s_sprite_perlin.texture_data = texture_data;
+    s_sprite_perlin.texture = texture;
+    s_sprite_perlin.scale = VEC2_ONE;
+    s_sprite_perlin.texture_slice = (t_vec4) {0, 0, 256, 256};
+    s_sprite_perlin.slice_borders = VEC4_ZERO;
 }
 
 void uninit_fire_particles() {
@@ -121,6 +259,7 @@ void uninit_fire_particles() {
     glDeleteBuffers(1, &s_vertex_buffer_object);
     glDeleteVertexArrays(1, &s_quad_vao_particles);
 }
+float x_org_u = 0;
 
 void draw_fire_particles() {
 
@@ -156,6 +295,18 @@ void draw_fire_particles() {
 
         if (particle->life_current > 0) {
             particle->life_current -= t_delta_time();
+
+            // float x_coord = (float)particle->rect.x / s_window_size.x * 10;
+            // float y_coord = t_get_time() + (float)particle->rect.y / s_window_size.y * 10;
+
+            // float sample = perlin(x_coord, y_coord);
+
+            // particle->velocity.x = 900 * sample;
+            // particle->velocity.y = 350;
+
+            // particle->rect.x += particle->velocity.x * t_delta_time();
+            // particle->rect.y -= particle->velocity.y * t_delta_time();
+
             particle->rect.x += random_float(-10, 500) * t_delta_time() * (particle->rect.width * 0.2f);
             particle->rect.y -= random_float(-10, 450) * t_delta_time() * (particle->rect.height * 0.2f);
 

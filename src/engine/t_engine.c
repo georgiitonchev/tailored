@@ -27,6 +27,7 @@
 static GLFWwindow* s_window;
 static ma_engine s_audio_engine;
 
+static float s_time = 0;
 static float s_delta_time;
 static float s_last_frame_time;
 
@@ -41,11 +42,11 @@ static unsigned int motion_blur_shader_id;
 static unsigned int first_pass_texture_id;
 static unsigned int motion_vector_texture_id;
 
-t_vec2 t_window_size() { 
+t_vec2 t_window_size() {
   return window_size;
 }
 
-t_vec2 t_framebuffer_size() { 
+t_vec2 t_framebuffer_size() {
   return framebuffer_size;
 }
 
@@ -113,8 +114,8 @@ unsigned int create_framebuffer() {
   // create a render buffer for depth & stencil
   unsigned int render_buffer_id;
   glGenRenderbuffers(1, &render_buffer_id);
-  glBindRenderbuffer(GL_RENDERBUFFER, render_buffer_id); 
-  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 640, 360);  
+  glBindRenderbuffer(GL_RENDERBUFFER, render_buffer_id);
+  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 640, 360);
   glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
   glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, render_buffer_id);
@@ -126,7 +127,7 @@ unsigned int create_framebuffer() {
     printf("ERROR: framebuffer is incomplete.\n");
   }
 
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);  
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
   return frame_buffer_id;
 }
 
@@ -163,15 +164,19 @@ static void init_quad() {
   glBindVertexArray(0);
 }
 
-float t_delta_time() { 
+float t_delta_time() {
   return s_delta_time;
+}
+
+float t_get_time() {
+    return s_time;
 }
 
 void t_play_audio(const char* path) {
   ma_engine_play_sound(&s_audio_engine, path, NULL);
 }
 
-ma_result t_init_sound(const char* path, ma_sound* sound) { 
+ma_result t_init_sound(const char* path, ma_sound* sound) {
 
   ma_result result = ma_sound_init_from_file(&s_audio_engine, path, 0, NULL, NULL, sound);
 
@@ -182,7 +187,7 @@ ma_result t_init_sound(const char* path, ma_sound* sound) {
   return result;
 }
 
-void t_uninit_sound(ma_sound* sound) { 
+void t_uninit_sound(ma_sound* sound) {
   ma_sound_uninit(sound);
 }
 
@@ -194,7 +199,7 @@ void t_fade_in_sound(ma_sound* sound, int time) {
   ma_sound_set_fade_in_milliseconds(sound, 0, 1, time * 1000);
 }
 
-void t_set_master_volume(float value) { 
+void t_set_master_volume(float value) {
   ma_engine_set_volume(&s_audio_engine, value);
 }
 
@@ -219,7 +224,10 @@ static void calculate_delta_time() {
   float current_frame_time = glfwGetTime();
   s_delta_time = current_frame_time - s_last_frame_time;
   s_last_frame_time = current_frame_time;
+
+  s_time += s_delta_time;
 }
+
 
 #ifndef __APPLE__
 void APIENTRY debug_callback(GLenum source, GLenum type, GLuint id,
