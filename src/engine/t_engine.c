@@ -277,14 +277,14 @@ static void cursor_pos_callback(GLFWwindow *window, double pos_x, double pos_y) 
 }
 
 int t_begin(int window_width, int window_height, const char* title) {
-    printf("Initializing GLFW...\n");
+    t_log_info("Initializing GLFW...");
 
     if (glfwInit() != GLFW_TRUE) {
-      printf("Failed to initialize GLFW.\n");
+      t_log_error("Failed to initialize GLFW.");
       exit(EXIT_FAILURE);
     }
 
-    printf("GLFW initialized succesfully.\n");
+    t_log_info("GLFW initialized succesfully.");
 
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -293,33 +293,33 @@ int t_begin(int window_width, int window_height, const char* title) {
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 
-    printf("Creating GLFW window...\n");
+    t_log_info("Creating GLFW window...");
     s_window = glfwCreateWindow(window_width, window_height, title, NULL, NULL);
 
     if (!s_window) {
-      printf("Failed to create a GLFW windo w.\n");
+      t_log_error("Failed to create a GLFW windo w.");
       glfwTerminate();
       exit(EXIT_FAILURE);
     }
 
-    printf("GLFW window created successfuly.\n");
+    t_log_info("GLFW window created successfuly.");
 
     glfwMakeContextCurrent(s_window);
     glfwSetCursorPosCallback(s_window, cursor_pos_callback);
     glfwSetMouseButtonCallback(s_window, mouse_button_callback);
     glfwSwapInterval(0);
 
-    printf("Initializing GLAD...\n");
+    t_log_info("Initializing GLAD...");
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-      printf("Failed to initialize GLAD.\n");
+      t_log_error("Failed to initialize GLAD.");
       glfwDestroyWindow(s_window);
       glfwTerminate();
       exit(EXIT_FAILURE);
     }
 
-    printf("GLAD initialized successsfuly.\n");
-    printf("OpenGL version: %s\n", glGetString(GL_VERSION));
+    t_log_info("GLAD initialized successsfuly.");
+    t_log_info("OpenGL version: %s", glGetString(GL_VERSION));
 
     // GLint extensions_count;
     // glGetIntegerv(GL_NUM_EXTENSIONS, &extensions_count);
@@ -341,8 +341,8 @@ int t_begin(int window_width, int window_height, const char* title) {
     window_size = (t_vec2) { window_width, window_height };
     framebuffer_size = (t_vec2) { width, height };
 
-    printf("window_size: %d, %d\n", window_width, window_height);
-    printf("framebuffer_size: %d, %d\n", width, height);
+    t_log_info("Window size: %d, %d", window_width, window_height);
+    t_log_info("Framebuffer size: %d, %d", width, height);
 
     t_init_sprite_renderer();
     t_init_font_renderer();
@@ -351,14 +351,14 @@ int t_begin(int window_width, int window_height, const char* title) {
 
     s_clip_area = RECT_ZERO;
 
-    printf("Initializing miniaudio...\n");
+    t_log_info("Initializing miniaudio...");
 
     ma_result result = ma_engine_init(NULL, &s_audio_engine);
     if (result != MA_SUCCESS) {
-      printf("Problem initializing miniaudio: %d\n", result);
+      t_log_error("Problem initializing miniaudio: %d", result);
       return -1;
     }
-    printf("miniaudio initialized successsfuly.\n");
+    t_log_info("miniaudio initialized successsfuly.");
 
     // END AUDIO
 

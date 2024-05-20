@@ -10,6 +10,8 @@
 #include "t_shapes.h"
 #include "t_ui.h"
 #include "t_easings.h"
+#include "t_math.h"
+#include "t_logging.h"
 
 #include "../../dep/include/glad/glad.h"
 #include "../../dep/include/cglm/cglm.h"
