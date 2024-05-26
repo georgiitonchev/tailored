@@ -44,8 +44,8 @@ void t_init_sprite_renderer() {
   init_quad();
 }
 
-void t_draw_sprite(t_sprite* sprite, float x, float y, float width, float height, t_color color) {
 
+static void s_draw_sprite(t_sprite* sprite, float x, float y, float rot, float width, float height, t_color color) {
   if (t_clip_area().width + t_clip_area().height > 0) {
         if (!does_rect_overlap_rect((t_rect){x, y, width, height}, t_clip_area()))
         return;
@@ -59,8 +59,8 @@ void t_draw_sprite(t_sprite* sprite, float x, float y, float width, float height
 
   mat4 mat4_model;
   glm_mat4_identity(mat4_model);
-  glm_translate(mat4_model,
-                (vec3){x, y, -0.2f});
+  glm_translate(mat4_model, (vec3){x, y, -0.2f});
+  glm_rotate(mat4_model, rot, (vec3) {0, 0, 1});
   glm_scale(mat4_model, (vec3){width, height, 1.0f});
 
   glUniformMatrix4fv(glGetUniformLocation(sprite_shader, "u_mat4_projection"),
@@ -88,10 +88,18 @@ void t_draw_sprite(t_sprite* sprite, float x, float y, float width, float height
   glBindVertexArray(0);
 }
 
+void t_draw_sprite(t_sprite* sprite, float x, float y, float width, float height, t_color color) {
+  s_draw_sprite(sprite, x, y, 0, width, height, color);
+}
+
 void t_draw_sprite_r(t_sprite *sprite, t_rect rect, t_color color) {
     t_draw_sprite(
       sprite,
       rect.x, rect.y, rect.width, rect.height, color);
+}
+
+void t_draw_sprite_rot(t_sprite* sprite, float x, float y, float rot, float width, float height, t_color color) { 
+  s_draw_sprite(sprite, x, y, rot, width, height, color);
 }
 
 void t_load_texture_data_s(t_sprite* sprite, const char* texture_path) {

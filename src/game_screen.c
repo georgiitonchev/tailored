@@ -146,6 +146,11 @@ int load_game_screen(void* args) {
     return 0;
 }
 
+static const char* s_categories[] = {"Horns", "Hair", "Body", "Eyes", "Nails", "Wings", "Ears", "Mouth", "Tail"};
+static void s_init_categories() { 
+
+}
+
 void init_game_screen() {
 
     s_ease_in_left_side = true;
@@ -199,7 +204,6 @@ void unload_game_screen() {
 
 static void s_draw_categories() {
 
-    const char* categories[] = {"Horns", "Hair", "Body", "Eyes", "Nails", "Wings", "Ears", "Mouth", "Tail"};
     unsigned int category_index = 0;
 
     for (int x = 0; x < 3; x++) {
@@ -213,8 +217,8 @@ static void s_draw_categories() {
 
             draw_rect(pos_x, pos_y, 64, 64, color);
 
-            t_vec2 text_size = measure_text_size_ttf(categories[category_index], &s_font_ui_s);
-            draw_text_ttf(categories[category_index], &s_font_ui_s, (t_vec2)
+            t_vec2 text_size = measure_text_size_ttf(s_categories[category_index], &s_font_ui_s);
+            draw_text_ttf(s_categories[category_index], &s_font_ui_s, (t_vec2)
                 { pos_x + (64 - text_size.x) / 2,
                   pos_y + 64 + text_size.y + 6 }, CC_BLACK, 0);
 

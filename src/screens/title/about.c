@@ -20,6 +20,7 @@ static t_ui_button s_button_slider_knob;
 static float s_value_scrolled = 0;
 
 static t_rect s_rect_slider;
+static float s_text_height;
 
 static const char* s_text_about = 
     "Lorem ipsum dolor sit amet, consectetur adipiscing elit,"
@@ -70,14 +71,16 @@ void init_section_about() {
     s_button_slider_knob.color_mouseover = CC_DARK_RED;
     s_button_slider_knob.color_clicked = CC_DARK_RED;
     s_button_slider_knob.on_pressed = s_on_slider_knob_button_pressed;
+
+    s_text_height = measure_text_size_w(s_text_about, &s_font_ui_s, CC_UI_SECTION_RECT.w - 32).y;
+    t_log_debug("Text height: %f", s_text_height);
 }
 
 void draw_section_about(const float p_offset_x, const float p_offset_y) {
 
     t_draw_sprite(&s_sprite_section_background, CC_UI_SECTION_RECT.x + p_offset_x, CC_UI_SECTION_RECT.y + p_offset_y, CC_UI_SECTION_RECT.z, CC_UI_SECTION_RECT.w, CC_LIGHT_RED);
     t_begin_scissor(CC_UI_SECTION_RECT.x + CC_UI_PADDING.left, CC_UI_SECTION_RECT.y + CC_UI_PADDING.top + p_offset_y, CC_UI_SECTION_RECT.z - 48, CC_UI_SECTION_RECT.w - 32);
-        draw_text_ttf(s_text_about, &s_font_ui_s, (t_vec2) { 256 + 16 , 16 + 32 + p_offset_y - s_value_scrolled * 600 }, CC_BLACK, 368 - 48);
-
+        draw_text_ttf(s_text_about, &s_font_ui_s, (t_vec2) { 256 + 16 , 16 + 32 + p_offset_y - s_value_scrolled * (s_text_height - CC_UI_SECTION_RECT.w - 32)  }, CC_BLACK, CC_UI_SECTION_RECT.w - 32);
     t_end_scissor();
 
     s_rect_slider = (t_rect) { 597, 32 + p_offset_y, s_sprite_slider_background.texture_data.width, 296};

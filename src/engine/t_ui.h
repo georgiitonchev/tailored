@@ -17,8 +17,8 @@ typedef struct t_ui_button {
     t_color color_text_disabled;
 
     void (*on_released)(struct t_ui_button*);
-    void (*on_mouse_enter)();
-    void (*on_mouse_exit)();
+    void (*on_mouse_enter)(struct t_ui_button*);
+    void (*on_mouse_exit)(struct t_ui_button*);
     void (*on_pressed)(struct t_ui_button*);
 
     bool is_mouse_over;

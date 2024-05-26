@@ -1,6 +1,6 @@
 #pragma once
 
-typedef enum t_screen { NONE, SPLASH, TITLE, GAME } t_screen;
+typedef enum t_screen { NONE, SPLASH, TITLE, GAME, SETUP } t_screen;
 
 void set_screen(t_screen screen);
 
@@ -18,6 +18,11 @@ int load_game_screen(void* args);
 void unload_game_screen();
 void init_game_screen();
 void draw_game_screen();
+
+int load_setup_screen(void* args);
+void unload_setup_screen();
+void init_setup_screen();
+void draw_setup_screen();
 
 void set_loading_progress(float progress);
 void set_loading_finished();

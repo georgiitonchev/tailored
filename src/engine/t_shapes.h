@@ -10,3 +10,5 @@ bool does_rect_overlap_rect(t_rect this, t_rect that);
 
 void draw_rect(int x, int y, int width, int height, t_color color);
 void draw_rect_lines(int x, int y, int width, int height, t_color color);
+
+void draw_line(int x_from, int y_from, int x_to, int y_to, float width, t_color color);

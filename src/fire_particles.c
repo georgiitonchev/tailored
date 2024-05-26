@@ -6,10 +6,6 @@
 
 #include <stdlib.h>
 
-static float random_float(float from, float to) {
-    return from + ((float)rand() / RAND_MAX) * (to - from);
-}
-
 typedef struct t_particle {
 
     float life_current;
@@ -68,17 +64,17 @@ static void init_quad() {
 
 static void init_particle(t_particle* particle) {
 
-    particle->life_initial = random_float(2, 10);
+    particle->life_initial = t_random_float(2, 10);
     particle->life_current = particle->life_initial;
     particle->timer = 0;
 
-    float size = random_float(3, 16);
+    float size = t_random_float(3, 16);
     particle->size_initial = size;
     particle->size_current = size;
 
-    particle->color_green_add = random_float(0.0f, 2.5f);
+    particle->color_green_add = t_random_float(0.0f, 2.5f);
 
-    particle->rect = (t_rect) { random_float(-s_window_size.x / 3, s_window_size.x / 2), s_window_size.y, size, size };
+    particle->rect = (t_rect) { t_random_float(-s_window_size.x / 3, s_window_size.x / 2), s_window_size.y, size, size };
 }
 
 void init_fire_particles(unsigned int count_particles_max) {
@@ -167,8 +163,8 @@ void draw_fire_particles() {
         if (s_update_particles && particle->life_current > 0) {
             particle->life_current -= 1.0f / 60.0f;
 
-            particle->rect.x += random_float(-10, 500) * (1.0f / 60.0f) * (particle->rect.width * 0.2f);
-            particle->rect.y -= random_float(-10, 450) * (1.0f / 60.0f) * (particle->rect.height * 0.2f);
+            particle->rect.x += t_random_float(-10, 500) * (1.0f / 60.0f) * (particle->rect.width * 0.2f);
+            particle->rect.y -= t_random_float(-10, 450) * (1.0f / 60.0f) * (particle->rect.height * 0.2f);
 
             // float perlin_sample = perlin(((float)particle->rect.x / t_window_size().x) * 5, ((float)particle->rect.y / t_window_size().y) * 5);
 

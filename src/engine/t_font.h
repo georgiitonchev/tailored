@@ -42,6 +42,8 @@ t_vec4 get_character(char character);
 void draw_text_ttf(const char* text, t_font* font, t_vec2 position, t_color color, int max_width);
 
 t_vec2 measure_text_size_ttf(const char* text, t_font* fonts);
+t_vec2 measure_text_size_w(const char* text, t_font* font, int max_width);
+
 
 t_glyph_info* t_load_font_glyphs(const unsigned char *fileData, int dataSize, int fontSize);
 t_font_character* t_get_font_characters(t_glyph_info** glyphs, unsigned int glyphs_count);

@@ -1,0 +1,37 @@
+{
+    "characters" : [
+        { 
+            "name": "Baby", 
+            "cost" : 1, 
+            "base_dmg": 1, 
+            "base_hp": 65, 
+            "base_range": 1, 
+            "base_as": 0.7, 
+            "base_ms": 0.5,
+            "texture": "character_baby.png",
+            "class": 0
+        },
+        { 
+            "name": "Knight", 
+            "cost" : 1, 
+            "base_dmg": 3, 
+            "base_hp": 35, 
+            "base_range": 1, 
+            "base_as": 1, 
+            "base_ms": 0.5,
+            "texture": "character_knight.png",
+            "class": 1
+        },
+        { 
+            "name": "Archer", 
+            "cost" : 1, 
+            "base_dmg": 2, 
+            "base_hp": 25, 
+            "base_range": 3,
+            "base_as": 0.8, 
+            "base_ms": 0.5,
+            "texture": "character_archer.png",
+            "class": 2
+        }
+    ]
+}

@@ -1,6 +1,4 @@
-#include "t_models.h"
-
-#include "../../dep/include/glad/glad.h"
+#include "tailored.h"
 
 #define CGLTF_IMPLEMENTATION
 #include "../../dep/include/cgltf/cgltf.h"
@@ -171,14 +169,14 @@ void process_gltf_file(const char *path, t_scene **scenes) {
 
   if (result == cgltf_result_success) {
 
-    printf(".gltf file loaded successfuly\n");
+    t_log_info(".gltf (%s) file loaded successfuly.", path);
 
     result = cgltf_load_buffers(&options, data, path);
     if (result == cgltf_result_success) {
 
       *scenes = malloc(sizeof(t_scene) * data->scenes_count);
 
-      printf(".gltf buffers loaded successfuly\n");
+      printf(".gltf (%s) buffers loaded successfuly.", path);
       printf("Scenes: %zu\n", data->scenes_count);
 
       for (cgltf_size i = 0; i < data->scenes_count; i++) {
@@ -223,14 +221,12 @@ void process_gltf_file(const char *path, t_scene **scenes) {
 
       printf("meshes processed.\n");
     } else {
-      printf("error loading .gltf buffers\n");
+      t_log_error("Error loading .gltf buffers: %d", result);
     }
-    // process_scene(data->scene);
 
     cgltf_free(data);
-    printf("free data.\n");
   } else {
-    printf("error loading .gltf file\n");
+    t_log_error("Error loading .gltf file\n");
   }
 }
 

@@ -116,6 +116,12 @@ void remove_from_list(t_list* list, unsigned int index_of_element) {
     list->size--;
 }
 
+void remove_from_list_e(t_list* list, const void* element) {
+    
+    int index = ((char*)element - (char*)list->elements) / list->element_size;
+    remove_from_list(list, index);
+}
+
 void* element_at_list(t_list* list, unsigned int index) {
 
     if (!list) {
@@ -135,4 +141,8 @@ void* element_at_list(t_list* list, unsigned int index) {
 void destroy_list(t_list* list) {
     destroy_memory_pool(list->memory_pool);
     free(list);
+}
+
+void clear_list(t_list* list) {
+    list->size = 0;
 }

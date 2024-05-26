@@ -1,9 +1,6 @@
 #include "tailored.h"
 #include <math.h>
 
-/* Function to linearly interpolate between a0 and a1
- * Weight w should be in the range [0.0, 1.0]
- */
 float interpolate(float a0, float a1, float w) {
      return (a1 - a0) * ((w * (w * 6.0 - 15.0) + 10.0) * w * w * w) + a0;
 }
@@ -82,4 +79,36 @@ unsigned char* generate_perlin_texture_bytes(int width, int height, float scale)
     }
 
     return pixels;
+}
+
+t_vec2 t_vec2_sub(t_vec2 a, t_vec2 b) {
+  return (t_vec2) { a.x - b.x, a.y - b.y };
+}
+
+float t_vec2_distance(t_vec2 a, t_vec2 b) {
+    return sqrt((b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y));
+}
+
+float t_vec2_angle(t_vec2 a, t_vec2 b) { 
+    return atan2(b.y - a.y, b.x - a.x);
+}
+
+t_vec2 t_vec2_dir(t_vec2 a, t_vec2 b) { 
+    return t_vec2_sub(b, a);
+}
+
+float t_vec2_dot(t_vec2 a, t_vec2 b) { 
+    return (a.x * b.x) + (a.y * b.y);
+}
+
+float t_map(float value, float from_min, float from_max, float to_min, float to_max) {
+    return (value - from_min) / (from_max - from_min) * (to_max - to_min) + to_min;
+}
+
+float t_random_float(float from, float to) {
+    return from + ((float)rand() / RAND_MAX) * (to - from);
+}
+
+int t_random_int(int from, int to) { 
+    return rand() % (to - from) + from;
 }

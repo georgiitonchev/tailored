@@ -213,6 +213,64 @@ t_vec2 measure_text_size_ttf(const char* text, t_font* font) {
   return size;
 }
 
+t_vec2 measure_text_size_w(const char* text, t_font* font, int max_width) {
+
+  t_vec2 size = VEC2_ZERO;
+
+  int text_length = (int) strlen(text);
+
+  int current_width = 0;
+  int height = font->line_height * 2;
+  int width = 0;
+
+  int current_word_width = 0;
+  int current_word_index = 0;
+  int current_word_length = 0;
+
+  int index = 0;
+
+  for (int i = 0; i < text_length; i++) {
+
+    int character = text[i] - 32;
+
+    if (character != 0) {
+
+      current_word_length ++;
+      current_word_width += font->characters[character].advance;
+    }
+
+    if (character == 0 || i == text_length - 1) {
+
+      if (current_word_length > 0) {
+
+        if (max_width != 0 && current_width + current_word_width >= max_width) {
+          
+          if (current_width > width) 
+            width = current_width;
+          
+          current_width = 0;
+          height += font->line_height;
+        }
+
+        for (int j = current_word_index; j < current_word_index + current_word_length; j++) {
+
+          int w_character = text[j] - 32;
+          current_width += font->characters[w_character].advance;
+        }
+
+        current_word_index = i + 1;
+        current_word_width = 0;
+        current_word_length = 0;
+      }
+    }
+  }
+
+  size.x = width;
+  size.y = height;
+
+  return size;
+}
+
 void draw_text_ttf(const char* text, t_font* font, t_vec2 position, t_color color, int max_width) {
 
   glUseProgram(font_shader);

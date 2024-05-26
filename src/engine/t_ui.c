@@ -102,7 +102,7 @@ void draw_ui_button(t_ui_button* button, int x, int y, int width, int height) {
                 button->is_mouse_over = true;
 
                 if (button->on_mouse_enter)
-                    button->on_mouse_enter();
+                    button->on_mouse_enter(button);
             }
 
             color = button->color_mouseover;
@@ -124,7 +124,7 @@ void draw_ui_button(t_ui_button* button, int x, int y, int width, int height) {
         }
         else {
             if (button->is_mouse_over && button->on_mouse_exit)
-                button->on_mouse_exit();
+                button->on_mouse_exit(button);
 
             button->is_mouse_over = false;
         }

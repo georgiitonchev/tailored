@@ -82,6 +82,13 @@ typedef struct t_input_state {
 
 } t_input_state;
 
+typedef struct t_camera { 
+
+  float near_clip;
+  float far_clip;
+  
+} t_camera;
+
 // FILE FUNCTIONS
 const char *t_read_file(const char *path, long* file_size);
 t_result t_write_file(const char* path, const char* file_data);
@@ -92,10 +99,6 @@ void t_destroy_shader_program(unsigned int shader_program);
 
 // COLOR FUNCTIONS
 void t_clear_color(t_color color);
-
-// MATH FUNCTIONS
-t_vec2 t_vec2_sub(t_vec2 a, t_vec2 b);
-float t_map(float value, float from_min, float from_max, float to_min, float to_max);
 
 // ENGINE FUNCTIONS
 int t_begin(int window_width, int window_height, const char* title);
@@ -133,6 +136,7 @@ t_vec2 t_framebuffer_size();
 #define RED (t_color) { 255, 0, 0, 255 }
 #define GREEN (t_color) { 0, 255, 0, 255 }
 #define BLUE (t_color) { 0, 0, 255, 255 }
+#define YELLOW (t_color) { 255, 255, 0, 255 }
 
 #define VEC2_ZERO (t_vec2) { 0, 0 }
 #define VEC2_ONE (t_vec2) { 1, 1 }
