@@ -1,3 +1,7 @@
+#include "engine/t_core.h"
+#include "engine/t_input.h"
+#include "engine/t_sprite.h"
+#include "engine/t_ui.h"
 #include "screens.h"
 #include "./engine/tailored.h"
 
@@ -42,7 +46,7 @@ typedef struct item {
   unsigned int cost;
 } item;
 
-typedef struct character { 
+typedef struct character {
 
   const char* name;
 
@@ -81,7 +85,7 @@ typedef struct a_cell {
   struct a_cell* parent;
 } a_cell;
 
-typedef struct character_instance { 
+typedef struct character_instance {
 
   character* character;
 
@@ -117,7 +121,7 @@ typedef struct board_slot {
 
 } board_slot;
 
-typedef struct character_slot { 
+typedef struct character_slot {
 
   unsigned int index;
   character* character;
@@ -166,7 +170,7 @@ static t_array* s_cells;
 static t_array* s_cells_open;
 static t_array* s_cells_closed;
 
-static void s_init_path() { 
+static void s_init_path() {
 
   if (s_cells_open != NULL)
     clear_array(s_cells_open);
@@ -178,9 +182,9 @@ static void s_init_path() {
   else
     s_cells_closed = create_array();
 
-  if (s_cells != NULL) { 
+  if (s_cells != NULL) {
 
-    for (int i = 0; i < s_cells->size; i++) { 
+    for (int i = 0; i < s_cells->size; i++) {
 
       a_cell* cell = element_at_array(s_cells, i);
       cell->is_closed = false;
@@ -195,11 +199,11 @@ static void s_init_path() {
     s_cells = create_array();
 }
 
-static float s_get_cell_distance(a_cell* cell_a, a_cell* cell_b) { 
+static float s_get_cell_distance(a_cell* cell_a, a_cell* cell_b) {
   float dist_x = abs(cell_a->grid_x - cell_b->grid_x);
   float dist_y = abs(cell_a->grid_y - cell_b->grid_y);
 
-  if (dist_x > dist_y) { 
+  if (dist_x > dist_y) {
     return 1.4f * dist_y + 1.0f * (dist_x - dist_y);
   } else {
     return 1.4f * dist_x + 1.0f * (dist_y - dist_x);
@@ -208,7 +212,7 @@ static float s_get_cell_distance(a_cell* cell_a, a_cell* cell_b) {
 
 static a_cell* s_find_path(a_cell* cell_from, a_cell* cell_to) {
   t_log_debug("Search path from (%d, %d) to (%d, %d)", cell_from->grid_x, cell_from->grid_y, cell_to->grid_x, cell_to->grid_y);
-  
+
   // mark start cell as open and add to list of open
   cell_from->is_open = true;
   add_to_array(s_cells_open, cell_from);
@@ -217,14 +221,14 @@ static a_cell* s_find_path(a_cell* cell_from, a_cell* cell_to) {
 
     a_cell* current = NULL;
     t_log_debug("Check open cells: %d", s_cells_open->size);
-    for (int i = 0; i < s_cells_open->size; i++) { 
+    for (int i = 0; i < s_cells_open->size; i++) {
       a_cell* open_cell = element_at_array(s_cells_open, i);
       t_log_debug("Comapre cell: (%d, %d) - %d", open_cell->grid_x, open_cell->grid_y, open_cell->is_open);
       //temp check if remove from list does not work
       if (!open_cell->is_open) continue;
       //t_log_debug("Compare cells: (%d, %d)[%f] - (%d, %d)[%f]", current->grid_x, current->grid_y, current->g_cost + current->h_cost,
       //   open_cell->grid_x, open_cell->grid_y, open_cell->g_cost + open_cell->h_cost);
-      
+
       if (current == NULL || ((open_cell->g_cost + open_cell->h_cost) < (current->g_cost + current->h_cost) ||
           ((open_cell->g_cost + open_cell->h_cost) == (current->g_cost + current->h_cost) && open_cell->h_cost < current->h_cost))) {
         current = open_cell;
@@ -244,15 +248,15 @@ static a_cell* s_find_path(a_cell* cell_from, a_cell* cell_to) {
     if (current == cell_to) {
       t_log_debug("Path found, retracing");
       a_cell* cell_parent = current;
-      while (true) { 
+      while (true) {
         if (cell_parent->parent == cell_from)
             return cell_parent;
-        
+
         cell_parent = cell_parent->parent;
       }
     }
 
-    for (int i = 0; i < 8; i ++) { 
+    for (int i = 0; i < 8; i ++) {
       a_cell* neighbour_cell = current->neighbours[i];
       if (neighbour_cell == NULL) continue;
 
@@ -268,19 +272,19 @@ static a_cell* s_find_path(a_cell* cell_from, a_cell* cell_to) {
       }
 
       t_log_debug("Evaluate neighbour: %d", i);
-      if (neighbour_cell->is_occupied || neighbour_cell->is_closed) { 
+      if (neighbour_cell->is_occupied || neighbour_cell->is_closed) {
         t_log_debug("Neighbour occupied or closed. Skipping");
         continue;
       }
       t_log_debug("Calculating neighbour movement cost.");
       float movement_cost = current->g_cost + s_get_cell_distance(current, neighbour_cell);
       t_log_debug("Movement cost: %f", movement_cost);
-      if (movement_cost < neighbour_cell->g_cost || !neighbour_cell->is_open) { 
+      if (movement_cost < neighbour_cell->g_cost || !neighbour_cell->is_open) {
         neighbour_cell->g_cost = movement_cost;
         neighbour_cell->h_cost = s_get_cell_distance(neighbour_cell, cell_to);
         neighbour_cell->parent = current;
 
-        if (!neighbour_cell->is_open) { 
+        if (!neighbour_cell->is_open) {
           neighbour_cell->is_open = true;
           add_to_array(s_cells_open, neighbour_cell);
 
@@ -289,15 +293,15 @@ static a_cell* s_find_path(a_cell* cell_from, a_cell* cell_to) {
       }
     }
   }
-  
+
   return NULL;
 }
 
-static void s_on_shop_slot_mouse_enter(t_ui_button* button) { 
+static void s_on_shop_slot_mouse_enter(t_ui_button* button) {
   s_shop_slot_mouseover = button;
 }
 
-static void s_on_shop_slot_mouse_exit(t_ui_button* button) { 
+static void s_on_shop_slot_mouse_exit(t_ui_button* button) {
   s_shop_slot_mouseover = NULL;
 }
 
@@ -306,15 +310,15 @@ static void s_on_shop_slot_clicked(t_ui_button* button) {
   shop_slot* s_slot = (shop_slot*)button->user_data;
   bool shop_slot_bought = false;
 
-  if (s_slot->character != NULL) { 
+  if (s_slot->character != NULL) {
     t_log_debug("Attempt buy character");
 
-    if ((int)s_currency - (int)s_slot->character->cost < 0) { 
+    if ((int)s_currency - (int)s_slot->character->cost < 0) {
       t_log_debug("Not enough currency");
       return;
     }
 
-    for (int i = 0; i < CHARACTER_SLOTS_SIZE; i ++) { 
+    for (int i = 0; i < CHARACTER_SLOTS_SIZE; i ++) {
       t_ui_button* character_slot_button = element_at_list(s_list_character_slots, i);
       character_slot* slot = (character_slot*)character_slot_button->user_data;
 
@@ -330,25 +334,67 @@ static void s_on_shop_slot_clicked(t_ui_button* button) {
       }
     }
   }
-  else { 
+  else {
 
   }
 }
 
-static void s_on_character_slot_mouse_enter(t_ui_button* button) { 
+static void s_on_character_slot_mouse_enter(t_ui_button* button) {
   s_character_slot_mouseover = button;
 }
 
-static void s_on_character_slot_mouse_exit(t_ui_button* button) { 
+static void s_on_character_slot_mouse_exit(t_ui_button* button) {
   s_character_slot_mouseover = NULL;
 }
 
-static void s_on_character_slot_clicked(t_ui_button* button) { 
+static bool s_slot_pressed = false;
+static float s_slot_pressed_timer = 0;
+static t_vec2 s_slot_pressed_at = VEC2_ZERO;
+
+static bool s_dragging_slot = false;
+static t_ui_button* s_dragged_slot = NULL;
+
+static void s_on_character_slot_pressed(t_ui_button* button) {
+
+    if (s_dragging_slot) return;
+
+    if (!s_slot_pressed) {
+        s_slot_pressed = true;
+        s_slot_pressed_timer = 0;
+        s_slot_pressed_at = mouse_position();
+    } else {
+        s_slot_pressed_timer += t_delta_time();
+
+        const float distance = t_vec2_distance(s_slot_pressed_at, mouse_position());
+        if (s_slot_pressed_timer >= 1.0f ||
+             distance > 20) {
+
+            s_dragging_slot = true;
+            //s_slot_pressed = false;
+        }
+    }
+
+    if (s_dragging_slot) {
+        s_dragged_slot = button;
+        //t_log_debug("Dragging");
+    }
+}
+
+static void s_on_character_slot_clicked(t_ui_button* button) {
+
+    if (s_dragging_slot) {
+        s_dragging_slot = false;
+        s_dragged_slot = NULL;
+        return;
+    }
+
   character_slot* slot = (character_slot*)button->user_data;
 
-  if (s_selected_board_slot != NULL) { 
+  s_selected_character = slot->character;
+  return;
+  if (s_selected_board_slot != NULL) {
      // Place
-    if (slot->character == NULL) { 
+    if (slot->character == NULL) {
       slot->character = s_selected_board_slot->character;
       s_selected_board_slot->character = NULL;
       s_selected_board_slot = NULL;
@@ -363,7 +409,7 @@ static void s_on_character_slot_clicked(t_ui_button* button) {
       s_selected_character_slot = slot;
     }
   }
-  else { 
+  else {
     if (s_selected_character_slot != slot) {
       s_selected_character_slot = slot;
     }
@@ -372,23 +418,23 @@ static void s_on_character_slot_clicked(t_ui_button* button) {
   }
 }
 
-static void s_on_board_slot_mouse_enter(t_ui_button* button) { 
+static void s_on_board_slot_mouse_enter(t_ui_button* button) {
   s_board_slot_mouseover = button;
 }
 
-static void s_on_board_slot_mouse_exit(t_ui_button* button) { 
+static void s_on_board_slot_mouse_exit(t_ui_button* button) {
   s_board_slot_mouseover = NULL;
 }
 
-static void s_on_board_slot_clicked(t_ui_button* button) { 
+static void s_on_board_slot_clicked(t_ui_button* button) {
 
   board_slot* slot = (board_slot*)button->user_data;
 
   // Swap or place
-  if (s_selected_character_slot != NULL) { 
+  if (s_selected_character_slot != NULL) {
 
     // Place
-    if (slot->character == NULL) { 
+    if (slot->character == NULL) {
       slot->character = s_selected_character_slot->character;
       s_selected_character_slot->character = NULL;
       s_selected_character_slot = NULL;
@@ -403,9 +449,9 @@ static void s_on_board_slot_clicked(t_ui_button* button) {
       s_selected_board_slot = slot;
     }
   }
-  else if (s_selected_board_slot != NULL && s_selected_board_slot != slot) { 
+  else if (s_selected_board_slot != NULL && s_selected_board_slot != slot) {
 
-    if (slot->character == NULL) { 
+    if (slot->character == NULL) {
       slot->character = s_selected_board_slot->character;
       s_selected_board_slot->character = NULL;
       s_selected_board_slot = slot;
@@ -419,23 +465,23 @@ static void s_on_board_slot_clicked(t_ui_button* button) {
     }
   }
   //PREVIEW
-  else { 
-    if (s_selected_board_slot != slot) { 
+  else {
+    if (s_selected_board_slot != slot) {
       s_selected_board_slot = slot;
-    } else { 
+    } else {
       s_selected_board_slot = NULL;
     }
   }
 }
 
-static void s_on_button_sell_clicked(t_ui_button* button) { 
+static void s_on_button_sell_clicked(t_ui_button* button) {
   UNUSED(button);
 
-  if (s_selected_board_slot != NULL) { 
+  if (s_selected_board_slot != NULL) {
     s_currency += s_selected_board_slot->character->cost;
     s_selected_board_slot->character = NULL;
     s_selected_board_slot = NULL;
-  } else if (s_selected_character_slot != NULL) { 
+  } else if (s_selected_character_slot != NULL) {
     s_currency += s_selected_character_slot->character->cost;
     s_selected_character_slot->character = NULL;
     s_selected_character_slot = NULL;
@@ -450,7 +496,7 @@ static bool s_ease_out_shop = false;
 static bool s_ease_in_shop = false;
 static float s_ease_timer_shop = 0;
 
-static void s_on_button_plan_clicked(t_ui_button* button) { 
+static void s_on_button_plan_clicked(t_ui_button* button) {
   UNUSED(button);
 
   s_phase = PLAN;
@@ -461,13 +507,13 @@ static void s_on_button_plan_clicked(t_ui_button* button) {
     t_ui_button* button = element_at_list(s_list_board_slots, i);
     board_slot* slot = (board_slot*)button->user_data;
 
-    if (t_random_float(0, 1) > 0.8f) { 
+    if (t_random_float(0, 1) > 0.8f) {
       slot->character = (character*)element_at_list(s_list_characters, t_random_int(0, s_list_characters->size));
     }
   }
 }
 
-static void s_on_button_play_clicked(t_ui_button* button) { 
+static void s_on_button_play_clicked(t_ui_button* button) {
   UNUSED(button);
 
   s_phase = COMBAT;
@@ -482,12 +528,12 @@ static void s_on_button_play_clicked(t_ui_button* button) {
   s_list_enemy_characters = create_list(sizeof(character_instance));
 
   // Allies
-  for (int i = s_list_board_slots->size / 2; i < s_list_board_slots->size; i ++) { 
+  for (int i = s_list_board_slots->size / 2; i < s_list_board_slots->size; i ++) {
     t_ui_button* button = element_at_list(s_list_board_slots, i);
     board_slot* slot = (board_slot*)button->user_data;
 
-    if (slot->character != NULL) { 
-      
+    if (slot->character != NULL) {
+
       character_instance* instance = malloc(sizeof(character_instance));
       instance->character = slot->character;
       instance->health_points_max = instance->character->base_hp;
@@ -515,8 +561,8 @@ static void s_on_button_play_clicked(t_ui_button* button) {
     t_ui_button* button = element_at_list(s_list_board_slots, i);
     board_slot* slot = (board_slot*)button->user_data;
 
-    if (slot->character != NULL) 
-    { 
+    if (slot->character != NULL)
+    {
       character_instance* instance = malloc(sizeof(character_instance));
       instance->character = slot->character;
       instance->health_points_max = instance->character->base_hp;
@@ -542,12 +588,12 @@ static void s_on_button_play_clicked(t_ui_button* button) {
   s_is_playing = true;
 }
 
-static void s_on_button_pause_cliced(t_ui_button* button) { 
+static void s_on_button_pause_cliced(t_ui_button* button) {
   UNUSED(button);
   s_is_playing = false;
 }
 
-static void play() { 
+static void play() {
 
   for (int i = 0; i < s_list_ally_characters->size; i++) {
     character_instance* ally_instance = element_at_list(s_list_ally_characters, i);
@@ -560,7 +606,7 @@ static void play() {
       // find closest
       character_instance* closest_enemy = NULL;
 
-      for (int ei = 0; ei < s_list_enemy_characters->size; ei++) { 
+      for (int ei = 0; ei < s_list_enemy_characters->size; ei++) {
         character_instance* enemy_instance = element_at_list(s_list_enemy_characters, ei);
 
         if (enemy_instance->is_alive && (closest_enemy == NULL || s_get_cell_distance(ally_instance->destination_cell, enemy_instance->destination_cell) < s_get_cell_distance(ally_instance->destination_cell, closest_enemy->destination_cell)))
@@ -575,12 +621,12 @@ static void play() {
     if (ally_instance->target != NULL) {
 
       draw_line(ally_instance->position.x + 48 / 2, ally_instance->position.y + 48 / 2, ally_instance->target->position.x + 48 / 2, ally_instance->target->position.y + 48 / 2, 1, WHITE);
-      
+
       if (ally_instance->performing_movement) {
         t_ease_out_quint(&ally_instance->current_movement_timer_x, &ally_instance->position.x, ally_instance->current_cell->position.x, ally_instance->destination_cell->position.x, 1.0f);
         float p = t_ease_out_quint(&ally_instance->current_movement_timer_y, &ally_instance->position.y, ally_instance->current_cell->position.y, ally_instance->destination_cell->position.y, 1.0f);
 
-        if (p >= 1) 
+        if (p >= 1)
         {
           ally_instance->performing_movement = false;
           ally_instance->current_cell = ally_instance->destination_cell;
@@ -595,7 +641,7 @@ static void play() {
         // t_log_debug("Pre distance check.");
         float distance_from_target = s_get_cell_distance(ally_instance->current_cell, ally_instance->target->destination_cell);
         // t_log_debug("Distance check: %f", distance_from_target);
-        if (distance_from_target - 0.41f > ally_instance->character->base_range) { 
+        if (distance_from_target - 0.41f > ally_instance->character->base_range) {
           // t_log_debug("Not withing range.");
           s_init_path();
           a_cell* next_move_cell = s_find_path(ally_instance->current_cell, ally_instance->target->destination_cell);
@@ -606,9 +652,9 @@ static void play() {
               ally_instance->current_cell->is_occupied = false;
           }
         }
-        else { 
+        else {
           ally_instance->attack_timer += t_delta_time() * ally_instance->character->base_as;
-        
+
           if (ally_instance->attack_timer >= 1.0f) {
 
             ally_instance->attack_timer = 1.0f - ally_instance->attack_timer;
@@ -616,12 +662,12 @@ static void play() {
 
             ally_instance->target->health_points_current -= ally_instance->character->base_dmg;
 
-            if (ally_instance->target->health_points_current <= 0) { 
+            if (ally_instance->target->health_points_current <= 0) {
               ally_instance->target->is_alive = false;
               ally_instance->destination_cell->is_occupied = false;
             }
 
-            if (ally_instance->energy >= 1.0f) { 
+            if (ally_instance->energy >= 1.0f) {
               ally_instance->energy = 0;
             }
           }
@@ -651,7 +697,7 @@ static void play() {
       // find closest
       character_instance* closest_enemy = NULL;
 
-      for (int ei = 0; ei < s_list_ally_characters->size; ei++) { 
+      for (int ei = 0; ei < s_list_ally_characters->size; ei++) {
         character_instance* enemy_instance = element_at_list(s_list_ally_characters, ei);
 
         if (enemy_instance->is_alive && (closest_enemy == NULL || s_get_cell_distance(enemy_instance->destination_cell, enemy_instance->destination_cell) < s_get_cell_distance(enemy_instance->destination_cell, closest_enemy->destination_cell)))
@@ -666,12 +712,12 @@ static void play() {
     if (enemy_instance->target != NULL) {
 
       draw_line(enemy_instance->position.x + 48 / 2, enemy_instance->position.y + 48 / 2, enemy_instance->target->position.x + 48 / 2, enemy_instance->target->position.y + 48 / 2, 1, WHITE);
-      
+
       if (enemy_instance->performing_movement) {
         t_ease_out_quint(&enemy_instance->current_movement_timer_x, &enemy_instance->position.x, enemy_instance->current_cell->position.x, enemy_instance->destination_cell->position.x, 1.0f);
         float p = t_ease_out_quint(&enemy_instance->current_movement_timer_y, &enemy_instance->position.y, enemy_instance->current_cell->position.y, enemy_instance->destination_cell->position.y, 1.0f);
 
-        if (p >= 1) 
+        if (p >= 1)
         {
           enemy_instance->performing_movement = false;
           enemy_instance->current_cell = enemy_instance->destination_cell;
@@ -683,7 +729,7 @@ static void play() {
         // t_log_debug("Pre distance check.");
         float distance_from_target = s_get_cell_distance(enemy_instance->current_cell, enemy_instance->target->destination_cell);
         // t_log_debug("Distance check: %f", distance_from_target);
-        if (distance_from_target - 0.41f > enemy_instance->character->base_range) { 
+        if (distance_from_target - 0.41f > enemy_instance->character->base_range) {
           // t_log_debug("Not withing range.");
           s_init_path();
           a_cell* next_move_cell = s_find_path(enemy_instance->current_cell, enemy_instance->target->destination_cell);
@@ -695,10 +741,10 @@ static void play() {
               enemy_instance->current_cell->is_occupied = false;
           }
         }
-        else 
-        { 
+        else
+        {
           enemy_instance->attack_timer += t_delta_time() * enemy_instance->character->base_as;
-        
+
           if (enemy_instance->attack_timer >= 1.0f) {
 
             enemy_instance->attack_timer = 1.0f - enemy_instance->attack_timer;
@@ -706,12 +752,12 @@ static void play() {
 
             enemy_instance->target->health_points_current -= enemy_instance->character->base_dmg;
 
-            if (enemy_instance->target->health_points_current <= 0) { 
+            if (enemy_instance->target->health_points_current <= 0) {
               enemy_instance->target->is_alive = false;
               enemy_instance->destination_cell->is_occupied = false;
             }
 
-            if (enemy_instance->energy >= 1.0f) { 
+            if (enemy_instance->energy >= 1.0f) {
               enemy_instance->energy = 0;
             }
           }
@@ -769,7 +815,7 @@ static void s_create_board() {
       slot_left->cell->neighbours[5] = cell;
     }
 
-    if (y > 0) { 
+    if (y > 0) {
       // top
       t_ui_button* slot_top_btn = element_at_list(s_list_board_slots, i - BOARD_COLS);
       board_slot* slot_top = slot_top_btn->user_data;
@@ -784,7 +830,7 @@ static void s_create_board() {
         cell->neighbours[4] = slot_top_right->cell;
       }
       // top left
-      if (x > 0) { 
+      if (x > 0) {
         t_ui_button* slot_top_left_btn = element_at_list(s_list_board_slots, i - (BOARD_COLS + 1));
         board_slot* slot_top_left = slot_top_left_btn->user_data;
         slot_top_left->cell->neighbours[6] = cell;
@@ -820,12 +866,13 @@ static void s_create_characters_bench() {
     slot_button->on_mouse_enter = s_on_character_slot_mouse_enter;
     slot_button->on_mouse_exit = s_on_character_slot_mouse_exit;
     slot_button->on_released = s_on_character_slot_clicked;
+    slot_button->on_pressed = s_on_character_slot_pressed;
 
     add_to_list(s_list_character_slots, slot_button);
   }
 }
 
-static void s_load_characters() { 
+static void s_load_characters() {
   s_list_characters = create_list(sizeof(character));
 
   long file_size;
@@ -873,7 +920,7 @@ static void s_load_characters() {
 
       t_log_debug("Characters successfuly loaded.");
 
-  } else { 
+  } else {
       t_log_debug("Problem loading characters.");
   }
 
@@ -1006,7 +1053,7 @@ static bool s_crit = false;
 static bool s_drawing_text = false;
 static int s_random_number = 120;
 
-static void s_draw_text() { 
+static void s_draw_text() {
 
   if (s_drawing_text) {
 
@@ -1019,7 +1066,7 @@ static void s_draw_text() {
     t_ease_out_quint(&s_text_pos_timer, &s_text_pos_y_offset, 0, -50, 1.5f);
     t_ease_out_quint(&s_text_fade_timer, &s_text_alpha_offset, 1, 0, 1.5f);
 
-    if (color.a == 0) { 
+    if (color.a == 0) {
 
       s_drawing_text = false;
 
@@ -1033,7 +1080,7 @@ static void s_draw_text() {
     sprintf(str_num, "%d", s_random_number + (s_crit ? s_random_number / 2 : 0));
     if (!s_crit)
       draw_text_ttf(str_num, &s_font, pos, color, 0);
-    else 
+    else
       draw_text_ttf(str_num, &s_font_l, pos, color, 0);
   }
   else {
@@ -1051,7 +1098,7 @@ static void s_draw_shop() {
 
   t_draw_sprite(&s_sprite_panel, 64, 32 + s_offset_y_shop, 232, 128, CC_RED);
 
-  for (int i = 0; i < SHOP_SIZE; i++) { 
+  for (int i = 0; i < SHOP_SIZE; i++) {
 
     t_ui_button* shop_slot_button = element_at_list(s_list_shop_slots, i);
     shop_slot* shop_slot = shop_slot_button->user_data;
@@ -1064,7 +1111,7 @@ static void s_draw_shop() {
 
     // get cost from shop_slot
     unsigned int cost = 0;
-    if (shop_slot->character != NULL) 
+    if (shop_slot->character != NULL)
       cost = shop_slot->character->cost;
     else if (shop_slot->item != NULL)
       cost = shop_slot->item->cost;
@@ -1085,25 +1132,30 @@ static void s_draw_shop() {
   draw_text_ttf("Lock", &s_font, (t_vec2) {184 + (96 - size_text_lock.x) / 2, 121 + (32 + size_text_lock.y) / 2 + s_offset_y_shop}, CC_RED, 0);
 }
 
-static void s_draw_inventory() { 
+static void s_draw_inventory() {
 
     t_draw_sprite(&s_sprite_shop_slot, 368, 24, 248, 132, CC_RED);
 
     // character slots
     int character_slot_index = 0;
 
-    for (int x = 0; x < 2; x++) { 
-      for (int y = 0; y < 6; y++) { 
-        const int pos_x = 376 + y * (32 + 8);
-        const int pos_y = 32 + x * (32 + 8);
+    for (int x = 0; x < 2; x++) {
+      for (int y = 0; y < 6; y++) {
+        int pos_x = 376 + y * (32 + 8);
+        int pos_y = 32 + x * (32 + 8);
 
         t_draw_sprite(&s_sprite_shop_slot, pos_x, pos_y, 32, 32, CC_DARK_RED);
 
         t_ui_button* slot_button = element_at_list(s_list_character_slots, character_slot_index);
         character_slot* slot = slot_button->user_data;
 
+        if (s_dragged_slot == slot_button) {
+            pos_x = mouse_position().x - slot_button->mouse_clicked_at.x;
+            pos_y = mouse_position().y - slot_button->mouse_clicked_at.y;
+        }
+
         if (slot->character != NULL)
-          draw_ui_button(slot_button, pos_x, pos_y - 2, 32, 32);        
+          draw_ui_button(slot_button, pos_x, pos_y - 2, 32, 32);
 
         character_slot_index++;
       }
@@ -1112,7 +1164,7 @@ static void s_draw_inventory() {
     draw_line(376, 110, 608, 110, 1, CC_DARK_RED);
 
     // item slots
-    for (int i = 0; i < 6; i++) { 
+    for (int i = 0; i < 6; i++) {
       const int pos_x = 376 + i * (32 + 8);
       const int pos_y = 116;
 
@@ -1120,11 +1172,11 @@ static void s_draw_inventory() {
     }
 }
 
-static void s_draw_character_info() { 
+static void s_draw_character_info() {
 
     t_draw_sprite(&s_sprite_shop_slot, 368, 164, 248, 132, CC_RED);
 
-    if (s_selected_character != NULL) { 
+    if (s_selected_character != NULL) {
 
       // sprite
       t_draw_sprite(&s_sprite_panel, 376, 172, 64, 64, CC_DARK_RED);
@@ -1153,7 +1205,7 @@ static void s_draw_character_info() {
       // stats
       //  attack damage
       t_draw_sprite(&s_sprite_sword, 448, 178, 24, 24, CC_DARK_RED);
-      
+
       char text_ad[5];
       sprintf(text_ad, "%u", s_selected_character->base_dmg);
       draw_text_ttf(text_ad, &s_font, (t_vec2) { 472, 178 + 20 }, CC_BLACK, 0);
@@ -1195,7 +1247,7 @@ static void s_draw_character_info() {
 
       // items
 
-      for (int i = 0; i < 3; i ++) { 
+      for (int i = 0; i < 3; i ++) {
         const int pos_x = 465 + i * (38 + 8);
         const int pos_y = 247;
 
@@ -1227,14 +1279,14 @@ void draw_setup_screen() {
     unsigned int board_slot_index = 0;
 
     // board
-    for (int y = 0; y < BOARD_COLS; y++) { 
+    for (int y = 0; y < BOARD_COLS; y++) {
       for (int x = 0; x < BOARD_ROWS; x++) {
 
         t_ui_button* button = element_at_list(s_list_board_slots, board_slot_index);
         board_slot* slot = (board_slot*)button->user_data;
         const int pos_x = slot->position.x;
         const int pos_y = slot->position.y;
-        
+
         t_color color = y >= 3 ? CC_RED : CC_DARK_RED;
         bool is_board_slot = y >= 3;
         draw_rect_lines(pos_x, pos_y, 48, 48, color);
@@ -1245,7 +1297,7 @@ void draw_setup_screen() {
 
             t_sprite* sprite_class = NULL;
 
-            switch (slot->character->class) { 
+            switch (slot->character->class) {
               case TANK:
                 sprite_class = &s_sprite_shield;
                 break;
@@ -1262,6 +1314,10 @@ void draw_setup_screen() {
         }
         else if (is_board_slot && !s_is_playing) {
 
+            t_rect rect_slot = {pos_x, pos_y, 48, 48};
+            if (s_dragging_slot && is_point_in_rect(mouse_position(), rect_slot)) {
+                t_draw_sprite(&s_sprite_panel, pos_x, pos_y, 48, 48, color);
+            }
           if (slot->character != NULL || s_selected_character_slot != NULL || s_selected_board_slot != NULL) {
             draw_ui_button(button, pos_x, pos_y, 48, 48);
           } else {
@@ -1272,10 +1328,10 @@ void draw_setup_screen() {
 
             bool from_this_board_slot = s_selected_board_slot != NULL && s_selected_board_slot->character == slot->character;
 
-            if (!from_this_board_slot) { 
+            if (!from_this_board_slot) {
               if (slot->character == NULL)
                 t_draw_sprite(&s_sprite_plus_sign, pos_x, pos_y, 48, 48, color);
-              else 
+              else
                 t_draw_sprite(&s_sprite_swap_sign, pos_x, pos_y, 48, 48, color);
             }
           }
@@ -1283,45 +1339,13 @@ void draw_setup_screen() {
           if (slot->character != NULL) {
             t_draw_sprite(slot->character->sprite, pos_x, pos_y, 48, 48, WHITE);
           }
-        } 
+        }
 
           board_slot_index++;
       }
     }
-    
+
     draw_rect_lines(360, 16, 264, 328, CC_RED);
-
-    unsigned int character_slot_index = 0;
-    // // character slots
-    // for (int y = 0; y < 2; y++) {
-    //   for (int x = 0; x < 4; x++) {
-
-    //     const int pos_x = 472 + x * (32 + 6);
-    //     const int pos_y = 20 + y * (32 + 6);
-    //     t_ui_button* character_slot_button = (t_ui_button*)element_at_list(s_list_character_slots, character_slot_index);
-    //     character_slot* slot = (character_slot*)character_slot_button->user_data;
-
-    //     if (slot->character != NULL || s_selected_board_slot != NULL) {
-    //       if (slot->character != NULL)
-    //         t_draw_sprite(slot->character->sprite, pos_x, pos_y, 32, 32, WHITE);
-
-    //       draw_ui_button(character_slot_button, pos_x, pos_y, 32, 32);
-    //     } else {
-    //       draw_rect_lines(pos_x, pos_y, 32, 32, CC_RED);
-    //     }
-
-    //     if (s_selected_board_slot != NULL) {
-    //       if (slot->character == NULL)
-    //         t_draw_sprite(&s_sprite_plus_sign, pos_x, pos_y, 32, 32, CC_RED);
-    //       else 
-    //         t_draw_sprite(&s_sprite_swap_sign, pos_x, pos_y, 32, 32, CC_RED);
-    //     }
-
-    //     character_slot_index++;
-    //   }
-    // }
-
-    // PREVIEW Rect
 
     if (s_is_playing) {
       play();
@@ -1342,13 +1366,13 @@ void draw_setup_screen() {
     s_draw_character_info();
     s_draw_game_info();
 
-    if (s_phase == SHOP) { 
+    if (s_phase == SHOP) {
       draw_ui_button(&s_button_plan, 520, 304, 96, 32);
 
       t_vec2 text_plan_size = measure_text_size_ttf("Plan", &s_font_l);
       draw_text_ttf("Plan", &s_font_l, (t_vec2) { 520 + (96 - text_plan_size.x) / 2, 304 + (32 + text_plan_size.y) / 2 }, CC_BLACK, 0);
     }
-    else if (s_phase == PLAN) { 
+    else if (s_phase == PLAN) {
       draw_ui_button(&s_button_play, 520, 304, 96, 32);
 
       t_vec2 text_start_size = measure_text_size_ttf("Start", &s_font_l);
