@@ -124,7 +124,7 @@ static t_texture s_load_texture(const t_texture_data* texture_data) {
   return texture;
 }
 
-t_vec4 get_character(char character) {
+static t_vec4 s_get_character(char character) {
   int columns = 16;
 
   int row = ((int)character) / columns;
@@ -271,7 +271,7 @@ t_vec2 measure_text_size_w(const char* text, t_font* font, int max_width) {
   return size;
 }
 
-void draw_text_ttf(const char* text, t_font* font, t_vec2 position, t_color color, int max_width) {
+void t_draw_text(const char* text, t_font* font, int x, int y, t_color color, int max_width) {
 
   glUseProgram(font_shader);
 
@@ -286,8 +286,8 @@ void draw_text_ttf(const char* text, t_font* font, t_vec2 position, t_color colo
   glBindTexture(GL_TEXTURE_2D, font->bitmap.id);
 
   int text_length = (int) strlen(text);
-  int pos_x = position.x;
-  int pos_y = position.y;
+  int pos_x = x;
+  int pos_y = y;
 
   int current_width = 0;
 
@@ -314,7 +314,7 @@ void draw_text_ttf(const char* text, t_font* font, t_vec2 position, t_color colo
         if (max_width != 0 && current_width + current_word_width >= max_width) {
 
           current_width = 0;
-          pos_x = position.x;
+          pos_x = x;
           pos_y += font->line_height;
 
           if (t_clip_area().height > 0 && pos_y - font->line_height > t_clip_area().y + t_clip_area().height) {

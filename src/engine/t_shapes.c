@@ -3,7 +3,7 @@
 #include "../../dep/include/glad/glad.h"
 
 static t_sprite s_white_rectangle_sprite;
-static t_sprite s_white_border_rectangle_sprite;
+static t_sprite s_white_border_rectangle_sprite; // 1 width
 
 static t_texture s_load_texture(const t_texture_data* texture_data) {
 

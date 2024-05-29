@@ -315,7 +315,7 @@ void draw_section_saves(const float p_offset_x, const float p_offset_y) {
         draw_rect((272 + i * 128 + i * 16) - offset_x + 4 + p_offset_x, 32 + p_offset_y + 223 - 48 + sfui_data->fade_in_y, 120, 32, (t_color) {12, 12, 12, 100});
 
         t_vec2 text_size = measure_text_size_ttf(sfui_data->save_file_name, &s_font_ui_xs);
-        draw_text_ttf(sfui_data->save_file_name, &s_font_ui_xs, (t_vec2){ (272 + i * 128 + i * 16) - offset_x + (128 - text_size.x) / 2 + p_offset_x, 32 + p_offset_y + 223 - 32 + sfui_data->fade_in_y + text_size.y / 2}, CC_RED, 0);
+        t_draw_text(sfui_data->save_file_name, &s_font_ui_xs, (272 + i * 128 + i * 16) - offset_x + (128 - text_size.x) / 2 + p_offset_x, 32 + p_offset_y + 223 - 32 + sfui_data->fade_in_y + text_size.y / 2, CC_RED, 0);
     }
     t_end_scissor();
 
@@ -358,21 +358,21 @@ void draw_section_saves(const float p_offset_x, const float p_offset_y) {
 
     if (s_list_saves->size == 0) {
         t_vec2 text_size_no_files_info = measure_text_size_ttf("Click \"New\" to create a new save file.", &s_font_ui_s);
-        draw_text_ttf("Click \"New\" to create a new save file.", &s_font_ui_s, (t_vec2) { 256 + (368 - text_size_no_files_info.x) / 2 + p_offset_x, 16 + p_offset_y + (328 + text_size_no_files_info.y) / 2}, CC_BLACK, 0);
+        t_draw_text("Click \"New\" to create a new save file.", &s_font_ui_s, 256 + (368 - text_size_no_files_info.x) / 2 + p_offset_x, 16 + p_offset_y + (328 + text_size_no_files_info.y) / 2, CC_BLACK, 0);
     }
        
     // CHARACTER BUTTONS
     draw_ui_button(&s_button_new, 256 + 16 + p_offset_x, 292 + p_offset_y, 80, 40);
     t_vec2 text_size_new = measure_text_size_ttf("New", &s_font_ui_m);
-    draw_text_ttf("New", &s_font_ui_m, (t_vec2) {256 + 16 + (80 - text_size_new.x) / 2  + p_offset_x, 292 + p_offset_y + (40 + text_size_new.y) / 2}, CC_RED, 0);
+    t_draw_text("New", &s_font_ui_m, 256 + 16 + (80 - text_size_new.x) / 2  + p_offset_x, 292 + p_offset_y + (40 + text_size_new.y) / 2, CC_RED, 0);
 
     draw_ui_button(&s_button_delete, 368 + p_offset_x, 292 + p_offset_y, 112, 40);
     t_vec2 text_size_delete = measure_text_size_ttf("Delete", &s_font_ui_m);
-    draw_text_ttf("Delete", &s_font_ui_m, (t_vec2) {368 + (112 - text_size_delete.x) / 2  + p_offset_x, 292 + p_offset_y + (40 + text_size_delete.y) / 2}, CC_RED, 0);
+    t_draw_text("Delete", &s_font_ui_m, 368 + (112 - text_size_delete.x) / 2  + p_offset_x, 292 + p_offset_y + (40 + text_size_delete.y) / 2, CC_RED, 0);
 
     draw_ui_button(&s_button_load, 496 + p_offset_x, 292 + p_offset_y, 112, 40);
     t_vec2 text_size_start = measure_text_size_ttf("Load", &s_font_ui_m);
-    draw_text_ttf("Load", &s_font_ui_m, (t_vec2) {496 + (112 - text_size_start.x) / 2 + p_offset_x, 292 + p_offset_y + (40 + text_size_start.y) / 2}, CC_RED, 0);
+    t_draw_text("Load", &s_font_ui_m, 496 + (112 - text_size_start.x) / 2 + p_offset_x, 292 + p_offset_y + (40 + text_size_start.y) / 2, CC_RED, 0);
 
 }
 

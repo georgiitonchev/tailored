@@ -277,10 +277,10 @@ void draw_title_screen() {
     draw_ui_button(&m_about_button, 64 + s_left_side_offset_x, 268, 128, 48);
 
     t_vec2 text_size_play = measure_text_size_ttf("Play", &s_ui_font_l);
-    draw_text_ttf("Play", &s_ui_font_l, (t_vec2) {64 + (128 - text_size_play.x) / 2 + s_left_side_offset_x , 140 + (48 + text_size_play.y) / 2}, CC_BLACK, 0);
+    t_draw_text("Play", &s_ui_font_l, 64 + (128 - text_size_play.x) / 2 + s_left_side_offset_x , 140 + (48 + text_size_play.y) / 2, CC_BLACK, 0);
 
     t_vec2 text_size_settings = measure_text_size_ttf("Settings", &s_ui_font_l);
-    draw_text_ttf("Settings", &s_ui_font_l, (t_vec2) {64 + (128 - text_size_settings.x) / 2 + s_left_side_offset_x, 204 + (48 + text_size_settings.y) / 2}, CC_BLACK, 0);
+    t_draw_text("Settings", &s_ui_font_l, 64 + (128 - text_size_settings.x) / 2 + s_left_side_offset_x, 204 + (48 + text_size_settings.y) / 2, CC_BLACK, 0);
 
     if (s_ease_in_characters) {
         float progress = t_ease_out_quint(&s_ease_out_timer_characters, &s_offset_y_characters, 360, 0, .5f);
@@ -354,7 +354,7 @@ void draw_title_screen() {
     }
 
     t_vec2 text_size_about = measure_text_size_ttf("About", &s_ui_font_l);
-    draw_text_ttf("About", &s_ui_font_l, (t_vec2) {64 + (128 - text_size_about.x) / 2 + s_left_side_offset_x, 268 + (48 + text_size_about.y) / 2}, CC_BLACK, 0);
+    t_draw_text("About", &s_ui_font_l, 64 + (128 - text_size_about.x) / 2 + s_left_side_offset_x, 268 + (48 + text_size_about.y) / 2, CC_BLACK, 0);
 
     if (m_draw_characters) {
         draw_section_saves(s_right_side_offset_x, s_offset_y_characters);

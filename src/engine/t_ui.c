@@ -149,7 +149,7 @@ void draw_ui_button(t_ui_button* button, int x, int y, int width, int height) {
     if (button->text != NULL && button->font != NULL) {
 
         t_vec2 text_size = measure_text_size_ttf(button->text, button->font);
-        draw_text_ttf(button->text, button->font, (t_vec2) { x + (width - text_size.x) / 2, y + (height + text_size.y ) / 2}, color_text, 0);
+        t_draw_text(button->text, button->font, x + (width - text_size.x) / 2, y + (height + text_size.y ) / 2, color_text, 0);
     }
 }
 

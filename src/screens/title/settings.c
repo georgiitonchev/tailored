@@ -107,10 +107,10 @@ void draw_section_settings(const float p_offset_x, const float p_offset_y) {
     t_draw_sprite(&s_sprite_section_background, 256, 16 + p_offset_y, 368, 328, CC_LIGHT_RED);
 
     t_vec2 text_size_sound = measure_text_size_ttf("Sound", &s_font_ui_l);
-    draw_text_ttf("Sound", &s_font_ui_l, (t_vec2) {256 + (368 - text_size_sound.x) / 2, 48 + p_offset_y}, CC_BLACK, 0);
+    t_draw_text("Sound", &s_font_ui_l, 256 + (368 - text_size_sound.x) / 2, 48 + p_offset_y, CC_BLACK, 0);
 
     // MASTER VOLUME
-    draw_text_ttf("Master", &s_font_ui_s, (t_vec2) { 272, 80 + p_offset_y}, CC_BLACK, 0);
+    t_draw_text("Master", &s_font_ui_s, 272, 80 + p_offset_y, CC_BLACK, 0);
 
     s_rect_master_volume_slider = (t_rect) { 340, 70 + p_offset_y, 200, s_sprite_slider_background.texture_data.height };
     
@@ -149,10 +149,10 @@ void draw_section_settings(const float p_offset_x, const float p_offset_y) {
 
     char value_str[4];
     sprintf(value_str, "%d", s_volume_master);
-    draw_text_ttf(value_str, &s_font_ui_s, (t_vec2) { 368 + 176 + 16, 80 + p_offset_y}, CC_BLACK, 0);
+    t_draw_text(value_str, &s_font_ui_s, 368 + 176 + 16, 80 + p_offset_y, CC_BLACK, 0);
 
     // MUSIC VOLUME
-    draw_text_ttf("Music", &s_font_ui_s, (t_vec2) {256 + 16, 112 + p_offset_y}, CC_BLACK, 0);
+    t_draw_text("Music", &s_font_ui_s, 256 + 16, 112 + p_offset_y, CC_BLACK, 0);
 
     s_rect_music_volume_slider = (t_rect) {  256 + 184 - 100, 102 + p_offset_y, 200, s_sprite_slider_background.texture_data.height };
     
@@ -190,9 +190,9 @@ void draw_section_settings(const float p_offset_x, const float p_offset_y) {
 
     char volume_music_str[4];
     sprintf(volume_music_str, "%d", s_volume_music);
-    draw_text_ttf(volume_music_str, &s_font_ui_s, (t_vec2) { 368 + 176 + 16, 112 + p_offset_y }, CC_BLACK, 0);
+    t_draw_text(volume_music_str, &s_font_ui_s, 368 + 176 + 16, 112 + p_offset_y, CC_BLACK, 0);
 
-    draw_text_ttf("Effects", &s_font_ui_s, (t_vec2) {256 + 16, 48 + 48 + 24 + 24 + p_offset_y}, CC_BLACK, 0);
+    t_draw_text("Effects", &s_font_ui_s, 256 + 16, 48 + 48 + 24 + 24 + p_offset_y, CC_BLACK, 0);
 
     s_rect_effects_volume_slider = (t_rect) {  256 + 184 - 100, 134 + p_offset_y, 200, s_sprite_slider_background.texture_data.height };
 
@@ -230,7 +230,7 @@ void draw_section_settings(const float p_offset_x, const float p_offset_y) {
 
     char volume_effects_str[4];
     sprintf(volume_effects_str, "%d", s_volume_effects);
-    draw_text_ttf(volume_effects_str, &s_font_ui_s, (t_vec2) { 368 + 176 + 16, 48 + 48 + 24 + 24 + p_offset_y}, CC_BLACK, 0);
+    t_draw_text(volume_effects_str, &s_font_ui_s, 368 + 176 + 16, 48 + 48 + 24 + 24 + p_offset_y, CC_BLACK, 0);
 }
 
 void unload_section_settings() {

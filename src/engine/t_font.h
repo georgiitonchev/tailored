@@ -38,8 +38,7 @@ void terminate_font_renderer();
 t_font load_ttf_font(const char* path, unsigned int font_size);
 void delete_ttf_font(t_font* font);
 
-t_vec4 get_character(char character);
-void draw_text_ttf(const char* text, t_font* font, t_vec2 position, t_color color, int max_width);
+void t_draw_text(const char* text, t_font* font, int x, int y, t_color color, int max_width);
 
 t_vec2 measure_text_size_ttf(const char* text, t_font* fonts);
 t_vec2 measure_text_size_w(const char* text, t_font* font, int max_width);

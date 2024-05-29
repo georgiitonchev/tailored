@@ -2,7 +2,7 @@
 #include <stdarg.h>
 #include <string.h>
 
-typedef enum t_log_level { INFO, DEBUG, WARNING, ERROR } t_log_level;
+typedef enum t_log_level { NONE, INFO, DEBUG, WARNING, ERROR } t_log_level;
 
 static void s_log(t_log_level log_level, const char* text, va_list args) {
 
@@ -12,12 +12,20 @@ static void s_log(t_log_level log_level, const char* text, va_list args) {
         case DEBUG:  strcpy(buffer, "DEBUG: "); break;
         case WARNING:  strcpy(buffer, "Warning: "); break;
         case ERROR:  strcpy(buffer, "Error: "); break;
+        case NONE: break;
     }
 
     unsigned int text_size = (unsigned int)strlen(text);
     memcpy(buffer + strlen(buffer), text, text_size);
     strcat(buffer, "\n");
     vprintf(buffer, args);
+}
+
+void t_log(const char* text, ...) { 
+    va_list args;
+    va_start(args, text);
+    s_log(NONE, text, args);
+    va_end(args);
 }
 
 void t_log_info(const char* text, ...) {

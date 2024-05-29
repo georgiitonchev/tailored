@@ -177,7 +177,7 @@ int main() {
         
         // char* text_fps[20];
         // sprintf(text_fps, "%d fps", s_current_fps);
-        // draw_text_ttf(text_fps, &s_font, (t_vec2) { 12, t_window_size().y - 12 }, WHITE, 0);
+        // t_draw_text(text_fps, &s_font, (t_vec2) { 12, t_window_size().y - 12 }, WHITE, 0);
 
         t_draw_scene();
         t_loop_end();

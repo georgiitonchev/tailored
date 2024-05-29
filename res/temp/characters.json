@@ -1,36 +1,68 @@
 {
     "characters" : [
         { 
-            "name": "Baby", 
-            "cost" : 1, 
-            "base_dmg": 1, 
-            "base_hp": 65, 
-            "base_range": 1, 
-            "base_as": 0.7, 
-            "base_ms": 0.5,
+            "name": "Baby",
             "texture": "character_baby.png",
+
+            "cost" : 1,
+            
+            "damage": 10,
+            "health": 1650, 
+            "energy": 100,
+            "range": 1, 
+            "crit_chance": 25, 
+            "crit_damage": 50,
+
+            "attack_resist": 0,
+            "ability_resist": 0,
+
+            "attack_speed": 1.0,
+            "movement_speed": 0.5,
+
             "class": 0
         },
         { 
-            "name": "Knight", 
-            "cost" : 1, 
-            "base_dmg": 3, 
-            "base_hp": 35, 
-            "base_range": 1, 
-            "base_as": 1, 
-            "base_ms": 0.5,
+            "name": "Knight",
             "texture": "character_knight.png",
+            
+            "cost" : 1,
+            
+            "damage": 10,
+            "health": 1450, 
+            "energy": 100,
+            "range": 1, 
+            "crit_chance": 25, 
+            "crit_damage": 50,
+
+            "attack_resist": 0,
+            "ability_resist": 0,
+
+            "attack_speed": 1.0,
+            "movement_speed": 0.5,
+
             "class": 1
-        },
+        },        
         { 
-            "name": "Archer", 
-            "cost" : 1, 
-            "base_dmg": 2, 
-            "base_hp": 25, 
-            "base_range": 3,
-            "base_as": 0.8, 
-            "base_ms": 0.5,
+            "name": "Archer",
             "texture": "character_archer.png",
+            
+            "description": "Grants allies in the same row 0.5 attack speed for 5 seconds.",
+
+            "cost" : 1,
+            
+            "damage": 15,
+            "health": 1200, 
+            "energy": 10,
+            "range": 4, 
+            "crit_chance": 25, 
+            "crit_damage": 50,
+
+            "attack_resist": 0,
+            "ability_resist": 0,
+
+            "attack_speed": 1.2,
+            "movement_speed": 0.5,
+
             "class": 2
         }
     ]

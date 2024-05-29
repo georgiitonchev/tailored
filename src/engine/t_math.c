@@ -81,8 +81,18 @@ unsigned char* generate_perlin_texture_bytes(int width, int height, float scale)
     return pixels;
 }
 
+t_vec2 t_vec2_normalize(t_vec2 v) { 
+    float magnitude = sqrt((v.x) * (v.x) + (v.y) * (v.y));
+    if (magnitude != 0) {
+        v.x /= magnitude;
+        v.y /= magnitude;
+    }
+
+    return v;
+}
+
 t_vec2 t_vec2_sub(t_vec2 a, t_vec2 b) {
-  return (t_vec2) { a.x - b.x, a.y - b.y };
+    return (t_vec2) { a.x - b.x, a.y - b.y };
 }
 
 float t_vec2_distance(t_vec2 a, t_vec2 b) {
@@ -94,11 +104,21 @@ float t_vec2_angle(t_vec2 a, t_vec2 b) {
 }
 
 t_vec2 t_vec2_dir(t_vec2 a, t_vec2 b) { 
-    return t_vec2_sub(b, a);
+    return t_vec2_normalize(t_vec2_sub(b, a));
 }
 
 float t_vec2_dot(t_vec2 a, t_vec2 b) { 
     return (a.x * b.x) + (a.y * b.y);
+}
+
+t_vec2 t_vec2_lerp(t_vec2 a, t_vec2 b, float t) {
+    
+    t_vec2 result;
+
+    result.x = a.x + t * (b.x - a.x);
+    result.y = a.y + t * (b.y - a.y);
+
+    return result;
 }
 
 float t_map(float value, float from_min, float from_max, float to_min, float to_max) {
