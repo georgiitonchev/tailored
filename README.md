@@ -8,4 +8,5 @@ A very simple C/OpenGL game framework/engine being developed for learning purpos
  - [CGLM](https://github.com/recp/cglm): Highly Optimized 2D / 3D Graphics Math (glm) for C.
  - [CGLTF](https://github.com/jkuhlmann/cgltf): Single-file/stb-style C glTF loader and writer.
  - [stb_image.h](https://github.com/nothings/stb/blob/master/stb_image.h): Image loading/decoding from file/memory: JPG, PNG, TGA, BMP, PSD, GIF, HDR, PIC.
+ - [stb_truetype.h](https://github.com/nothings/stb/blob/master/stb_truetype.h): Parse, decode, and rasterize characters from truetype fonts.
  - [Miniaudio](https://github.com/mackron/miniaudio): Audio playback and capture library written in C, in a single source file.
