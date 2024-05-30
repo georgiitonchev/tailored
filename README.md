@@ -1,6 +1,6 @@
 # Tailored
 
-A very basic and simple C/OpenGL game framework/engine being developed for **learning purposes**. (Work in progress) (Windows/macOS)  
+A very basic and simple C/OpenGL game/app framework/engine being developed for **learning purposes**. (Work in progress) (Windows/macOS)  
 \+ an example 3 screen setup for a simple character creator: Splash, Title, Game (Work in progress)  
 
 **A lot of the code is incomplete or just temporary as im rushing to implement features and then improve and clean up as this is just a project I'm working on as I am learning and getting used to C and OpenGL.**
