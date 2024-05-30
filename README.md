@@ -10,3 +10,12 @@ A very simple C/OpenGL game framework/engine being developed for learning purpos
  - [stb_image.h](https://github.com/nothings/stb/blob/master/stb_image.h): Image loading/decoding from file/memory: JPG, PNG, TGA, BMP, PSD, GIF, HDR, PIC.
  - [stb_truetype.h](https://github.com/nothings/stb/blob/master/stb_truetype.h): Parse, decode, and rasterize characters from truetype fonts.
  - [Miniaudio](https://github.com/mackron/miniaudio): Audio playback and capture library written in C, in a single source file.
+
+## Features
+
+
+## Examples
+Example UI featuring buttons, scrollable areas and a simple particle system.  
+
+https://github.com/georgiitonchev/tailored/assets/16121911/423b0212-5c20-407b-9a24-078f7ea5eaa5
+
