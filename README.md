@@ -17,5 +17,7 @@ A very basic C/OpenGL game framework/engine being developed for learning purpose
 ## Examples
 Example UI featuring buttons, scrollable areas and a simple particle system.  
 
-https://github.com/georgiitonchev/tailored/assets/16121911/423b0212-5c20-407b-9a24-078f7ea5eaa5
+https://github.com/georgiitonchev/tailored/assets/16121911/423b0212-5c20-407b-9a24-078f7ea5eaa5  
+
+https://github.com/georgiitonchev/tailored/assets/16121911/a6de7976-8721-4bb6-9a53-d25453806578
 
