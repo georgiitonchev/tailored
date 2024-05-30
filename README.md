@@ -1,6 +1,6 @@
 # Tailored
 
-A very simple C/OpenGL game framework/engine being developed for learning purposes. (Work in progress) (Windows/macOS)
+A very simple C/OpenGL game framework/engine being developed for learning purposes. (Work in progress) (Windows/macOS)  
 \+ an example 3 screen setup: Splash, Title, Game (Work in progress)
 
 ## Libraries
