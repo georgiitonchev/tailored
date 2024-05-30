@@ -1,6 +1,3 @@
-Learning C and OpenGL.
+# Tailored
 
-Naming conventions:
-
-private (static) fields
-    - s_type_name -> s_sprite_player, s_sprite_button;
+A very simple C/OpenGL game framework/engine being developed for learning purposes.
