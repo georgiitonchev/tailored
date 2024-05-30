@@ -16,7 +16,7 @@ A very basic and simple C/OpenGL game framework/engine being developed for **lea
 ## Features
  - Sprites: Rendering of textures with additional settings such as 9-slice scaling.
  - UI system: A base implementation of UI elements used throughout the examples.
- - Text: A basic implementation of text rendering using .ttf font files.
+ - Text: A basic font system implementation for text rendering using .ttf font files.
  - 3D models/scenes: Rendering of 3D models and scenes loaded from .gltf files. 
 
 ## Examples
