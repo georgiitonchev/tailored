@@ -12,7 +12,9 @@ A very basic C/OpenGL game framework/engine being developed for learning purpose
  - [Miniaudio](https://github.com/mackron/miniaudio): Audio playback and capture library written in C, in a single source file.
 
 ## Features
-
+ - Sprites: Rendering of textures with additional settings such as 9-slice scaling.
+ - UI system: A base implementation of UI elements used throughout the examples.
+ - Text: A basic implementation of text rendering using .ttf font files.
 
 ## Examples
 Example UI featuring buttons, scrollable areas and a simple particle system.  
