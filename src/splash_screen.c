@@ -13,6 +13,8 @@ static t_vec2 s_window_size;
 static float s_timer_splash_fade = 0;
 static float s_splash_fade = 0;
 
+static bool s_should_update = false;
+
 int load_splash_screen(void* args) {
      UNUSED(args);
 
@@ -35,6 +37,10 @@ void unload_splash_screen() {
 void draw_splash_screen() {
 
      t_clear_color(CC_BLACK);
+
+     if (is_mouse_button_pressed(MOUSE_BUTTON_LEFT)) s_should_update = true;
+
+     if (!s_should_update) return;
 
      t_color logo_color = CC_RED;
      logo_color.a -= CC_RED.a * s_splash_fade;

@@ -159,15 +159,15 @@ int main() {
             }
         }
 
-        s_fps_update += t_delta_time();
-        if (s_fps_update >= 1.0f) { 
-            s_current_fps = (int)(1.0f / t_delta_time());
-            s_fps_update = 0;
-        }
+        // s_fps_update += t_delta_time();
+        // if (s_fps_update >= 1.0f) { 
+        //     s_current_fps = (int)(1.0f / t_delta_time());
+        //     s_fps_update = 0;
+        // }
         
-        char* text_fps[20];
-        sprintf(text_fps, "%d fps", s_current_fps);
-        t_draw_text(text_fps, &s_font, 12, t_window_size().y - 12, WHITE, 0);
+        // char* text_fps[20];
+        // sprintf(text_fps, "%d fps", s_current_fps);
+        // t_draw_text(text_fps, &s_font, 12, t_window_size().y - 12, WHITE, 0);
 
         t_draw_scene();
         t_loop_end();
