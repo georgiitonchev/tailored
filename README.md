@@ -29,7 +29,12 @@ https://github.com/georgiitonchev/tailored/assets/16121911/423b0212-5c20-407b-9a
 
 https://github.com/georgiitonchev/tailored/assets/16121911/a6de7976-8721-4bb6-9a53-d25453806578  
 
-https://github.com/georgiitonchev/tailored/assets/16121911/ac70810f-ad23-4788-a6d5-023dd0b7980b
+https://github.com/georgiitonchev/tailored/assets/16121911/ac70810f-ad23-4788-a6d5-023dd0b7980b  
+
+https://github.com/georgiitonchev/tailored/assets/16121911/ea66371c-9f6b-4769-8563-3f5abfc4b9a4
+
+
+
 
 
 
