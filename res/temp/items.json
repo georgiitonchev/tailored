@@ -1,0 +1,54 @@
+{
+    "items" : [
+        { 
+            "name": "Sword", 
+            "cost" : 1, 
+            "texture": "sword_as.png",
+            "attack_damage": 15,
+            "attack_speed": 0,
+            "crit_chance": 0,
+            "health": 0,
+            "description" : "Gain 5 attack damage on every takedown."
+        },
+        { 
+            "name": "Knife", 
+            "cost" : 1, 
+            "texture": "sword.png",
+            "attack_damage": 0,
+            "attack_speed": 0,
+            "crit_chance": 15,
+            "health": 0,
+            "description" : "Gain 5% crit chance after every takedown."
+        },
+        { 
+            "name": "Bow", 
+            "cost" : 1, 
+            "texture": "bow.png",
+            "attack_damage": 0,
+            "attack_speed": 0.5,
+            "crit_chance": 0,
+            "health": 0,
+            "description": "Each attack grants bonus 0.1 attack speed stacking up to 10 times.",
+            "effect" : {
+                "condition" : 1,
+                "type" : 1,
+                "repeat" : 1,
+                "lifetime": 1,
+                "limit": 10,
+                "stats": {
+                    "attack_speed": 0.1
+                }
+            } 
+        },
+        { 
+            "name": "Shield", 
+            "cost" : 1, 
+            "texture": "shield.png",
+            "attack_damage": 0,
+            "attack_speed": 0,
+            "crit_chance": 0,
+            "health": 100,
+            "description": "Gain 5 energy whenever hit by an attack."
+        }
+    ]
+}
