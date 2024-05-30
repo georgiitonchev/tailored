@@ -21,6 +21,7 @@ A very basic and simple C/OpenGL game framework/engine being developed for **lea
 
 ## Examples
 Example UI featuring buttons, scrollable areas and a simple particle system.  
+The example screen setup also features a very simple loading of assets on a different thread while displaying a loading bar. (and a fake loading bar between the title and game screen for an added effect)
 
 Some assets used in the examples are from [https://kenney.nl/](https://kenney.nl/)  
 Font used is [Eczar](https://fonts.google.com/specimen/Eczar)
