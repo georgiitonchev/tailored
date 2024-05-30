@@ -1,6 +1,6 @@
 # Tailored
 
-A very simple C/OpenGL game framework/engine being developed for learning purposes.
+A very simple C/OpenGL game framework/engine being developed for learning purposes. (Windows/macOS)
 
 ## Libraries
  - [GLFW](https://github.com/glfw/glfw): A multi-platform library for OpenGL, OpenGL ES, Vulkan, window and input.
