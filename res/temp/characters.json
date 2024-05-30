@@ -46,13 +46,13 @@
             "name": "Archer",
             "texture": "character_archer.png",
             
-            "description": "Grants allies in the same row 0.5 attack speed for 5 seconds.",
+            "description": "Grants allies 0.5 attack speed for 5 seconds.",
 
             "cost" : 1,
             
             "damage": 15,
             "health": 1200, 
-            "energy": 10,
+            "energy": 15,
             "range": 4, 
             "crit_chance": 25, 
             "crit_damage": 50,

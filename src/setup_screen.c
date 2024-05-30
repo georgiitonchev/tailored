@@ -57,7 +57,7 @@ typedef struct item_effect {
 } item_effect;
 //bow = on attack, gain stats, 25 times
 
-typedef enum game_phase { SHOP, PLAN, COMBAT } game_phase;
+typedef enum game_phase { SHOP, PLAN, COMBAT, RECAP } game_phase;
 typedef enum character_class { TANK, FIGHTER, RANGER } character_class;
 
 static t_sprite s_sprite_panel;
@@ -67,6 +67,8 @@ static t_sprite s_sprite_gear;
 static t_sprite s_sprite_panel_border_1;
 
 static t_sprite s_sprite_border_2;
+
+static t_sprite s_sprite_circling_particles;
 
 static t_sprite s_sprite_sword;
 static t_sprite s_sprite_shield;
@@ -211,6 +213,8 @@ typedef struct character_combat_instance {
   float attack_speed;
   float movement_speed;
 
+  t_list* team;
+
   struct character_combat_instance* target;
 
 } character_combat_instance;
@@ -266,6 +270,89 @@ static t_list* s_list_board_slots;
 
 static t_list* s_list_characters;
 static t_list* s_list_items;
+
+static bool s_ability_active = false;
+static float s_ability_timer = 0;
+
+static t_list* s_list_active_abilities;
+
+typedef struct ability_instance { 
+
+  void (*ability_start)(struct ability_instance*);
+  void (*ability_loop)(struct ability_instance*);
+  void (*ability_end)(struct ability_instance*);
+
+  character_combat_instance* character_combat_instance;
+
+  float timer;
+  float timer_limit;
+
+} ability_instance;
+
+static void s_add_ability_instance(ability_instance* instance) { 
+  if (s_list_active_abilities == NULL)
+    s_list_active_abilities = create_list(sizeof(ability_instance));
+
+  instance->ability_start(instance);
+  add_to_list(s_list_active_abilities, instance);
+}
+
+static void s_update_active_abilities() { 
+
+  if (s_list_active_abilities != NULL) {
+    for (int i = 0; i < s_list_active_abilities->size; i++) { 
+
+      ability_instance* instance = element_at_list(s_list_active_abilities, i);
+
+      instance->ability_loop(instance);
+      instance->timer += t_delta_time();
+
+      if (instance->timer >= instance->timer_limit) {
+        instance->ability_end(instance);
+        remove_from_list(s_list_active_abilities, i);
+        i--;
+      }
+    }
+  }
+}
+
+static void s_ranger_ability_start(ability_instance* instance) {
+  for (int i = 0; i < instance->character_combat_instance->team->size; i++) { 
+
+    t_ui_button* btn = element_at_list(instance->character_combat_instance->team, i);
+    character_combat_instance* team_member_instance = btn->user_data;
+
+    team_member_instance->attack_speed += 0.5;
+  }
+}
+
+static void s_ranger_ability_loop(ability_instance* instance) {
+
+}
+
+static void s_ranger_ability_end(ability_instance* instance) { 
+  for (int i = 0; i < instance->character_combat_instance->team->size; i++) { 
+
+    t_ui_button* btn = element_at_list(instance->character_combat_instance->team, i);
+    character_combat_instance* team_member_instance = btn->user_data;
+
+    team_member_instance->attack_speed -= 0.5;
+  }
+}
+
+static void s_ranger_ability(character_combat_instance* instance) { 
+
+  ability_instance* abi_instance = malloc(sizeof(ability_instance));
+  abi_instance->ability_start = s_ranger_ability_start;
+  abi_instance->ability_loop = s_ranger_ability_loop;
+  abi_instance->ability_end = s_ranger_ability_end;
+
+  abi_instance->character_combat_instance = instance;
+  abi_instance->timer = 0;
+  abi_instance->timer_limit = 5;
+
+  s_add_ability_instance(abi_instance);
+}
 
 static t_list* s_list_ally_characters;
 static t_list* s_list_enemy_characters;
@@ -410,7 +497,7 @@ static void s_on_shop_slot_mouse_exit(t_ui_button* button) {
   s_shop_slot_mouseover = NULL;
 }
 
-static character_combat_instance* s_create_character_combat_instance(character_instance* instance) { 
+static character_combat_instance* s_create_character_combat_instance(character_instance* instance, t_list* team) { 
 
   character_combat_instance* combat_instance = malloc(sizeof(character_combat_instance));
 
@@ -458,6 +545,7 @@ static character_combat_instance* s_create_character_combat_instance(character_i
   combat_instance->current_movement_timer_x = 0;
   combat_instance->current_movement_timer_y = 0;
   combat_instance->performing_movement = false;
+  combat_instance->team = team;
 
   return combat_instance;
 }
@@ -716,7 +804,7 @@ static void s_on_button_play_clicked(t_ui_button* button) {
       t_ui_button* instance_button = malloc(sizeof(t_ui_button));
       *instance_button = create_ui_button(slot->character_slot.instance->character->sprite);
 
-      character_combat_instance* instance = s_create_character_combat_instance(slot->character_slot.instance);
+      character_combat_instance* instance = s_create_character_combat_instance(slot->character_slot.instance, s_list_ally_characters);
       instance->position = slot->position;
       instance->current_cell = slot->cell;
       instance->destination_cell = slot->cell;
@@ -741,7 +829,7 @@ static void s_on_button_play_clicked(t_ui_button* button) {
       t_ui_button* instance_button = malloc(sizeof(t_ui_button));
       *instance_button = create_ui_button(slot->character_slot.instance->character->sprite);
 
-      character_combat_instance* instance = s_create_character_combat_instance(slot->character_slot.instance);
+      character_combat_instance* instance = s_create_character_combat_instance(slot->character_slot.instance, s_list_enemy_characters);
       instance->position = slot->position;
       instance->current_cell = slot->cell;
       instance->destination_cell = slot->cell;
@@ -934,8 +1022,7 @@ static void s_draw_combat_characters(t_list* allies, t_list* enemies, bool move)
             if (combat_instance->energy_current >= combat_instance->energy_max) {
               combat_instance->energy_current = 0;
 
-              // cast 
-              combat_instance->attack_speed += 0.5f;
+              s_ranger_ability(combat_instance);
             }
           }
         }
@@ -1200,13 +1287,8 @@ static void s_create_shop() {
       slot->character = NULL;
       slot->item = NULL;
 
-      if (i < SHOP_SIZE / 2) { 
-        slot->character = (character*)element_at_list(s_list_characters, 2);
-        *slot_button = create_ui_button(slot->character->sprite);
-      }else { 
-        slot->item = (item*)element_at_list(s_list_items, t_random_int(0, s_list_items->size));
-        *slot_button = create_ui_button(slot->item->sprite);
-      }
+      slot->character = (character*)element_at_list(s_list_characters, t_random_int(0, s_list_characters->size));
+      *slot_button = create_ui_button(slot->character->sprite);
 
       slot_button->user_data = slot;
       slot_button->on_mouse_enter = s_on_shop_slot_mouse_enter;
@@ -1215,6 +1297,22 @@ static void s_create_shop() {
 
       add_to_list(s_list_shop_slots, slot_button);
     }
+}
+
+static t_array* s_sprite_queue;
+
+typedef struct t_sprite_queue_item { 
+
+  t_sprite* sprite;
+  const char* texture_path;
+} t_sprite_load_queue_item;
+
+static void s_load_queue_sprites() { 
+
+}
+
+static void s_init_queue_sprites() { 
+
 }
 
 int load_setup_screen(void* args) {
@@ -1231,6 +1329,8 @@ int load_setup_screen(void* args) {
 
     t_load_texture_data_s(&s_sprite_border_2, "./res/textures/border_2.png");
     t_load_texture_data_s(&s_sprite_panel_border_1, "./res/textures/panel-border-001.png");
+
+    t_load_texture_data_s(&s_sprite_circling_particles, "./res/textures/circling_particles.png");
 
     t_load_texture_data_s(&s_sprite_sword, "./res/textures/sword.png");
     t_load_texture_data_s(&s_sprite_shield, "./res/textures/shield.png");
@@ -1271,6 +1371,8 @@ void init_setup_screen() {
 
   t_init_sprite(&s_sprite_border_2);
   s_sprite_border_2.slice_borders = (t_vec4) { 2, 2, 2, 2 };
+
+  t_init_sprite(&s_sprite_circling_particles);
 
   t_init_sprite(&s_sprite_panel_border_1);
   s_sprite_panel_border_1.slice_borders = (t_vec4) { 16, 16, 16, 16 };
@@ -1980,6 +2082,8 @@ static void s_draw_combat_phase() {
     s_draw_combat();
     s_draw_shots();
     s_draw_texts();
+
+    s_update_active_abilities();
   }
 }
 
