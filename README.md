@@ -1,7 +1,9 @@
 # Tailored
 
 A very basic and simple C/OpenGL game framework/engine being developed for **learning purposes**. (Work in progress) (Windows/macOS)  
-\+ an example 3 screen setup for a simple character creator: Splash, Title, Game (Work in progress)
+\+ an example 3 screen setup for a simple character creator: Splash, Title, Game (Work in progress)  
+
+**A lot of the code is incomplete or just temporary as this is just a project I'm working on as I am learning C and OpenGL.**
 
 ## Libraries
  - [GLFW](https://github.com/glfw/glfw): A multi-platform library for OpenGL, OpenGL ES, Vulkan, window and input.
