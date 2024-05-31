@@ -385,8 +385,8 @@ void draw_title_screen() {
         if (progress > 1) {
             s_show_loading_bar = false;
 
-            set_screen(GAME);
-            // set_screen(SETUP);
+            //set_screen(GAME);
+            set_screen(SETUP);
         }
     }
 

@@ -5,7 +5,6 @@
 
 // STB
 #include "../../dep/include/stb/stb_image.h"
-#include "../../dep/include/stb/stb_ds.h"
 
 // MATH
 #include "../../dep/include/cglm/cglm.h"
