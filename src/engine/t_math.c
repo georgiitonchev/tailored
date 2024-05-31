@@ -63,7 +63,7 @@ float perlin(float x, float y) {
     return value * .5f + .5f; // Will return in range -1 to 1. To make it in range 0 to 1, multiply by 0.5 and add 0.5
 }
 
-unsigned char* generate_perlin_texture_bytes(int width, int height, float scale) { 
+unsigned char* generate_perlin_texture_bytes(int width, int height, float scale) {
 
     unsigned char* pixels = malloc(sizeof(char) * width * height * 4);
 
@@ -81,7 +81,7 @@ unsigned char* generate_perlin_texture_bytes(int width, int height, float scale)
     return pixels;
 }
 
-t_vec2 t_vec2_normalize(t_vec2 v) { 
+t_vec2 t_vec2_normalize(t_vec2 v) {
     float magnitude = sqrt((v.x) * (v.x) + (v.y) * (v.y));
     if (magnitude != 0) {
         v.x /= magnitude;
@@ -99,20 +99,20 @@ float t_vec2_distance(t_vec2 a, t_vec2 b) {
     return sqrt((b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y));
 }
 
-float t_vec2_angle(t_vec2 a, t_vec2 b) { 
+float t_vec2_angle(t_vec2 a, t_vec2 b) {
     return atan2(b.y - a.y, b.x - a.x);
 }
 
-t_vec2 t_vec2_dir(t_vec2 a, t_vec2 b) { 
+t_vec2 t_vec2_dir(t_vec2 a, t_vec2 b) {
     return t_vec2_normalize(t_vec2_sub(b, a));
 }
 
-float t_vec2_dot(t_vec2 a, t_vec2 b) { 
+float t_vec2_dot(t_vec2 a, t_vec2 b) {
     return (a.x * b.x) + (a.y * b.y);
 }
 
 t_vec2 t_vec2_lerp(t_vec2 a, t_vec2 b, float t) {
-    
+
     t_vec2 result;
 
     result.x = a.x + t * (b.x - a.x);
@@ -129,6 +129,6 @@ float t_random_float(float from, float to) {
     return from + ((float)rand() / RAND_MAX) * (to - from);
 }
 
-int t_random_int(int from, int to) { 
+int t_random_int(int from, int to) {
     return rand() % (to - from) + from;
 }

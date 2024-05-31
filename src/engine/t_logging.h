@@ -1,3 +1,5 @@
+#pragma once
+
 void t_log(const char* text, ...);
 void t_log_info(const char* text, ...);
 void t_log_debug(const char* text, ...);

@@ -16,7 +16,7 @@ static t_texture s_load_texture(const t_texture_data* texture_data) {
     texture_format = GL_RGBA;
 
   unsigned int texture_id;
-  
+
   glGenTextures(1, &texture_id);
   glBindTexture(GL_TEXTURE_2D, texture_id);
 
@@ -42,7 +42,7 @@ GLuint s_line_vbo;
 
 unsigned int s_line_shader_program;
 
-static void s_init_line_renderer() { 
+static void s_init_line_renderer() {
 
     float lineVertices[] = {
     -0.5f, -0.5f, // Vertex 1
@@ -71,7 +71,7 @@ void t_init_shapes_renderer() {
     unsigned char white_pixel[] = { 255, 255, 255, 255 };
     t_texture_data texture_white_data = { .bytes = (unsigned char*) white_pixel, .width = 1, .height = 1, .channels = 4 };
     t_texture texture_white = s_load_texture(&texture_white_data);
-    
+
     s_white_rectangle_sprite.texture_data = texture_white_data;
     s_white_rectangle_sprite.texture = texture_white;
     s_white_rectangle_sprite.scale = (t_vec2){ 1, 1 };
@@ -116,7 +116,7 @@ bool is_rect_in_rect(t_rect this, t_rect that) {
            this.y >= that.y && this.y + this.height <= that.y + that.height;
 }
 
-bool is_rect_zero(t_rect rect) { 
+bool is_rect_zero(t_rect rect) {
     return rect.x == 0 && rect.y == 0 && rect.width == 0 && rect.height == 0;
 }
 
@@ -139,7 +139,7 @@ void draw_rect_lines(int x, int y, int width, int height, t_color color) {
     t_draw_sprite(&s_white_border_rectangle_sprite, x, y, width, height, color);
 }
 
-void draw_line(int x_from, int y_from, int x_to, int y_to, float width, t_color color) { 
+void draw_line(int x_from, int y_from, int x_to, int y_to, float width, t_color color) {
 
     t_vec2 from = (t_vec2) {x_from, y_from};
     t_vec2 to = (t_vec2) {x_to, y_to};
@@ -151,12 +151,12 @@ void draw_line(int x_from, int y_from, int x_to, int y_to, float width, t_color 
 
 }
 
-// void draw_line(int x_from, int y_from, int x_to, int y_to, t_color color) { 
+// void draw_line(int x_from, int y_from, int x_to, int y_to, t_color color) {
 
 //     glUseProgram(s_line_shader_program);
 //     glUniform4fv(glGetUniformLocation(s_line_shader_program, "u_color"), 1,
 //                 (vec4){color.r / 255.0, color.g / 255.0, color.b / 255.0, color.a / 255.0});
-                
+
 //     glBindVertexArray(s_line_vao);
 //     glDrawArrays(GL_LINES, 0, 2);
 //     glBindVertexArray(0);

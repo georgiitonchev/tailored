@@ -44,9 +44,9 @@ void destroy_array(t_array* array) {
 
 void add_to_array(t_array* array, void* element) {
 
-	if (array->size == array->capacity) 
+	if (array->size == array->capacity)
 		s_resize_array(array, array->capacity * 2);
-	
+
 	array->data[array->size++] = element;
 }
 
@@ -74,7 +74,7 @@ void remove_from_array(t_array* array, void* element) {
 	}
 }
 
-void* element_at_array(t_array* array, int index) { 
+void* element_at_array(t_array* array, int index) {
 
 	 if (!array) {
         printf("ERROR: array is NULL at element_at_array.\n");
@@ -86,7 +86,6 @@ void* element_at_array(t_array* array, int index) {
         return NULL;
     }
 
-    //void* element = (char*)array->data + (sizeof(void*) * index);
     return array->data[index];
 }
 
