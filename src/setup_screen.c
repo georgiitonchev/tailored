@@ -1,6 +1,7 @@
 #include "engine/t_core.h"
 #include "engine/t_input.h"
 #include "engine/t_sprite.h"
+#include "engine/t_texture.h"
 #include "engine/t_ui.h"
 #include "screens.h"
 #include "./engine/tailored.h"
@@ -15,36 +16,36 @@
 
 typedef enum item_effect_condition {
 
-  PASSIVE, 
-  ON_ATTACK, 
-  ON_HIT, 
+  PASSIVE,
+  ON_ATTACK,
+  ON_HIT,
   ON_CAST,
   AT_HEALTH,
 
 } item_effect_condition;
 
-typedef enum item_effect_type { 
+typedef enum item_effect_type {
 
   TYPE_EMTPY,
   GAIN_STATS
 
 } item_effect_type;
 
-typedef enum item_effect_repeat { 
+typedef enum item_effect_repeat {
 
   ONCE,
   REPEAT,
 
 } item_effect_repeat;
 
-typedef enum item_effect_lifetime { 
+typedef enum item_effect_lifetime {
 
   TIME, //example 5 seconds
   END_OF_COMBAT, //until end of combat
 
 } item_effect_lifetime;
 
-typedef struct item_effect { 
+typedef struct item_effect {
 
   item_effect_condition condition;
   item_effect_type type;
@@ -56,6 +57,9 @@ typedef struct item_effect {
 
 } item_effect;
 //bow = on attack, gain stats, 25 times
+
+static t_texture_data s_texture_data_spritesheet;
+static t_texture s_texture_spritesheet;
 
 typedef enum game_phase { SHOP, PLAN, COMBAT, RECAP } game_phase;
 typedef enum character_class { TANK, FIGHTER, RANGER } character_class;
@@ -97,7 +101,7 @@ static unsigned int s_stage = 0;
 typedef struct item {
 
   const char* name;
-  const char* description; 
+  const char* description;
 
   unsigned int cost;
   unsigned int attack_damage;
@@ -130,7 +134,7 @@ typedef struct character {
 
   float attack_speed;
   float movement_speed;
-  
+
   character_class class;
 
 
@@ -177,7 +181,7 @@ typedef struct character_instance {
 
 } character_instance;
 
-typedef struct character_combat_instance { 
+typedef struct character_combat_instance {
 
   character_instance* instance;
 
@@ -276,7 +280,7 @@ static float s_ability_timer = 0;
 
 static t_list* s_list_active_abilities;
 
-typedef struct ability_instance { 
+typedef struct ability_instance {
 
   void (*ability_start)(struct ability_instance*);
   void (*ability_loop)(struct ability_instance*);
@@ -289,7 +293,7 @@ typedef struct ability_instance {
 
 } ability_instance;
 
-static void s_add_ability_instance(ability_instance* instance) { 
+static void s_add_ability_instance(ability_instance* instance) {
   if (s_list_active_abilities == NULL)
     s_list_active_abilities = create_list(sizeof(ability_instance));
 
@@ -297,10 +301,10 @@ static void s_add_ability_instance(ability_instance* instance) {
   add_to_list(s_list_active_abilities, instance);
 }
 
-static void s_update_active_abilities() { 
+static void s_update_active_abilities() {
 
   if (s_list_active_abilities != NULL) {
-    for (int i = 0; i < s_list_active_abilities->size; i++) { 
+    for (int i = 0; i < s_list_active_abilities->size; i++) {
 
       ability_instance* instance = element_at_list(s_list_active_abilities, i);
 
@@ -317,7 +321,7 @@ static void s_update_active_abilities() {
 }
 
 static void s_ranger_ability_start(ability_instance* instance) {
-  for (int i = 0; i < instance->character_combat_instance->team->size; i++) { 
+  for (int i = 0; i < instance->character_combat_instance->team->size; i++) {
 
     t_ui_button* btn = element_at_list(instance->character_combat_instance->team, i);
     character_combat_instance* team_member_instance = btn->user_data;
@@ -330,8 +334,8 @@ static void s_ranger_ability_loop(ability_instance* instance) {
 
 }
 
-static void s_ranger_ability_end(ability_instance* instance) { 
-  for (int i = 0; i < instance->character_combat_instance->team->size; i++) { 
+static void s_ranger_ability_end(ability_instance* instance) {
+  for (int i = 0; i < instance->character_combat_instance->team->size; i++) {
 
     t_ui_button* btn = element_at_list(instance->character_combat_instance->team, i);
     character_combat_instance* team_member_instance = btn->user_data;
@@ -340,7 +344,7 @@ static void s_ranger_ability_end(ability_instance* instance) {
   }
 }
 
-static void s_ranger_ability(character_combat_instance* instance) { 
+static void s_ranger_ability(character_combat_instance* instance) {
 
   ability_instance* abi_instance = malloc(sizeof(ability_instance));
   abi_instance->ability_start = s_ranger_ability_start;
@@ -497,7 +501,7 @@ static void s_on_shop_slot_mouse_exit(t_ui_button* button) {
   s_shop_slot_mouseover = NULL;
 }
 
-static character_combat_instance* s_create_character_combat_instance(character_instance* instance, t_list* team) { 
+static character_combat_instance* s_create_character_combat_instance(character_instance* instance, t_list* team) {
 
   character_combat_instance* combat_instance = malloc(sizeof(character_combat_instance));
 
@@ -510,7 +514,7 @@ static character_combat_instance* s_create_character_combat_instance(character_i
     t_ui_button* slot_button = &instance->item_slot_buttons[i];
     item_slot* item_slot = slot_button->user_data;
 
-    if (item_slot != NULL && item_slot->item != NULL) { 
+    if (item_slot != NULL && item_slot->item != NULL) {
       total_damage += item_slot->item->attack_damage;
       total_crit_chance += item_slot->item->crit_chance;
       total_attack_speed += item_slot->item->attack_speed;
@@ -550,7 +554,7 @@ static character_combat_instance* s_create_character_combat_instance(character_i
   return combat_instance;
 }
 
-static character_instance* s_create_character_instance(character* character) { 
+static character_instance* s_create_character_instance(character* character) {
 
   character_instance* instance = malloc(sizeof(character_instance));
   instance->character = character;
@@ -571,7 +575,7 @@ static character_instance* s_create_character_instance(character* character) {
 
   instance->item_slot_buttons = malloc(3 * sizeof(t_ui_button));
 
-  for (int i = 0; i < 3; i++) { 
+  for (int i = 0; i < 3; i++) {
     instance->item_slot_buttons[i] = create_ui_button(&s_sprite_border_2);
 
     item_slot* slot = malloc(sizeof(item_slot));
@@ -583,7 +587,7 @@ static character_instance* s_create_character_instance(character* character) {
   return instance;
 }
 
-static void s_on_combat_instance_clicked(t_ui_button* button) { 
+static void s_on_combat_instance_clicked(t_ui_button* button) {
 
   character_combat_instance* instance = button->user_data;
 
@@ -658,7 +662,7 @@ static t_vec2 s_slot_pressed_at;
 static bool s_dragging_item = false;
 static t_ui_button* s_dragged_button = NULL;
 
-static void s_on_item_slot_pressed(t_ui_button* button) { 
+static void s_on_item_slot_pressed(t_ui_button* button) {
 
   if (s_dragging_item) return;
 
@@ -856,13 +860,13 @@ typedef struct instance_shot {
   t_vec2 shot_from;
   character_combat_instance* from;
   character_combat_instance* to;
-  
+
   t_vec2 pos;
 
 } instance_shot;
 
-typedef struct instance_text { 
-  
+typedef struct instance_text {
+
   t_vec2 spawned_at;
   char text[15];
 
@@ -870,10 +874,10 @@ typedef struct instance_text {
   float timer;
 } instance_text;
 
-static t_list* s_list_shots = NULL; 
+static t_list* s_list_shots = NULL;
 static t_list* s_list_texts = NULL;
 
-static void s_spawn_text(int value, int x, int y, bool crit) { 
+static void s_spawn_text(int value, int x, int y, bool crit) {
 
   if (s_list_texts == NULL)
     s_list_texts = create_list(sizeof(instance_text));
@@ -903,10 +907,10 @@ static void s_spawn_shot(character_combat_instance* from, character_combat_insta
   add_to_list(s_list_shots, instance);
 }
 
-static void s_draw_shots() { 
+static void s_draw_shots() {
 
-  if (s_list_shots != NULL) { 
-    for (int i = 0; i < s_list_shots->size; i++) { 
+  if (s_list_shots != NULL) {
+    for (int i = 0; i < s_list_shots->size; i++) {
 
       instance_shot* shot = element_at_list(s_list_shots, i);
 
@@ -927,7 +931,7 @@ static void s_draw_shots() {
         bool is_crit = t_random_int(0, 100) < shot->from->crit_chance;
         int damage = is_crit ? shot->from->damage * (1 + ((float)shot->from->crit_damage / 100)) : shot->from->damage;
         shot->to->health_current -= damage;
-        
+
         s_spawn_text(damage, shot->pos.x, shot->pos.y, is_crit);
 
         if (shot->to->health_current <= 0) {
@@ -945,28 +949,28 @@ static void s_draw_shots() {
 static void s_draw_combat_characters(t_list* allies, t_list* enemies, bool move) {
 
   int allies_alive = allies->size;
-  for (int i = 0; i < allies->size; i++) { 
+  for (int i = 0; i < allies->size; i++) {
 
     t_ui_button* combat_instance_button = element_at_list(allies, i);
     character_combat_instance* combat_instance = combat_instance_button->user_data;
 
     // skip if not alive
-    if (!combat_instance->is_alive) { allies_alive --; continue; } 
+    if (!combat_instance->is_alive) { allies_alive --; continue; }
 
     // find new target
     if (combat_instance->target == NULL || !combat_instance->target->is_alive) {
 
       character_combat_instance* closest_enemy = NULL;
 
-      for (int e = 0; e < enemies->size; e++) { 
+      for (int e = 0; e < enemies->size; e++) {
 
         character_combat_instance* enemy_combat_instance = ((t_ui_button*)element_at_list(enemies, e))->user_data;
 
         // skip if not alive
         if (!enemy_combat_instance->is_alive) continue;
 
-        if (closest_enemy == NULL || 
-              s_get_cell_distance(combat_instance->destination_cell, enemy_combat_instance->destination_cell) < 
+        if (closest_enemy == NULL ||
+              s_get_cell_distance(combat_instance->destination_cell, enemy_combat_instance->destination_cell) <
               s_get_cell_distance(combat_instance->destination_cell, closest_enemy->destination_cell)) {
 
           closest_enemy = enemy_combat_instance;
@@ -979,9 +983,9 @@ static void s_draw_combat_characters(t_list* allies, t_list* enemies, bool move)
     draw_ui_button(combat_instance_button, combat_instance->position.x, combat_instance->position.y, 48, 48);
     // t_draw_sprite(combat_instance->instance->character->sprite, combat_instance->position.x, combat_instance->position.y, 48, 48, WHITE);
 
-    if (move && combat_instance->target != NULL) { 
+    if (move && combat_instance->target != NULL) {
 
-      if (combat_instance->performing_movement) { 
+      if (combat_instance->performing_movement) {
 
         t_ease_out_quint(&combat_instance->current_movement_timer_x, &combat_instance->position.x, combat_instance->current_cell->position.x, combat_instance->destination_cell->position.x, 1.0f);
         float p = t_ease_out_quint(&combat_instance->current_movement_timer_y, &combat_instance->position.y, combat_instance->current_cell->position.y, combat_instance->destination_cell->position.y, 1.0f);
@@ -993,8 +997,8 @@ static void s_draw_combat_characters(t_list* allies, t_list* enemies, bool move)
           combat_instance->current_movement_timer_y = 0;
           combat_instance->destination_cell->is_occupied = true;
         }
-      } 
-      else { 
+      }
+      else {
 
         float distance_from_target = s_get_cell_distance(combat_instance->current_cell, combat_instance->target->destination_cell);
 
@@ -1007,7 +1011,7 @@ static void s_draw_combat_characters(t_list* allies, t_list* enemies, bool move)
             combat_instance->destination_cell = next_move_cell;
             combat_instance->destination_cell->is_occupied = true;
             combat_instance->current_cell->is_occupied = false;
-          }        
+          }
         }
         else {
           combat_instance->attack_timer += t_delta_time() * combat_instance->attack_speed;
@@ -1028,7 +1032,7 @@ static void s_draw_combat_characters(t_list* allies, t_list* enemies, bool move)
         }
       }
     }
-    
+
     // health
     draw_rect(combat_instance->position.x, combat_instance->position.y, ((float)combat_instance->health_current / combat_instance->health_max) * 48, 4, H_GREEN);
 
@@ -1141,8 +1145,8 @@ static void s_create_characters_inventory() {
   }
 }
 
-static void s_create_items_inventory() { 
-  
+static void s_create_items_inventory() {
+
   s_list_item_slots = create_list(sizeof(t_ui_button));
 
   for (int i = 0; i < ITEM_SLOTS_SIZE; i++) {
@@ -1162,13 +1166,13 @@ static void s_create_items_inventory() {
   }
 }
 
-static void s_load_items() { 
+static void s_load_items() {
   s_list_items = create_list(sizeof(item));
 
   long file_size;
   const char* items_data = t_read_file("./res/temp/items.json", &file_size);
 
-  if (items_data != NULL) { 
+  if (items_data != NULL) {
     t_log_debug("Loading items.");
 
     cJSON* json_data = cJSON_Parse(items_data);
@@ -1193,7 +1197,7 @@ static void s_load_items() {
       itm->description = cJSON_GetObjectItem(json_array_item, "description")->valuestring;
 
       cJSON* json_effect = cJSON_GetObjectItem(json_array_item, "effect");
-      if (json_effect != NULL) { 
+      if (json_effect != NULL) {
 
         item_effect effect;
         effect.condition = cJSON_GetObjectItem(json_effect, "condition")->valueint;
@@ -1255,13 +1259,14 @@ static void s_load_characters() {
         ch->movement_speed = (float)cJSON_GetObjectItem(json_array_item, "movement_speed")->valuedouble;
         ch->class = cJSON_GetObjectItem(json_array_item, "class")->valueint;
 
-        const char* texture_name = cJSON_GetObjectItem(json_array_item, "texture")->valuestring;
-        t_sprite* sprite = malloc(sizeof(t_sprite));
+        int texture_x = cJSON_GetObjectItem(json_array_item, "texture_x")->valueint;
+        int texture_y = cJSON_GetObjectItem(json_array_item, "texture_y")->valueint;
 
-        char texture_path[200];
-        sprintf(texture_path, "./res/textures/%s", texture_name);
-        t_load_texture_data_s(sprite, texture_path);
-        t_init_sprite(sprite);
+        t_sprite* sprite = malloc(sizeof(t_sprite));
+        sprite->texture = s_texture_spritesheet;
+        sprite->slice_borders = VEC4_ZERO;
+        sprite->scale = VEC2_ONE;
+        sprite->texture_slice = (t_vec4) { texture_x * 16, texture_y * 16, 16, 16 };
 
         ch->sprite = sprite;
 
@@ -1301,22 +1306,24 @@ static void s_create_shop() {
 
 static t_array* s_sprite_queue;
 
-typedef struct t_sprite_queue_item { 
+typedef struct t_sprite_queue_item {
 
   t_sprite* sprite;
   const char* texture_path;
 } t_sprite_load_queue_item;
 
-static void s_load_queue_sprites() { 
+static void s_load_queue_sprites() {
 
 }
 
-static void s_init_queue_sprites() { 
+static void s_init_queue_sprites() {
 
 }
 
 int load_setup_screen(void* args) {
     UNUSED(args);
+
+    s_texture_data_spritesheet = t_load_texture_data("./res/textures/colored-transparent_packed.png");
 
     t_load_texture_data_s(&s_sprite_plus_sign, "./res/textures/plus_sign.png");
     t_load_texture_data_s(&s_sprite_swap_sign, "./res/textures/swap_sign.png");
@@ -1357,6 +1364,8 @@ static t_font s_font_l;
 
 void init_setup_screen() {
   process_gltf_file("./res/models/cube/Cube.gltf", &scenes);
+
+  s_texture_spritesheet = t_load_texture_from_data(&s_texture_data_spritesheet);
 
   shader_program = t_create_shader_program("./res/shaders/model_shader.vs", "./res/shaders/model_shader.fs");
 
@@ -1442,7 +1451,7 @@ static void s_draw_texts() {
 
   if (s_list_texts != NULL) {
 
-    for (int i = 0; i < s_list_texts->size; i++) { 
+    for (int i = 0; i < s_list_texts->size; i++) {
 
       instance_text* instance = element_at_list(s_list_texts, i);
       t_color color = instance->crit ? RED : WHITE;
@@ -1472,7 +1481,7 @@ static void s_draw_texts() {
 
 static t_ui_button* button_slot_over = NULL;
 
-static void s_draw_board() { 
+static void s_draw_board() {
   unsigned int board_slot_index = 0;
 
   button_slot_over = NULL;
@@ -1753,7 +1762,7 @@ static void s_draw_character_combat_instance_info() {
       t_ui_button* slot_button = &s_selected_character_combat_instance->instance->item_slot_buttons[i];
       item_slot* item_slot = slot_button->user_data;
 
-       if (item_slot != NULL && item_slot->item != NULL) { 
+       if (item_slot != NULL && item_slot->item != NULL) {
         t_draw_sprite(item_slot->item->sprite, pos_x + 2, pos_y + 2, 32, 32, WHITE);
       }
     }
@@ -1781,7 +1790,7 @@ static void s_draw_character_instance_info() {
 
       draw_rect_lines(pos_x, pos_y, 38, 38, CC_BLACK);
 
-      if (item_slot != NULL && item_slot->item != NULL) { 
+      if (item_slot != NULL && item_slot->item != NULL) {
         t_draw_sprite(item_slot->item->sprite, pos_x + 2, pos_y + 2, 32, 32, WHITE);
         total_damage += item_slot->item->attack_damage;
         total_attack_speed += item_slot->item->attack_speed;
@@ -1898,7 +1907,7 @@ static void s_draw_character_instance_info() {
       s_draw_tooltip("Range");
     }
 
-    
+
   }
 }
 
@@ -1917,7 +1926,7 @@ static void s_draw_item_info() {
     int pos_x_stat = 451 + x * (56);
     int pos_y_stat = 199 + y * (26);
 
-    if (s_selected_item->attack_damage > 0) { 
+    if (s_selected_item->attack_damage > 0) {
       t_draw_sprite(&s_sprite_sword, pos_x_stat, pos_y_stat, 16, 16, CC_DARK_RED);
 
       char text_ad[5];
@@ -1933,7 +1942,7 @@ static void s_draw_item_info() {
       pos_x_stat = 451 + x * (56);
     }
 
-    if (s_selected_item->attack_speed > 0.0f) { 
+    if (s_selected_item->attack_speed > 0.0f) {
       t_draw_sprite(&s_sprite_sword, pos_x_stat, pos_y_stat, 16, 16, CC_DARK_RED);
 
       char text_as[5];
@@ -1949,7 +1958,7 @@ static void s_draw_item_info() {
       pos_x_stat = 451 + x * (56);
     }
 
-    if (s_selected_item->crit_chance > 0) { 
+    if (s_selected_item->crit_chance > 0) {
       t_draw_sprite(&s_sprite_sword, pos_x_stat, pos_y_stat, 16, 16, CC_DARK_RED);
 
       char text_cc[5];
@@ -2010,21 +2019,21 @@ static void s_draw_phase_controls() {
     }
 }
 
-static void s_draw_settings() { 
+static void s_draw_settings() {
 
     t_draw_sprite(&s_sprite_gear, 1, 1, 32, 32, CC_RED);
 }
 
-static void s_draw_slot_dragging() { 
+static void s_draw_slot_dragging() {
 
   if (s_dragged_button != NULL) {
-  
+
     const int pos_x = mouse_position().x - s_dragged_button->mouse_clicked_at.x;
     const int pos_y = mouse_position().y - s_dragged_button->mouse_clicked_at.y;
 
     draw_ui_button(s_dragged_button, pos_x, pos_y, 48, 48);
 
-    if (is_mouse_button_released(MOUSE_BUTTON_LEFT)) { 
+    if (is_mouse_button_released(MOUSE_BUTTON_LEFT)) {
 
       if (button_slot_over != NULL) {
 
@@ -2046,19 +2055,19 @@ static void s_draw_slot_dragging() {
             s_dragged_button->sprite = on_board->character->sprite;
           }
 
-          button_slot_over->sprite = slot_to->instance->character->sprite; 
+          button_slot_over->sprite = slot_to->instance->character->sprite;
 
-        } else { 
+        } else {
           item_slot* slot_from = s_dragged_button->user_data_1;
           item_slot* slot_to = button_slot_over->user_data_1;
 
           // Place
-          if (slot_to->item == NULL) { 
+          if (slot_to->item == NULL) {
             slot_to->item = slot_from->item;
             slot_from->item = NULL;
           }
-          // Swap 
-          else { 
+          // Swap
+          else {
             item* on_slot = slot_to->item;
             slot_to->item = slot_from->item;
             slot_from->item = on_slot;
@@ -2076,9 +2085,9 @@ static void s_draw_slot_dragging() {
   }
 }
 
-static void s_draw_combat_phase() { 
+static void s_draw_combat_phase() {
 
-  if (s_is_playing) { 
+  if (s_is_playing) {
     s_draw_combat();
     s_draw_shots();
     s_draw_texts();

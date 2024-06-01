@@ -1,69 +1,72 @@
 {
-    "characters" : [
-        { 
-            "name": "Baby",
-            "texture": "character_baby.png",
+  "characters": [
+    {
+      "name": "Baby",
+      "texture_x": 24,
+      "texture_y": 3,
 
-            "cost" : 1,
-            
-            "damage": 10,
-            "health": 1650, 
-            "energy": 100,
-            "range": 1, 
-            "crit_chance": 25, 
-            "crit_damage": 50,
+      "cost": 1,
 
-            "attack_resist": 0,
-            "ability_resist": 0,
+      "damage": 10,
+      "health": 1650,
+      "energy": 100,
+      "range": 1,
+      "crit_chance": 25,
+      "crit_damage": 50,
 
-            "attack_speed": 1.0,
-            "movement_speed": 0.5,
+      "attack_resist": 0,
+      "ability_resist": 0,
 
-            "class": 0
-        },
-        { 
-            "name": "Knight",
-            "texture": "character_knight.png",
-            
-            "cost" : 1,
-            
-            "damage": 10,
-            "health": 1450, 
-            "energy": 100,
-            "range": 1, 
-            "crit_chance": 25, 
-            "crit_damage": 50,
+      "attack_speed": 1.0,
+      "movement_speed": 0.5,
 
-            "attack_resist": 0,
-            "ability_resist": 0,
+      "class": 0
+    },
+    {
+      "name": "Knight",
+      "texture_x": 27,
+      "texture_y": 0,
 
-            "attack_speed": 1.0,
-            "movement_speed": 0.5,
+      "cost": 1,
 
-            "class": 1
-        },        
-        { 
-            "name": "Archer",
-            "texture": "character_archer.png",
-            
-            "description": "Grants allies 0.5 attack speed for 5 seconds.",
+      "damage": 10,
+      "health": 1450,
+      "energy": 100,
+      "range": 1,
+      "crit_chance": 25,
+      "crit_damage": 50,
 
-            "cost" : 1,
-            
-            "damage": 15,
-            "health": 1200, 
-            "energy": 15,
-            "range": 4, 
-            "crit_chance": 25, 
-            "crit_damage": 50,
+      "attack_resist": 0,
+      "ability_resist": 0,
 
-            "attack_resist": 0,
-            "ability_resist": 0,
+      "attack_speed": 1.0,
+      "movement_speed": 0.5,
 
-            "attack_speed": 1.2,
-            "movement_speed": 0.5,
+      "class": 1
+    },
+    {
+      "name": "Archer",
+      "texture_x": 25,
+      "texture_y": 2,
 
-            "class": 2
-        }
-    ]
+      "description": "Grants allies 0.5 attack speed for 5 seconds.",
+
+      "cost": 1,
+
+      "damage": 15,
+      "health": 1200,
+      "energy": 15,
+      "range": 4,
+      "crit_chance": 25,
+      "crit_damage": 50,
+
+      "attack_resist": 0,
+      "ability_resist": 0,
+
+      "attack_speed": 1.2,
+      "movement_speed": 0.5,
+
+      "class": 2
+    }
+  ]
 }
