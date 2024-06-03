@@ -73,8 +73,8 @@ void load_section_settings() {
 
 void init_section_settings() {
 
-    s_font_ui_s = load_ttf_font("./res/fonts/Eczar-Regular.ttf", 32);
-    s_font_ui_l = load_ttf_font("./res/fonts/Eczar-Regular.ttf", 42);
+    s_font_ui_s = t_load_ttf_font("./res/fonts/Eczar-Regular.ttf", 32);
+    s_font_ui_l = t_load_ttf_font("./res/fonts/Eczar-Regular.ttf", 42);
 
     t_init_sprite(&s_sprite_section_background);
     s_sprite_section_background.slice_borders = (t_vec4){ 16, 16, 16, 16 };
@@ -106,7 +106,7 @@ void draw_section_settings(const float p_offset_x, const float p_offset_y) {
 
     t_draw_sprite(&s_sprite_section_background, 256, 16 + p_offset_y, 368, 328, CC_LIGHT_RED);
 
-    t_vec2 text_size_sound = measure_text_size_ttf("Sound", &s_font_ui_l);
+    t_vec2 text_size_sound = t_measure_text_size("Sound", &s_font_ui_l);
     t_draw_text("Sound", &s_font_ui_l, 256 + (368 - text_size_sound.x) / 2, 48 + p_offset_y, CC_BLACK, 0);
 
     // MASTER VOLUME
@@ -235,8 +235,8 @@ void draw_section_settings(const float p_offset_x, const float p_offset_y) {
 
 void unload_section_settings() {
     
-    delete_ttf_font(&s_font_ui_s);
-    delete_ttf_font(&s_font_ui_l);
+    t_delete_ttf_font(&s_font_ui_s);
+    t_delete_ttf_font(&s_font_ui_l);
 
     t_deinit_sprite(&s_sprite_section_background);
     t_deinit_sprite(&s_sprite_slider_background);

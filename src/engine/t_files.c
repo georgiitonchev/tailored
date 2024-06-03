@@ -5,6 +5,7 @@
 #include <stdlib.h>
 
 const char *t_read_file(const char *path, long* file_size) {
+  
   char *text_buffer;
 
   FILE *file_pointer = fopen(path, "rb");
@@ -30,6 +31,7 @@ const char *t_read_file(const char *path, long* file_size) {
 }
 
 t_result t_write_file(const char* path, const char* file_data) {
+
   FILE *file = fopen(path, "wt");
   if (file != NULL)
   {

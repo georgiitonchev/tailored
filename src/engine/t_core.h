@@ -105,7 +105,6 @@ int t_begin(int window_width, int window_height, const char* title);
 bool t_loop();
 void t_loop_end();
 void t_end();
-void t_draw_scene();
 
 void t_begin_scissor(int x, int y, int width, int height);
 void t_end_scissor();
@@ -124,7 +123,7 @@ void t_set_master_volume(float value);
 // CORE FUNCTIONS
 void t_set_cursor(const char* path, int xhot, int yhot);
 float t_delta_time();
-float t_get_time();
+float t_time();
 t_vec2 t_window_size();
 t_vec2 t_framebuffer_size();
 

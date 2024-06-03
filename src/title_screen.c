@@ -191,7 +191,7 @@ int load_title_screen(void* args) {
 
 void init_title_screen() {
 
-    s_ui_font_l = load_ttf_font("./res/fonts/Eczar-Regular.ttf", 42);
+    s_ui_font_l = t_load_ttf_font("./res/fonts/Eczar-Regular.ttf", 42);
 
     t_init_sprite(&s_sprite_loading_bar);
     t_init_sprite(&s_sprite_logo);
@@ -240,7 +240,7 @@ void unload_title_screen() {
     t_deinit_sprite(&s_sprite_button_selected);
     t_deinit_sprite(&s_sprite_loading_bar);
 
-    delete_ttf_font(&s_ui_font_l);
+    t_delete_ttf_font(&s_ui_font_l);
 }
 
 void draw_title_screen() {
@@ -276,10 +276,10 @@ void draw_title_screen() {
     draw_ui_button(&m_settings_button, 64 + s_left_side_offset_x, 204, 128, 48);
     draw_ui_button(&m_about_button, 64 + s_left_side_offset_x, 268, 128, 48);
 
-    t_vec2 text_size_play = measure_text_size_ttf("Play", &s_ui_font_l);
+    t_vec2 text_size_play = t_measure_text_size("Play", &s_ui_font_l);
     t_draw_text("Play", &s_ui_font_l, 64 + (128 - text_size_play.x) / 2 + s_left_side_offset_x , 140 + (48 + text_size_play.y) / 2, CC_BLACK, 0);
 
-    t_vec2 text_size_settings = measure_text_size_ttf("Settings", &s_ui_font_l);
+    t_vec2 text_size_settings = t_measure_text_size("Settings", &s_ui_font_l);
     t_draw_text("Settings", &s_ui_font_l, 64 + (128 - text_size_settings.x) / 2 + s_left_side_offset_x, 204 + (48 + text_size_settings.y) / 2, CC_BLACK, 0);
 
     if (s_ease_in_characters) {
@@ -353,7 +353,7 @@ void draw_title_screen() {
         }
     }
 
-    t_vec2 text_size_about = measure_text_size_ttf("About", &s_ui_font_l);
+    t_vec2 text_size_about = t_measure_text_size("About", &s_ui_font_l);
     t_draw_text("About", &s_ui_font_l, 64 + (128 - text_size_about.x) / 2 + s_left_side_offset_x, 268 + (48 + text_size_about.y) / 2, CC_BLACK, 0);
 
     if (m_draw_characters) {

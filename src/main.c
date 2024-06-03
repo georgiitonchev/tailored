@@ -64,7 +64,7 @@ int main() {
     t_set_cursor("./res/textures/pointer_b.png", 8, 6);
     t_load_texture_data_s(&s_sprite_loading_bar, "./res/textures/loading_bar.png");
     t_init_sprite(&s_sprite_loading_bar);
-    s_font = load_ttf_font("./res/fonts/Roboto-Regular.ttf", 18);
+    s_font = t_load_ttf_font("./res/fonts/Roboto-Regular.ttf", 18);
 
     set_screen(SPLASH);
 
@@ -165,7 +165,6 @@ int main() {
         // sprintf(text_fps, "%d fps", s_current_fps);
         // t_draw_text(text_fps, &s_font, 12, t_window_size().y - 12, WHITE, 0);
 
-        t_draw_scene();
         t_loop_end();
     }
 

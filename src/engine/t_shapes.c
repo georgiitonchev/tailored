@@ -37,35 +37,6 @@ static t_texture s_load_texture(const t_texture_data* texture_data) {
   return texture;
 }
 
-GLuint s_line_vao;
-GLuint s_line_vbo;
-
-unsigned int s_line_shader_program;
-
-static void s_init_line_renderer() {
-
-    float lineVertices[] = {
-    -0.5f, -0.5f, // Vertex 1
-     0.5f,  0.5f  // Vertex 2
-    };
-
-    glGenVertexArrays(1, &s_line_vao);
-    glGenBuffers(1, &s_line_vbo);
-
-    glBindVertexArray(s_line_vao);
-
-    glBindBuffer(GL_ARRAY_BUFFER, s_line_vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(lineVertices), lineVertices, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
-
-    s_line_shader_program = t_create_shader_program("./res/shaders/line_shader.vs", "./res/shaders/line_shader.fs");
-}
-
 void t_init_shapes_renderer() {
 
     unsigned char white_pixel[] = { 255, 255, 255, 255 };
@@ -103,8 +74,6 @@ void t_init_shapes_renderer() {
     s_white_border_rectangle_sprite.scale = (t_vec2){ 1, 1 };
     s_white_border_rectangle_sprite.texture_slice = (t_vec4){ 0, 0, s_white_border_rectangle_sprite.texture_data.width, s_white_border_rectangle_sprite.texture_data.height };
     s_white_border_rectangle_sprite.slice_borders = VEC4_ONE;
-
-    //s_init_line_renderer();
 }
 
 bool is_point_in_rect(t_vec2 point, t_rect rect) {
@@ -148,16 +117,4 @@ void draw_line(int x_from, int y_from, int x_to, int y_to, float width, t_color 
     float angle = t_vec2_angle(from, to);
 
     t_draw_sprite_rot(&s_white_rectangle_sprite, x_from, y_from, angle, distance, width, color);
-
 }
-
-// void draw_line(int x_from, int y_from, int x_to, int y_to, t_color color) {
-
-//     glUseProgram(s_line_shader_program);
-//     glUniform4fv(glGetUniformLocation(s_line_shader_program, "u_color"), 1,
-//                 (vec4){color.r / 255.0, color.g / 255.0, color.b / 255.0, color.a / 255.0});
-
-//     glBindVertexArray(s_line_vao);
-//     glDrawArrays(GL_LINES, 0, 2);
-//     glBindVertexArray(0);
-// }

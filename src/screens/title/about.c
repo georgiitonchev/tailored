@@ -57,7 +57,7 @@ void load_section_about() {
 
 void init_section_about() {
 
-    s_font_ui_s = load_ttf_font("./res/fonts/Eczar-Regular.ttf", 32);
+    s_font_ui_s = t_load_ttf_font("./res/fonts/Eczar-Regular.ttf", 32);
 
     t_init_sprite(&s_sprite_section_background);
     s_sprite_section_background.slice_borders = (t_vec4){ 16, 16, 16, 16 };
@@ -72,7 +72,7 @@ void init_section_about() {
     s_button_slider_knob.color_clicked = CC_DARK_RED;
     s_button_slider_knob.on_pressed = s_on_slider_knob_button_pressed;
 
-    s_text_height = measure_text_size_w(s_text_about, &s_font_ui_s, CC_UI_SECTION_RECT.w - 32).y;
+    s_text_height = t_measure_text_size_w(s_text_about, &s_font_ui_s, CC_UI_SECTION_RECT.w - 32).y;
     t_log_debug("Text height: %f", s_text_height);
 }
 
@@ -123,5 +123,5 @@ void unload_section_about() {
     t_deinit_sprite(&s_sprite_small_knob);
     t_deinit_sprite(&s_sprite_big_knob);
 
-    delete_ttf_font(&s_font_ui_s);
+    t_delete_ttf_font(&s_font_ui_s);
 }

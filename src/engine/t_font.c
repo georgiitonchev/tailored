@@ -18,7 +18,7 @@ static t_texture font_texture;
 
 static mat4 s_mat4_projection;
 
-static float bake_font_bitmap(stbtt_fontinfo *font_info,
+static float s_bake_font_bitmap(stbtt_fontinfo *font_info,
                                 float pixel_height,                     // height of font in pixels
                                 unsigned char *pixels, int pw, int ph,  // bitmap to be filled in
                                 int first_char, int num_chars,          // characters to bake
@@ -64,7 +64,7 @@ static float bake_font_bitmap(stbtt_fontinfo *font_info,
 }
 
 
-static void init_quad() {
+static void s_init_quad() {
   // configure VAO/VBO
   unsigned int vertex_buffer_object;
 
@@ -87,7 +87,7 @@ static void init_quad() {
   glBindVertexArray(0);
 }
 
-static void init_shader() {
+static void s_init_shader() {
   font_shader = t_create_shader_program("./res/shaders/font_shader.vs",
                                         "./res/shaders/font_shader.fs");
 }
@@ -137,7 +137,7 @@ static t_vec4 s_get_character(char character) {
   return slice;
 }
 
-t_font load_ttf_font(const char* path, unsigned int font_size) {
+t_font t_load_ttf_font(const char* path, unsigned int font_size) {
 
   t_font font = { 0 };
   font.characters = malloc(96 * sizeof(t_font_character));
@@ -153,7 +153,7 @@ t_font load_ttf_font(const char* path, unsigned int font_size) {
   if (!stbtt_InitFont(&font_info, file_data, 0))
     printf("Eror initializing font. \n");
 
-  float scale = bake_font_bitmap(&font_info, font_size, bitmap_data, 512, 512, 32, 96, font.characters);
+  float scale = s_bake_font_bitmap(&font_info, font_size, bitmap_data, 512, 512, 32, 96, font.characters);
 
   int font_ascent = 0;
   int font_descent = 0;
@@ -174,29 +174,25 @@ t_font load_ttf_font(const char* path, unsigned int font_size) {
   return font;
 }
 
-void delete_ttf_font(t_font* font) {
+void t_delete_ttf_font(t_font* font) {
   free(font->characters);
   t_free_texture(&font->bitmap);
 }
 
 void t_init_font_renderer() {
-    init_quad();
-    init_shader();
+    s_init_quad();
+    s_init_shader();
 
     glm_ortho(0, 640, 360, 0, 0.0, 1.0, s_mat4_projection);
 
     font_texture = t_load_texture("./res/textures/font.png");
 }
 
-void terminate_font_renderer() {
+void t_terminate_font_renderer() {
     t_free_texture(&font_texture);
 }
 
-t_vec2 measure_text_size(const char* text, int size) {
-    return (t_vec2) { size * strlen(text), size };
-}
-
-t_vec2 measure_text_size_ttf(const char* text, t_font* font) {
+t_vec2 t_measure_text_size(const char* text, t_font* font) {
 
   t_vec2 size = VEC2_ZERO;
 
@@ -213,7 +209,7 @@ t_vec2 measure_text_size_ttf(const char* text, t_font* font) {
   return size;
 }
 
-t_vec2 measure_text_size_w(const char* text, t_font* font, int max_width) {
+t_vec2 t_measure_text_size_w(const char* text, t_font* font, int max_width) {
 
   t_vec2 size = VEC2_ZERO;
 
